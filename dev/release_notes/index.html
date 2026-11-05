@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -27,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/css/pydicom.css?v=0f9d927c" />
@@ -41,10 +40,10 @@
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
     <script src="../_static/documentation_options.js?v=d3077db3"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
@@ -55,7 +54,7 @@
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'release_notes/index';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.21.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.24.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -69,6 +68,7 @@
     <link rel="next" title="3.1.0" href="v3.1.0.html" />
     <link rel="prev" title="pydicom.uid.XRayRadiofluoroscopicImageStorage" href="../reference/generated/pydicom.uid.XRayRadiofluoroscopicImageStorage.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="3.1.0.dev0" />
   
@@ -118,7 +118,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -196,7 +196,7 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+  <a class="nav-link nav-internal" href="#" aria-current="page">
     Releases
   </a>
 </li>
@@ -212,7 +212,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
         </div>
@@ -241,15 +241,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -286,14 +286,14 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
     </div>
   
 
   
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page" aria-expanded="false" aria-controls="pst-secondary-sidebar-modal">
       <span class="fa-solid fa-outdent"></span>
     </button>
   
@@ -307,7 +307,7 @@
       
       
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
@@ -359,7 +359,7 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+  <a class="nav-link nav-internal" href="#" aria-current="page">
     Releases
   </a>
 </li>
@@ -397,15 +397,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -512,7 +512,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Releases</span></li>
@@ -578,17 +578,31 @@ datasets with more than 2**31 - 1 bytes (<a class="extlink-issue reference exter
 values with VRs supporting only ASCII characters (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2243">#2243</a>).</p></li>
 <li><p>Correctly handle empty values represented as empty strings in json while converting them
 to a dataset (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2221">#2221</a>).</p></li>
+<li><p>Correctly handle empty components of multi-valued <strong>DS</strong> and <strong>IS</strong> elements when
+converting to and from JSON.</p></li>
 <li><p>Correctly handle empty LUT data (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2238">#2238</a>).</p></li>
 <li><p>Fixed data in the “unused” bits above <em>Bits Stored</em> sometimes being included in the returned
 pixel data for JPEG 2000 and JPEG-LS (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2260">#2260</a>).</p></li>
 <li><p>Correctly handle meta data tags incorrectly written in implicit transfer syntax (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2290">#2290</a>)</p></li>
 <li><p>Made debugging of <a class="reference internal" href="../reference/generated/pydicom.filereader.read_dataset.html#pydicom.filereader.read_dataset" title="pydicom.filereader.read_dataset"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_dataset()</span></code></a> a bit more robust (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/2292">#2292</a>).</p></li>
 <li><p>Fixed deepcopy of private blocks in <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2294">#2294</a>)</p></li>
+<li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.private_block" title="pydicom.dataset.Dataset.private_block"><code class="xref py py-meth docutils literal notranslate"><span class="pre">private_block()</span></code></a> returning an outdated block
+after the private creator was removed using <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pop" title="pydicom.dataset.Dataset.pop"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pop()</span></code></a>,
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.popitem" title="pydicom.dataset.Dataset.popitem"><code class="xref py py-meth docutils literal notranslate"><span class="pre">popitem()</span></code></a> or <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.clear" title="pydicom.dataset.Dataset.clear"><code class="xref py py-meth docutils literal notranslate"><span class="pre">clear()</span></code></a>,
+or replaced by a different private creator. New private elements could be added
+without a private creator element.</p></li>
 <li><p>Make float data elements with <cite>NaN</cite> value compare as equal - this is semantically better suited
 then the mathematical comparison, where <cite>NaN != NaN</cite> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2273">#2273</a>)</p></li>
 <li><p>Fixed fileset-uid-property-annotation with Python 3.14 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2358">#2358</a>)</p></li>
 <li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.compress" title="pydicom.dataset.Dataset.compress"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compress()</span></code></a> silently producing byte swapped pixel
 data when the source dataset uses <em>Explicit VR Big Endian</em> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2340">#2340</a>).</p></li>
+<li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.pixels.apply_voi.html#pydicom.pixels.apply_voi" title="pydicom.pixels.apply_voi"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_voi()</span></code></a> and <a class="reference internal" href="../reference/generated/pydicom.pixels.apply_modality_lut.html#pydicom.pixels.apply_modality_lut" title="pydicom.pixels.apply_modality_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_modality_lut()</span></code></a>
+wrapping out-of-range LUT indices instead of clamping them to the last entry
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2381">#2381</a>).</p></li>
+<li><p>Fixed compression of packed one-bit pixel data stored as <em>OW</em> with
+<em>Explicit VR Big Endian</em> byte ordering, including frames ending within a byte or word.</p></li>
+<li><p>Fixed decoding text with <em>ISO 2022</em> escape sequences for <em>ISO_IR 58</em> (GB2312) character
+sets (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2383">#2383</a>).</p></li>
 </ul>
 </section>
 <section id="enhancements">
@@ -628,6 +642,8 @@ ambiguous VR correction fails during writing due to an invalid value length (<a 
 <a class="reference internal" href="../reference/generated/pydicom.pixels.convert_color_space.html#pydicom.pixels.convert_color_space" title="pydicom.pixels.convert_color_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code></a> where applicable (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2228">#2228</a>)</p></li>
 <li><p>Take the color space information from an Adobe APP14 marker into account when decoding
 pixel data for JPEG transfer syntaxes.</p></li>
+<li><p>Warn when multiples of the same element are found within a dataset or sequence item
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2420">#2420</a>).</p></li>
 </ul>
 </section>
 </section>
@@ -678,7 +694,7 @@ for 32-bit systems (<a class="extlink-issue reference external" href="https://gi
 <a class="reference internal" href="../reference/generated/pydicom.data.get_testdata_files.html#pydicom.data.get_testdata_files" title="pydicom.data.get_testdata_files"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_testdata_files()</span></code></a>
 now raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> if called with an absolute path or pattern.</p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.uid.generate_uid.html#pydicom.uid.generate_uid" title="pydicom.uid.generate_uid"><code class="xref py py-func docutils literal notranslate"><span class="pre">generate_uid()</span></code></a> has been changed to use a random suffix
-generated using <a class="reference external" href="https://docs.python.org/3/library/secrets.html#secrets.randbelow" title="(in Python v3.14)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randbelow()</span></code></a> when <cite>entropy_srcs</cite> isn’t used, and
+generated using <a class="reference external" href="https://docs.python.org/3/library/secrets.html#secrets.randbelow" title="(in Python v3.15)"><code class="xref py py-func docutils literal notranslate"><span class="pre">randbelow()</span></code></a> when <cite>entropy_srcs</cite> isn’t used, and
 the maximum allowed length of the <cite>prefix</cite> has been changed to 54 characters
 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1773">#1773</a>).</p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement.VM" title="pydicom.dataelem.DataElement.VM"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DataElement.VM</span></code></a> always returns <code class="docutils literal notranslate"><span class="pre">1</span></code>
@@ -693,7 +709,7 @@ method will now raise an exception if the user tries to convert between little
 and big endian datasets. If this is something you need, use
 <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a> instead.</p></li>
 <li><p>Added the <cite>overwrite</cite> argument to <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.save_as" title="pydicom.dataset.Dataset.save_as"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.save_as()</span></code></a>
-and <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a> to allow raising a <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#FileExistsError" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileExistsError</span></code></a>
+and <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a> to allow raising a <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#FileExistsError" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileExistsError</span></code></a>
 if trying to write to a file that already exists (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2104">#2104</a>).</p></li>
 <li><p><cite>implicit_vr</cite>, <cite>little_endian</cite> and <cite>force_encoding</cite> optional arguments
 added to  <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a>.</p></li>
@@ -845,9 +861,9 @@ fragments.</p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.encaps.get_frame.html#pydicom.encaps.get_frame" title="pydicom.encaps.get_frame"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_frame()</span></code></a> for returning the specific encapsulated frame at <cite>index</cite>
 without necessarily having to read the preceding frames into memory.</p></li>
 </ul>
-<p>These new functions support reading encapsulated data from both <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#bytes" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>
+<p>These new functions support reading encapsulated data from both <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#bytes" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>
 or any Python object with <code class="docutils literal notranslate"><span class="pre">read()</span></code>, <code class="docutils literal notranslate"><span class="pre">seek()</span></code> and <code class="docutils literal notranslate"><span class="pre">tell()</span></code> methods such
-as <a class="reference external" href="https://docs.python.org/3/library/io.html#io.BytesIO" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">io.BytesIO</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryIO</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/mmap.html#mmap.mmap" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">mmap.mmap</span></code></a>.
+as <a class="reference external" href="https://docs.python.org/3/library/io.html#io.BytesIO" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">io.BytesIO</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryIO</span></code></a> or <a class="reference external" href="https://docs.python.org/3/library/mmap.html#mmap.mmap" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">mmap.mmap</span></code></a>.
 They also support using the <a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.7.6.3.html#sect_C.7.6.3.1.8">Extended Offset Table</a> for determining frame boundaries.</p>
 </li>
 <li><p>Added the <cite>keep_deferred</cite> keyword argument to <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.get_item" title="pydicom.dataset.Dataset.get_item"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.get_item()</span></code></a> to allow accessing the file offset and
@@ -908,7 +924,7 @@ for applying ICC profiles to an <a class="reference external" href="https://nump
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.update_raw_element" title="pydicom.dataset.Dataset.update_raw_element"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.update_raw_element()</span></code></a>
 to make it easier to modify a <a class="reference internal" href="../reference/generated/pydicom.dataelem.RawDataElement.html#pydicom.dataelem.RawDataElement" title="pydicom.dataelem.RawDataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawDataElement</span></code></a>’s VR or value
 prior to conversion to a <a class="reference internal" href="../reference/generated/pydicom.dataelem.DataElement.html#pydicom.dataelem.DataElement" title="pydicom.dataelem.DataElement"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataElement</span></code></a> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1739">#1739</a>).</p></li>
-<li><p>Added support for using <a class="reference external" href="https://docs.python.org/3/library/io.html#io.BufferedIOBase" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">io.BufferedIOBase</span></code></a> subclasses to set the value for
+<li><p>Added support for using <a class="reference external" href="https://docs.python.org/3/library/io.html#io.BufferedIOBase" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">io.BufferedIOBase</span></code></a> subclasses to set the value for
 elements with O* VRs such as <strong>OB</strong> and <strong>OW</strong> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1913">#1913</a>).</p></li>
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate_buffer.html#pydicom.encaps.encapsulate_buffer" title="pydicom.encaps.encapsulate_buffer"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_buffer()</span></code></a> and
 <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate_extended_buffer.html#pydicom.encaps.encapsulate_extended_buffer" title="pydicom.encaps.encapsulate_extended_buffer"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_extended_buffer()</span></code></a> for encapsulating buffered
@@ -935,7 +951,7 @@ when the J2K stream disagrees with the dataset and
 <li><p>Fixed a possible security issue with <a class="reference internal" href="../reference/generated/pydicom.fileset.FileInstance.html#pydicom.fileset.FileInstance" title="pydicom.fileset.FileInstance"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileInstance</span></code></a> instances
 being able to escape the temporary directory when being added to a
 <a class="reference internal" href="../reference/generated/pydicom.fileset.FileSet.html#pydicom.fileset.FileSet" title="pydicom.fileset.FileSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileSet</span></code></a> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1922">#1922</a>).</p></li>
-<li><p>Fixed an <code class="docutils literal notranslate"><span class="pre">AttributeError</span></code> when running <a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.14)"><code class="xref py py-func docutils literal notranslate"><span class="pre">deepcopy()</span></code></a> after
+<li><p>Fixed an <code class="docutils literal notranslate"><span class="pre">AttributeError</span></code> when running <a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.15)"><code class="xref py py-func docutils literal notranslate"><span class="pre">deepcopy()</span></code></a> after
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.update" title="pydicom.dataset.Dataset.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.update</span></code></a> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1816">#1816</a>).</p></li>
 <li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.encaps.encapsulate_extended.html#pydicom.encaps.encapsulate_extended" title="pydicom.encaps.encapsulate_extended"><code class="xref py py-func docutils literal notranslate"><span class="pre">encapsulate_extended()</span></code></a> not returning the correct
 values for odd-length frames (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1968">#1968</a>).</p></li>
@@ -959,7 +975,7 @@ the <em>Pixel Data</em> element value until after saving (<a class="extlink-issu
 <li><p>Fixed a rare issue with converting pixel data to an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> when
 <em>Bits Stored</em> is less than <em>Bits Allocated</em> and the unused bits haven’t been
 set to an appropriate value for correct interpretation of the data.</p></li>
-<li><p>Fixed a <code class="docutils literal notranslate"><span class="pre">RecursionError</span></code> when using <a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.14)"><code class="xref py py-func docutils literal notranslate"><span class="pre">copy.deepcopy()</span></code></a> with a dataset containing
+<li><p>Fixed a <code class="docutils literal notranslate"><span class="pre">RecursionError</span></code> when using <a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.15)"><code class="xref py py-func docutils literal notranslate"><span class="pre">copy.deepcopy()</span></code></a> with a dataset containing
 a private block (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2025">#2025</a>).</p></li>
 <li><p>Fixed non-unique keywords for the concept codes in <code class="docutils literal notranslate"><span class="pre">pydicom.sr</span></code> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1388">#1388</a>).</p></li>
 <li><p>Fixed keywords using Python identifiers in <code class="docutils literal notranslate"><span class="pre">pydicom.sr</span></code> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1273">#1273</a>).</p></li>
@@ -1209,7 +1225,7 @@ v3.0, use <a class="reference internal" href="../reference/generated/pydicom.fil
 <li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">write_file()</span></code> is deprecated and will be removed in
 v3.0, use <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a> instead.</p></li>
 <li><p>Data dictionaries updated to version 2021b of the DICOM Standard</p></li>
-<li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> no longer inherits from <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> no longer inherits from <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p></li>
 </ul>
 </section>
 <section id="id19">
@@ -1258,7 +1274,7 @@ from individual components of names (<code class="docutils literal notranslate">
 See <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.from_named_components" title="pydicom.valuerep.PersonName.from_named_components"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_named_components()</span></code></a> and
 <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName.from_named_components_veterinary" title="pydicom.valuerep.PersonName.from_named_components_veterinary"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_named_components_veterinary()</span></code></a>.</p></li>
 <li><p>Added support for downloading the large test files with the <a class="reference external" href="https://docs.python-requests.org/en/master/">requests</a> package in addition to
-<a class="reference external" href="https://docs.python.org/3/library/urllib.request.html#module-urllib.request" title="(in Python v3.14)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">urllib.request</span></code></a> (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1340">#1340</a>)</p></li>
+<a class="reference external" href="https://docs.python.org/3/library/urllib.request.html#module-urllib.request" title="(in Python v3.15)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">urllib.request</span></code></a> (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1340">#1340</a>)</p></li>
 <li><p>Ensured <code class="xref py py-func docutils literal notranslate"><span class="pre">convert_color_space()</span></code> uses
 32-bit floats for calculation, added <cite>per_frame</cite> flag to allow frame-by-frame
 processing and improved the speed by ~20-60% (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1348">#1348</a>)</p></li>
@@ -1293,7 +1309,7 @@ after the sequence had been read (<a class="extlink-issue reference external" hr
 encoding, and sequences with VR <strong>UN</strong> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1312">#1312</a>)</p></li>
 <li><p>Do not load external data sources until needed - fixes problems with
 standard workflow if <cite>setuptools</cite> are not installed (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1341">#1341</a>)</p></li>
-<li><p>Fixed empty <strong>PN</strong> elements read from file being <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> rather than
+<li><p>Fixed empty <strong>PN</strong> elements read from file being <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> rather than
 <a class="reference internal" href="../reference/generated/pydicom.valuerep.PersonName.html#pydicom.valuerep.PersonName" title="pydicom.valuerep.PersonName"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonName</span></code></a> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1338">#1338</a>)</p></li>
 <li><p>Fixed handling of JPEG (10918-1) images compressed using RGB colourspace
 rather than YBR with the Pillow pixel data handler (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/878">#878</a>)</p></li>
@@ -1375,7 +1391,7 @@ customizing the behavior when a camel case variable name is used that isn’t
 a known element keyword (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1014">#1014</a>)</p></li>
 <li><p>Added <a class="reference internal" href="../reference/generated/pydicom.config.INVALID_KEY_BEHAVIOR.html#pydicom.config.INVALID_KEY_BEHAVIOR" title="pydicom.config.INVALID_KEY_BEHAVIOR"><code class="xref py py-attr docutils literal notranslate"><span class="pre">INVALID_KEY_BEHAVIOR</span></code></a> config option to allow
 customizing the behavior when an invalid key is used with the
-<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__contains__" title="(in Python v3.14)"><code class="xref py py-func docutils literal notranslate"><span class="pre">in</span></code></a> operator
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> <a class="reference external" href="https://docs.python.org/3/library/operator.html#operator.__contains__" title="(in Python v3.15)"><code class="xref py py-func docutils literal notranslate"><span class="pre">in</span></code></a> operator
 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1200">#1200</a>)</p></li>
 <li><p>Implemented full support (loading, accessing, modifying, writing) of
 DICOM File-sets and their DICOMDIR files via the
@@ -1464,7 +1480,7 @@ pixel data to avoid erroring out on embedded sequence delimiter
 connection is available (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/1156">#1156</a>)</p></li>
 <li><p>Fixed GDCM &lt; v2.8.8 not returning the pixel array for datasets not read from
 a file-like (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1153">#1153</a>)</p></li>
-<li><p>Raise <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#TypeError" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeError</span></code></a> if <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> or
+<li><p>Raise <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#TypeError" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeError</span></code></a> if <a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> or
 <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a> is called with wrong argument</p></li>
 <li><p>Gracefully handle empty Specific Character Set (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1190">#1190</a>)</p></li>
 <li><p>Fixed empty ambiguous VR elements raising an exception (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/1193">#1193</a>)</p></li>
@@ -2356,7 +2372,7 @@ information (r67)</p></li>
             
             
               
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <dialog id="pst-secondary-sidebar-modal" tabindex="-1"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
@@ -2528,8 +2544,8 @@ information (r67)</p></li>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -2550,7 +2566,6 @@ information (r67)</p></li>
 
   <p class="sphinx-version">
     Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
-    <br/>
   </p>
 </div>
       
@@ -2563,7 +2578,7 @@ information (r67)</p></li>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>

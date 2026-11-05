@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -27,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=75c7c72ae941e8b558d8" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/pydicom.css?v=0f9d927c" />
@@ -41,10 +40,10 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8" />
 
     <script src="../../_static/documentation_options.js?v=d3077db3"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -55,7 +54,7 @@
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'guides/decoding/decoder_options';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.21.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.24.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -69,6 +68,7 @@
     <link rel="next" title="Pixel Data Decoder Plugins" href="decoder_plugins.html" />
     <link rel="prev" title="Pixel Data decoding options and plugins" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="3.1.0.dev0" />
   
@@ -118,7 +118,7 @@
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation" aria-expanded="false" aria-controls="pst-primary-sidebar-modal">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -212,7 +212,7 @@
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
         </div>
@@ -241,15 +241,15 @@
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -286,14 +286,14 @@
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
     </div>
   
 
   
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page" aria-expanded="false" aria-controls="pst-secondary-sidebar-modal">
       <span class="fa-solid fa-outdent"></span>
     </button>
   
@@ -307,7 +307,7 @@
       
       
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <dialog id="pst-primary-sidebar-modal" tabindex="-1"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
 
@@ -397,15 +397,15 @@
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
-    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
-    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
-    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -446,7 +446,7 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Pixel Data Decoder Options</a></li>
+<li class="toctree-l1 current active"><a aria-current="page" class="current reference internal" href="#">Pixel Data Decoder Options</a></li>
 <li class="toctree-l1"><a class="reference internal" href="decoder_plugins.html">Pixel Data Decoder Plugins</a></li>
 </ul>
 </div>
@@ -485,7 +485,7 @@
     
     <li class="breadcrumb-item breadcrumb-home">
       <a href="../../index.html" class="nav-link" aria-label="Home">
-        <i class="fa-solid fa-home"></i>
+        <i class="fa-solid fa-house"></i>
       </a>
     </li>
     
@@ -525,7 +525,7 @@
 <li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_array" title="pydicom.pixels.decoders.base.Decoder.as_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_array()</span></code></a></p></li>
 <li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_array" title="pydicom.pixels.decoders.base.Decoder.iter_array"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_array()</span></code></a></p></li>
 </ul>
-<p>When decoding to a buffer (such as <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#bytes" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#bytearray" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a> or <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#memoryview" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">memoryview</span></code></a>):</p>
+<p>When decoding to a buffer (such as <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#bytes" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a>, <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#bytearray" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytearray</span></code></a> or <a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#memoryview" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">memoryview</span></code></a>):</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.as_buffer" title="pydicom.pixels.decoders.base.Decoder.as_buffer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.as_buffer()</span></code></a></p></li>
 <li><p><a class="reference internal" href="../../reference/generated/pydicom.pixels.decoders.base.Decoder.html#pydicom.pixels.decoders.base.Decoder.iter_buffer" title="pydicom.pixels.decoders.base.Decoder.iter_buffer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Decoder.iter_buffer()</span></code></a></p></li>
@@ -549,47 +549,47 @@ is a <a class="reference internal" href="../../reference/generated/pydicom.datas
 </thead>
 <tbody>
 <tr class="row-odd"><td><p><cite>rows</cite></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p>(0028,0010)</p></td>
 <td><p><em>Rows</em></p></td>
 <td><p>The number of <a class="reference internal" href="../glossary.html#rows"><span class="std std-ref">rows</span></a> in <cite>src</cite></p></td>
 </tr>
 <tr class="row-even"><td><p><cite>columns</cite></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p>(0028,0011)</p></td>
 <td><p><em>Columns</em></p></td>
 <td><p>The number of <a class="reference internal" href="../glossary.html#columns"><span class="std std-ref">columns</span></a> in <cite>src</cite></p></td>
 </tr>
 <tr class="row-odd"><td><p><cite>number_of_frames</cite></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p>(0028,0008)</p></td>
 <td><p><em>Number
 of Frames</em></p></td>
 <td><p>The <a class="reference internal" href="../glossary.html#number-of-frames"><span class="std std-ref">number of frames</span></a> in <cite>src</cite></p></td>
 </tr>
 <tr class="row-even"><td><p><cite>samples_per_pixel</cite></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p>(0028,0002)</p></td>
 <td><p><em>Samples
 Per Pixel</em></p></td>
 <td><p>The number of <a class="reference internal" href="../glossary.html#samples-per-pixel"><span class="std std-ref">samples per pixel</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p><cite>bits_allocated</cite></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p>(0028,0100)</p></td>
 <td><p><em>Bits
 Allocated</em></p></td>
 <td><p>The number of bits used to <a class="reference internal" href="../glossary.html#bits-allocated"><span class="std std-ref">contain each pixel</span></a></p></td>
 </tr>
 <tr class="row-even"><td><p><cite>bits_stored</cite></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p>(0028,0101)</p></td>
 <td><p><em>Bits Stored</em></p></td>
 <td><p>Required if <cite>pixel_keyword</cite> is <code class="docutils literal notranslate"><span class="pre">'PixelData'</span></code>, the
 number of bits actually <a class="reference internal" href="../glossary.html#bits-stored"><span class="std std-ref">used by each pixel</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p><cite>photometric_interpretation</cite></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td><p>(0028,0004)</p></td>
 <td><p><em>Photometric
 Interpretation</em></p></td>
@@ -597,7 +597,7 @@ Interpretation</em></p></td>
 of the encoded pixel data</p></td>
 </tr>
 <tr class="row-even"><td><p><cite>pixel_representation</cite></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p>(0028,0103)</p></td>
 <td><p><em>Pixel
 Representation</em></p></td>
@@ -605,7 +605,7 @@ Representation</em></p></td>
 whether the pixels are <a class="reference internal" href="../glossary.html#pixel-representation"><span class="std std-ref">signed or unsigned</span></a></p></td>
 </tr>
 <tr class="row-odd"><td><p><cite>planar_configuration</cite></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p></td>
 <td><p>(0028,0006)</p></td>
 <td><p><em>Planar
 Configuration</em></p></td>
@@ -613,7 +613,7 @@ Configuration</em></p></td>
 encoding order</span></a></p></td>
 </tr>
 <tr class="row-even"><td><p><cite>pixel_keyword</cite></p></td>
-<td><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
+<td><p><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p></td>
 <td colspan="2"></td>
 <td><p>Required if <cite>src</cite> uses a <a class="reference internal" href="../glossary.html#transfer-syntax"><span class="std std-ref">native transfer syntax</span></a>, the keyword of the element containing
 the pixel data. One of <code class="docutils literal notranslate"><span class="pre">'PixelData'</span></code>,
@@ -628,12 +628,12 @@ the pixel data. One of <code class="docutils literal notranslate"><span class="p
 <p>The following options may be used with any transfer syntax for controlling the
 processing applied after decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
 <ul class="simple">
-<li><p><cite>as_rgb</cite>: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then convert pixel data with a
+<li><p><cite>as_rgb</cite>: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) then convert pixel data with a
 <a class="reference internal" href="../glossary.html#photometric-interpretation"><span class="std std-ref">photometric interpretation</span></a> of <code class="docutils literal notranslate"><span class="pre">&quot;YBR_FULL&quot;</span></code>,
 <code class="docutils literal notranslate"><span class="pre">&quot;YBR_FULL_422&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;YBR_PARTIAL_420&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;YBR_PARTIAL_422&quot;</span></code> to RGB.</p></li>
-<li><p><cite>force_rgb</cite>: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> then force a YBR_FULL to RGB color space
+<li><p><cite>force_rgb</cite>: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> then force a YBR_FULL to RGB color space
 conversion on the array (default <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
-<li><p><cite>force_ybr</cite>: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> then force an RGB to YBR_FULL color space
+<li><p><cite>force_ybr</cite>: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> then force an RGB to YBR_FULL color space
 conversion on the array (default <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
 </ul>
 </section>
@@ -642,7 +642,7 @@ conversion on the array (default <code class="docutils literal notranslate"><spa
 <p>The following options may be used with both native (uncompressed) and encapsulated
 (compressed) transfer syntaxes when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
 <ul class="simple">
-<li><p><cite>correct_unused_bits</cite>: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) and <em>Bits Stored</em>
+<li><p><cite>correct_unused_bits</cite>: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) and <em>Bits Stored</em>
 doesn’t equal <em>Bits Allocated</em> then apply bit-shifting operations to correct
 for any misinterpretation due to the unused bits. For example, if <em>Bits Stored</em>
 is 5 and <em>Bits Allocated</em> is 8 then the 3 most significant bits are unused.
@@ -656,7 +656,7 @@ produce the correct interpretation.</p></li>
 (compressed) transfer syntaxes when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> or
 buffer-like object:</p>
 <ul class="simple">
-<li><p><cite>allow_excess_frames</cite>: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) and <cite>src</cite> contains
+<li><p><cite>allow_excess_frames</cite>: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default) and <cite>src</cite> contains
 more frames of data than given by the value of (0028,0008) <em>Number of Frames</em> then
 include those extra frames in the returned data, otherwise return only the number
 of frames given by <em>Number of Frames</em>.</p></li>
@@ -664,7 +664,7 @@ of frames given by <em>Number of Frames</em>.</p></li>
 <p>The following options may be used with native (uncompressed) transfer syntaxes
 when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
 <ul class="simple">
-<li><p><cite>view_only</cite>: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> and <cite>src</cite> is a
+<li><p><cite>view_only</cite>: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> and <cite>src</cite> is a
 <a class="reference internal" href="../../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset" title="pydicom.dataset.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> or buffer-like then make a best effort
 attempt to return an <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a> that’s a <a class="reference external" href="https://numpy.org/doc/stable/user/basics.copies.html#view">view</a> on the original
 buffer (default <code class="docutils literal notranslate"><span class="pre">False</span></code>). Note that if the original buffer is immutable then
@@ -673,10 +673,10 @@ the returned <a class="reference external" href="https://numpy.org/doc/stable/re
 <p>The following options may be used with encapsulated (compressed) transfer syntaxes
 of the corresponding type when decoding to a NumPy <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>:</p>
 <ul class="simple">
-<li><p><cite>apply_jls_sign_correction</cite>: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), <cite>src</cite> contains
+<li><p><cite>apply_jls_sign_correction</cite>: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), <cite>src</cite> contains
 JPEG-LS compressed pixel data and the pixel representation is 1, then convert
 the raw decoded pixel values from unsigned to signed integers.</p></li>
-<li><p><cite>apply_j2k_sign_correction</cite>: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), <cite>src</cite> contains
+<li><p><cite>apply_j2k_sign_correction</cite>: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a> - if <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), <cite>src</cite> contains
 JPEG 2000 compressed pixel data and the pixel representation doesn’t match the
 signedness given in the JPEG 2000 codestream, then convert the raw decoded
 pixel values to match the pixel representation.</p></li>
@@ -768,7 +768,7 @@ big endian systems (default)</p></td>
             
             
               
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <dialog id="pst-secondary-sidebar-modal" tabindex="-1"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
@@ -804,8 +804,8 @@ big endian systems (default)</p></td>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=75c7c72ae941e8b558d8"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=75c7c72ae941e8b558d8"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -826,7 +826,6 @@ big endian systems (default)</p></td>
 
   <p class="sphinx-version">
     Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
-    <br/>
   </p>
 </div>
       
@@ -839,7 +838,7 @@ big endian systems (default)</p></td>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.24.0.
 </p></div>
       
     </div>
