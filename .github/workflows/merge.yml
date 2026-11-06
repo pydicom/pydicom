@@ -30,6 +30,11 @@ jobs:
             test-numpy: true
             test-extras: true
             upload-coverage: false
+          - os: ubuntu
+            python-version: "3.15"
+            test-numpy: true
+            test-extras: true
+            upload-coverage: false
           - os: macos
             python-version: "3.12"
             test-numpy: true
