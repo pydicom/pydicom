@@ -384,7 +384,8 @@ class RecordNode(Iterable["RecordNode"]):
                     (root_path / path).resolve().is_relative_to(root_path)
                 ):
                     raise PermissionError(
-                        f"ReferencedFileID ('{path}') must be inside the DICOMDIR root path"
+                        f"ReferencedFileID ('{path}') must be "
+                        "inside the DICOMDIR root path"
                     )
             return path
 
@@ -2028,12 +2029,12 @@ class FileSet:
         return "\n".join(s)
 
     @property
-    def UID(self) -> UID:
+    def UID(self) -> sop.UID:
         """Return the File-set's UID."""
-        return cast(UID, self._uid)
+        return cast(sop.UID, self._uid)
 
     @UID.setter
-    def UID(self, uid: UID) -> None:
+    def UID(self, uid: sop.UID) -> None:
         """Set the File-set UID.
 
         Parameters

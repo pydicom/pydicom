@@ -1214,8 +1214,7 @@ class TestDataElementValidation:
     )
     def test_invalid_string_value(self, value, value_type, vr):
         msg = (
-            f"A value of type '{value_type}' cannot be assigned"
-            f" to a tag with VR {vr}."
+            f"A value of type '{value_type}' cannot be assigned to a tag with VR {vr}."
         )
         with pytest.warns(UserWarning, match=msg):
             DataElement(0x00410001, vr, value, validation_mode=config.WARN)
@@ -1226,10 +1225,7 @@ class TestDataElementValidation:
         "value, value_type", [(42, "int"), (complex(1, 2), "complex"), (1.45, "float")]
     )
     def test_invalid_pn_value_type(self, value, value_type):
-        msg = (
-            f"A value of type '{value_type}' cannot be assigned"
-            f" to a tag with VR PN."
-        )
+        msg = f"A value of type '{value_type}' cannot be assigned to a tag with VR PN."
         with pytest.warns(UserWarning, match=msg):
             # will raise an exception as it cannot handle these types later
             with pytest.raises(AttributeError):
@@ -1279,8 +1275,7 @@ class TestDataElementValidation:
     @pytest.mark.parametrize("vr", ("US", "SS", "UV", "SV"))
     def test_invalid_numeric_value(self, value, value_type, vr):
         msg = (
-            f"A value of type '{value_type}' cannot be assigned"
-            f" to a tag with VR {vr}."
+            f"A value of type '{value_type}' cannot be assigned to a tag with VR {vr}."
         )
         with pytest.warns(UserWarning, match=msg):
             DataElement(0x00410001, vr, value, validation_mode=config.WARN)
@@ -1293,8 +1288,7 @@ class TestDataElementValidation:
     @pytest.mark.parametrize("vr", ("FL", "FD"))
     def test_invalid_float_value(self, value, value_type, vr):
         msg = (
-            f"A value of type '{value_type}' cannot be assigned"
-            f" to a tag with VR {vr}."
+            f"A value of type '{value_type}' cannot be assigned to a tag with VR {vr}."
         )
         with pytest.warns(UserWarning, match=msg):
             DataElement(0x00410001, vr, value, validation_mode=config.WARN)
@@ -1314,10 +1308,7 @@ class TestDataElementValidation:
 
     @pytest.mark.parametrize("value", (-1, 66000))
     def test_invalid_us_value(self, value):
-        msg = (
-            "Invalid value: a value for a tag with VR US "
-            "must be between 0 and 65535."
-        )
+        msg = "Invalid value: a value for a tag with VR US must be between 0 and 65535."
         with pytest.warns(UserWarning, match=msg):
             DataElement(0x00410001, "US", value, validation_mode=config.WARN)
         with pytest.raises(ValueError, match=msg):

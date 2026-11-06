@@ -1,7 +1,6 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Tests for the 'pydicom' encoder plugin."""
 
-
 import pytest
 
 try:
@@ -477,14 +476,14 @@ class TestEncodeRLEFrame:
             b"\x40\x00\x00\x00"
             b"\x46\x00\x00\x00"
             b"\x4c\x00\x00\x00"
-        )
+        )  # fmt: skip
         header += b"\x00" * (64 - len(header))
         assert header == encoded[:64]
         assert (
             b"\x04\x00\x01\x02\x03\x04"
             b"\x04\x00\x01\x02\x03\x04"
             b"\x04\x00\x01\x02\x03\x04"
-        ) == encoded[64:]
+        ) == encoded[64:]  # fmt: skip
 
     def test_invalid_byteorder_raises(self):
         """Test big endian `src` raises an exception."""

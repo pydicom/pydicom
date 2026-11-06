@@ -1,5 +1,6 @@
 # Copyright 2008-2018 pydicom authors. See LICENSE file for details.
 """test cases for pydicom.filewriter module"""
+
 import tempfile
 from copy import deepcopy
 from datetime import date, datetime, time, timedelta, timezone
@@ -15,7 +16,7 @@ from tempfile import TemporaryFile
 from typing import cast
 import zlib
 
-from pydicom.errors import InvalidDicomError
+from pydicom.errors import BytesLengthException, InvalidDicomError
 
 try:
     import resource
@@ -117,9 +118,7 @@ def as_assertable(dataset):
     to a set that can be safely compared using pytest's assert.
     (Datasets can't be so compared because DataElements are not
     hashable.)"""
-    safe_dict = dict(
-        (f"{elem.tag} {elem.keyword}", elem.value) for elem in dataset
-    )
+    safe_dict = dict((f"{elem.tag} {elem.keyword}", elem.value) for elem in dataset)
     if hasattr(dataset, "file_meta"):
         safe_dict.update(as_assertable(dataset.file_meta))
     return safe_dict
@@ -403,8 +402,8 @@ class TestWriteDataElement:
 
         Returns
         -------
-        str or bytes
-            The encoded element as str (python2) or bytes (python3)
+        bytes
+            The encoded element
         """
         with DicomBytesIO() as fp:
             fp.is_implicit_VR = is_implicit_VR
@@ -696,8 +695,7 @@ class TestWriteDataElement:
         elem.value = "Test."
         encoded_elem = self.encode_element(elem, False, True)
         ref_bytes = (
-            b"\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00"
-            b"\x54\x65\x73\x74\x2e\x20"
+            b"\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00\x54\x65\x73\x74\x2e\x20"
         )
         assert ref_bytes == encoded_elem
 
@@ -705,8 +703,7 @@ class TestWriteDataElement:
         elem.value = ["Aa", "B", "C"]
         encoded_elem = self.encode_element(elem, False, True)
         ref_bytes = (
-            b"\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00"
-            b"\x41\x61\x5c\x42\x5c\x43"
+            b"\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00\x41\x61\x5c\x42\x5c\x43"
         )
         assert ref_bytes == encoded_elem
 
@@ -714,8 +711,7 @@ class TestWriteDataElement:
         elem.value = ["A", "B", "C"]
         encoded_elem = self.encode_element(elem, False, True)
         ref_bytes = (
-            b"\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00"
-            b"\x41\x5c\x42\x5c\x43\x20"
+            b"\x18\x00\x08\x99\x55\x43\x00\x00\x06\x00\x00\x00\x41\x5c\x42\x5c\x43\x20"
         )
         assert ref_bytes == encoded_elem
 
@@ -1363,6 +1359,18 @@ class TestCorrectAmbiguousVRElement:
         ds = dcmread(fp, force=True)
         assert ds.ModalityLUTSequence[0]["LUTDescriptor"].VR == "US"
         assert ds.ModalityLUTSequence[0]["LUTData"].VR == "OW"
+
+    def test_invalid_value_length(self):
+        """Regression test for #2168: the error message includes the tag."""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.SmallestImagePixelValue = b"\x00\x01\x02"
+        msg = (
+            r"Failed to resolve ambiguous VR for tag \(0028,0106\): Expected "
+            r"total bytes to be an even multiple of bytes per value"
+        )
+        with pytest.raises(BytesLengthException, match=msg):
+            correct_ambiguous_vr_element(ds[0x00280106], ds, True)
 
 
 class TestWriteAmbiguousVR:
@@ -2057,8 +2065,7 @@ class TestDetermineEncoding:
         ds._read_little = True
         tsyntax = ImplicitVRLittleEndian
         msg = (
-            "'implicit_vr' and 'little_endian' are required if "
-            "'force_encoding' is used"
+            "'implicit_vr' and 'little_endian' are required if 'force_encoding' is used"
         )
         with pytest.raises(ValueError, match=msg):
             _determine_encoding(ds, tsyntax, None, True, True)
@@ -2138,8 +2145,7 @@ class TestDetermineEncoding:
         """Test public non-transfer syntax raises."""
         syntax = CTImageStorage
         msg = (
-            "The Transfer Syntax UID 'CT Image Storage' is not a valid "
-            "transfer syntax"
+            "The Transfer Syntax UID 'CT Image Storage' is not a valid transfer syntax"
         )
         with pytest.raises(ValueError, match=msg):
             _determine_encoding(Dataset(), syntax, False, True, False)
@@ -3023,7 +3029,8 @@ class TestWriteText:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with invalid ASCII value
-        elem = DataElement(0x00180015, "CS", "Dionysios Διονυσιος")
+        with pytest.warns(UserWarning):
+            elem = DataElement(0x00180015, "CS", "Dionysios Διονυσιος")
         msg = "Not a valid ASCII string - using replacement characters"
         with pytest.warns(UserWarning, match=msg):
             write_string(fp, elem)
@@ -3047,6 +3054,7 @@ class TestWriteText:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
+
         elem = DataElement(0x00081039, "LO", "Dionysios Διονυσιος")
         with pytest.raises(UnicodeEncodeError, match=msg):
             # encode with two invalid encodings
@@ -3055,7 +3063,8 @@ class TestWriteText:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with invalid ASCII value
-        elem = DataElement(0x00180015, "CS", "Dionysios Διονυσιος")
+        with pytest.warns(UserWarning):
+            elem = DataElement(0x00180015, "CS", "Dionysios Διονυσιος")
         msg = (
             r"'latin-?1' codec can't encode characters in position 10-18:"
             r" ordinal not in range\(256\)"
@@ -3145,8 +3154,8 @@ class TestWriteUndefinedLengthPixelData:
     @pytest.mark.parametrize(
         "data",
         (
-            b"\xff\xff\x00\xe0" b"\x00\x01\x02\x03" b"\xfe\xff\xdd\xe0",
-            BytesIO(b"\xff\xff\x00\xe0" b"\x00\x01\x02\x03" b"\xfe\xff\xdd\xe0"),
+            b"\xff\xff\x00\xe0\x00\x01\x02\x03\xfe\xff\xdd\xe0",
+            BytesIO(b"\xff\xff\x00\xe0\x00\x01\x02\x03\xfe\xff\xdd\xe0"),
         ),
     )
     def test_little_endian_incorrect_data(self, data):
@@ -3170,8 +3179,8 @@ class TestWriteUndefinedLengthPixelData:
     @pytest.mark.parametrize(
         "data",
         (
-            b"\x00\x00\x00\x00" b"\x00\x01\x02\x03" b"\xff\xfe\xe0\xdd",
-            BytesIO(b"\x00\x00\x00\x00" b"\x00\x01\x02\x03" b"\xff\xfe\xe0\xdd"),
+            b"\x00\x00\x00\x00\x00\x01\x02\x03\xff\xfe\xe0\xdd",
+            BytesIO(b"\x00\x00\x00\x00\x00\x01\x02\x03\xff\xfe\xe0\xdd"),
         ),
     )
     def test_big_endian_incorrect_data(self, data):

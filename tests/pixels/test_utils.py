@@ -254,7 +254,7 @@ class TestPixelArray:
             "bits_allocated": EXPL_8_3_1F_YBR422.ds.BitsAllocated,
             "bits_stored": EXPL_8_3_1F_YBR422.ds.BitsStored,
             "columns": EXPL_8_3_1F_YBR422.ds.Columns,
-            "photometric_interpretation": EXPL_8_3_1F_YBR422.ds.PhotometricInterpretation,
+            "photometric_interpretation": EXPL_8_3_1F_YBR422.ds.PhotometricInterpretation,  # noqa: E501
         }
         with pytest.raises(AttributeError, match=msg):
             pixel_array(b, **opts)
@@ -264,7 +264,7 @@ class TestPixelArray:
             "bits_allocated": EXPL_8_3_1F_YBR422.ds.BitsAllocated,
             "bits_stored": EXPL_8_3_1F_YBR422.ds.BitsStored,
             "columns": EXPL_8_3_1F_YBR422.ds.Columns,
-            "photometric_interpretation": EXPL_8_3_1F_YBR422.ds.PhotometricInterpretation,
+            "photometric_interpretation": EXPL_8_3_1F_YBR422.ds.PhotometricInterpretation,  # noqa: E501
             "pixel_representation": EXPL_8_3_1F_YBR422.ds.PixelRepresentation,
         }
         with pytest.raises(AttributeError, match=msg):
@@ -275,7 +275,7 @@ class TestPixelArray:
             "bits_allocated": EXPL_8_3_1F_YBR422.ds.BitsAllocated,
             "bits_stored": EXPL_8_3_1F_YBR422.ds.BitsStored,
             "columns": EXPL_8_3_1F_YBR422.ds.Columns,
-            "photometric_interpretation": EXPL_8_3_1F_YBR422.ds.PhotometricInterpretation,
+            "photometric_interpretation": EXPL_8_3_1F_YBR422.ds.PhotometricInterpretation,  # noqa: E501
             "pixel_representation": EXPL_8_3_1F_YBR422.ds.PixelRepresentation,
             "rows": EXPL_8_3_1F_YBR422.ds.Rows,
         }
@@ -288,7 +288,7 @@ class TestPixelArray:
             "bits_stored": EXPL_8_3_1F_YBR422.ds.BitsStored,
             "columns": EXPL_8_3_1F_YBR422.ds.Columns,
             "rows": EXPL_8_3_1F_YBR422.ds.Rows,
-            "photometric_interpretation": EXPL_8_3_1F_YBR422.ds.PhotometricInterpretation,
+            "photometric_interpretation": EXPL_8_3_1F_YBR422.ds.PhotometricInterpretation,  # noqa: E501
             "samples_per_pixel": EXPL_8_3_1F_YBR422.ds.SamplesPerPixel,
             "pixel_representation": EXPL_8_3_1F_YBR422.ds.PixelRepresentation,
         }
@@ -1504,7 +1504,6 @@ REFERENCE_BINARY_PIXELS = [
 
 
 class TestGetPackedFrame:
-
     @pytest.mark.parametrize("pixels_per_frame", range(1, 25))
     @pytest.mark.parametrize("pad", [True, False])
     def test_get_packed_frame(self, pixels_per_frame, pad):
@@ -1591,7 +1590,6 @@ class TestGetPackedFrame:
 
 
 class TestConcatenatePackedFrames:
-
     @pytest.mark.parametrize("pixels_per_frame", range(1, 25))
     @pytest.mark.parametrize("pad", [True, False])
     def test_concatenate_packed_frames(self, pixels_per_frame, pad):

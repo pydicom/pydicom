@@ -17,6 +17,7 @@ from pydicom.dataelem import (
     RawDataElement,
 )
 from pydicom.dataset import Dataset, validate_file_meta, FileMetaDataset
+from pydicom.errors import BytesLengthException
 from pydicom.filebase import DicomFile, DicomBytesIO, DicomIO, WriteableBuffer
 from pydicom.fileutil import (
     path_from_pathlike,
@@ -278,6 +279,10 @@ def correct_ambiguous_vr_element(
             raise AttributeError(
                 f"Failed to resolve ambiguous VR for tag {elem.tag}: {e}"
             )
+        except BytesLengthException as e:
+            raise BytesLengthException(
+                f"Failed to resolve ambiguous VR for tag {elem.tag}: {e}"
+            )
 
     return elem
 
@@ -467,8 +472,7 @@ def _default_encoded(val: str) -> bytes:
         if config.settings.writing_validation_mode == config.RAISE:
             raise
         warn_and_log(
-            "Not a valid ASCII string "
-            "- using replacement characters in encoded string"
+            "Not a valid ASCII string - using replacement characters in encoded string"
         )
         return val.encode(default_encoding, errors="replace")
 
@@ -823,8 +827,8 @@ def write_dataset(
         or dataset.original_character_set != dataset._character_set
     ):
         dataset = correct_ambiguous_vr(dataset, fp.is_little_endian)
-        # Use __getitem__ instead or get_item to force parsing of RawDataElements into DataElements,
-        # so we can re-encode them with the correct charset and encoding
+        # Use __getitem__ instead or get_item to force parsing of RawDataElements into
+        # DataElements, so we can re-encode them with the correct charset and encoding
         get_item = dataset.__getitem__
 
     dataset_encoding = cast(
@@ -1108,8 +1112,7 @@ def _determine_encoding(
 
     if not tsyntax.is_transfer_syntax:
         raise ValueError(
-            f"The Transfer Syntax UID '{tsyntax.name}' is not a valid "
-            "transfer syntax"
+            f"The Transfer Syntax UID '{tsyntax.name}' is not a valid transfer syntax"
         )
 
     # Check that supplied args match transfer syntax

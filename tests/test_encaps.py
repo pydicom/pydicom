@@ -60,7 +60,7 @@ class TestGetFrameOffsets:
             b"\xfe\xff\x00\xe0"
             b"\x0a\x00\x00\x00"
             b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a"
-        )
+        )  # fmt: skip
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         with pytest.raises(
@@ -186,7 +186,7 @@ class TestGetNrFragments:
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
             b"\xfe\xff\xdd\xe0"
-        )
+        )  # fmt: skip
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         assert 1 == self.func(fp)
@@ -313,7 +313,7 @@ class TestGeneratePixelDataFragment:
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
             b"\xfe\xff\xdd\xe0"
-        )
+        )  # fmt: skip
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         fragments = self.func(fp)
@@ -1095,7 +1095,7 @@ class TestReadItem:
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
             b"\xfe\xff\xdd\xe0"
-        )
+        )  # fmt:skip
         fp = DicomBytesIO(bytestream)
         fp.is_little_endian = True
         assert self.func(fp) == b"\x01\x00\x00\x00"
@@ -1417,7 +1417,7 @@ class TestParseBasicOffsets:
             b"\xfe\xff\x00\xe0"
             b"\x0a\x00\x00\x00"
             b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a"
-        )
+        )  # fmt: skip
         msg = "The length of the Basic Offset Table item is not a multiple of 4"
         for func in (bytes, as_bytesio):
             src = func(buffer)
@@ -1428,7 +1428,7 @@ class TestParseBasicOffsets:
             b"\xff\xfe\xe0\x00"
             b"\x00\x00\x00\x0a"
             b"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a"
-        )
+        )  # fmt: skip
         for func in (bytes, as_bytesio):
             src = func(buffer)
             with pytest.raises(ValueError, match=msg):
@@ -1665,7 +1665,7 @@ class TestParseFragments:
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
             b"\xfe\xff\xdd\xe0"
-        )
+        )  # fmt:skip
         for func in (bytes, as_bytesio):
             src = func(buffer)
             assert parse_fragments(src) == (1, [0])
@@ -1677,7 +1677,7 @@ class TestParseFragments:
             b"\x00\x00\x00\x04"
             b"\x00\x00\x00\x01"
             b"\xff\xfe\xe0\xdd"
-        )
+        )  # fmt: skip
         for func in (bytes, as_bytesio):
             src = func(buffer)
             assert parse_fragments(src, endianness=">") == (1, [0])
@@ -1898,7 +1898,7 @@ class TestGenerateFragments:
             b"\x04\x00\x00\x00"
             b"\x01\x00\x00\x00"
             b"\xfe\xff\xdd\xe0"
-        )
+        )  # fmt: skip
         for func in (bytes, as_bytesio):
             src = func(buffer)
             fragments = generate_fragments(src)
@@ -1910,7 +1910,7 @@ class TestGenerateFragments:
             b"\x00\x00\x00\x04"
             b"\x01\x00\x00\x00"
             b"\xff\xfe\xe0\xdd"
-        )
+        )  # fmt: skip
         for func in (bytes, as_bytesio):
             src = func(buffer)
             fragments = generate_fragments(src, endianness=">")

@@ -1,7 +1,6 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 """Read a dicom media file"""
 
-
 # Need zlib and io.BytesIO for deflate-compressed file
 import os
 from struct import Struct, unpack
@@ -253,7 +252,8 @@ def data_element_generator(
                     dotdot = "..." if length > 20 else "   "
                     displayed_value = value[:20] if value else b""
                     logger_debug(
-                        f"{value_tell:08x}: {bytes2hex(displayed_value):<34} {dotdot} {displayed_value!r} {dotdot}"
+                        f"{value_tell:08x}: {bytes2hex(displayed_value):<34} "
+                        f"{dotdot} {displayed_value!r} {dotdot}"
                     )
 
             # If the tag is (0008,0005) Specific Character Set, then store it
@@ -408,6 +408,42 @@ def _is_implicit_vr(
     return found_implicit
 
 
+def _warn_duplicate_elem(
+    dupe: RawDataElement | DataElement,
+    orig: RawDataElement | DataElement,
+    is_implicit_VR: bool,
+) -> None:
+    """Warn about a duplicate element found in the current dataset.
+
+    Parameters
+    ----------
+    dupe : RawDataElement | DataElement
+        The duplicate element.
+    orig : RawDataElement | DataElement
+        The original element.
+    is_implicit_VR : bool
+        ``True`` if the elements use implicit VR, ``False`` otherwise.
+    """
+    # Get the file offset to the start of the element tag
+    value_offset = 8
+    if not is_implicit_VR and dupe.VR in EXPLICIT_VR_LENGTH_32:
+        value_offset += 4
+
+    # RawDataElement uses value_tell, DataElement uses file_tell
+    attr = "value_tell" if hasattr(dupe, "value_tell") else "file_tell"
+    dupe_offset = getattr(dupe, attr) - value_offset
+    attr = "value_tell" if hasattr(orig, "value_tell") else "file_tell"
+    orig_offset = getattr(orig, attr) - value_offset
+
+    msg = (
+        f"Element {dupe.tag} found multiple times at the same level of the dataset - "
+        f"initially at offset {orig_offset} and again at offset {dupe_offset}. Having "
+        "multiples of the same element is not valid, the later instance will be "
+        "ignored."
+    )
+    warn_and_log(msg)
+
+
 def read_dataset(
     fp: BinaryIO,
     is_implicit_VR: bool,
@@ -475,13 +511,23 @@ def read_dataset(
         parent_encoding,
         specific_tags,
     )
+
     try:
         if bytelength is None:
-            raw_data_elements = {e.tag: e for e in de_gen}
+            for elem in de_gen:
+                if (tag := elem.tag) in raw_data_elements:
+                    _warn_duplicate_elem(elem, raw_data_elements[tag], is_implicit_VR)
+                    continue
+
+                raw_data_elements[tag] = elem
         else:
             while fp_tell() - fp_start < bytelength:
-                raw_data_element = next(de_gen)
-                raw_data_elements[raw_data_element.tag] = raw_data_element
+                elem = next(de_gen)
+                if (tag := elem.tag) in raw_data_elements:
+                    _warn_duplicate_elem(elem, raw_data_elements[tag], is_implicit_VR)
+                    continue
+
+                raw_data_elements[tag] = elem
     except StopIteration:
         pass
     except EOFError as details:

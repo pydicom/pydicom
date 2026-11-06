@@ -23,6 +23,7 @@ from pydicom.pixels.common import (
 from pydicom.pixels.utils import get_packed_frame
 from pydicom.uid import (
     UID,
+    ExplicitVRBigEndian,
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
     JPEGLossless,
@@ -318,7 +319,7 @@ class EncodeRunner(RunnerBase):
 
         if isinstance(src, Dataset):
             self._set_options_ds(src)
-            self._src = src.PixelData
+            self._src = self._pixel_data_as_little_endian(src)
             self._src_type = "Dataset"
         elif isinstance(src, (bytes | bytearray | memoryview)):
             self._src = src
@@ -343,9 +344,51 @@ class EncodeRunner(RunnerBase):
                 f"not '{src.__class__.__name__}'"
             )
 
+    def _pixel_data_as_little_endian(self, ds: "Dataset") -> Buffer:
+        """Return `ds`'s *Pixel Data* as little-endian ordered bytes.
+
+        Encoders require little-endian input, so *Pixel Data* read from an
+        *Explicit VR Big Endian* dataset has to be byte swapped first. Without
+        this the encoder reads every sample byte-reversed and encodes corrupt
+        pixel data without raising - a 16-bit value of 1 becomes 256.
+
+        Parameters
+        ----------
+        ds : pydicom.dataset.Dataset
+            The dataset supplying the pixel data.
+
+        Returns
+        -------
+        bytes | bytearray | memoryview
+            The pixel data, byte swapped if the dataset is big-endian encoded.
+        """
+        src = cast(Buffer, ds.PixelData)
+        file_meta = getattr(ds, "file_meta", None)
+        if getattr(file_meta, "TransferSyntaxUID", None) != ExplicitVRBigEndian:
+            return src
+
+        # OW stores packed 1-bit or 8-bit pixels in 16-bit words. Normalize
+        # the complete value before slicing frames, which may end mid-word.
+        nr_bytes = self.bits_allocated // 8
+        if self.bits_allocated in (1, 8) and ds[0x7FE00010].VR == "OW":
+            nr_bytes = 2
+        if nr_bytes < 2 or len(src) % nr_bytes:
+            return src
+
+        # Swap symmetric byte positions within each sample
+        buffer = bytearray(src)
+        for left in range(nr_bytes // 2):
+            right = nr_bytes - 1 - left
+            buffer[left::nr_bytes], buffer[right::nr_bytes] = (
+                buffer[right::nr_bytes],
+                buffer[left::nr_bytes],
+            )
+
+        return bytes(buffer)
+
     @property
     def src(self) -> "Buffer | np.ndarray":
-        """Return the buffer-like or :class:`numpy.ndarray` containing the pixel data."""
+        """Return the buffer-like or :class:`numpy.ndarray` containing the pixel data."""  # noqa: E501
         return self._src
 
     def __str__(self) -> str:
@@ -425,7 +468,8 @@ class EncodeRunner(RunnerBase):
             s = ["unsigned", "signed"][is_signed]
             raise ValueError(
                 f"The ndarray's dtype '{dtype}' is not consistent with a (0028,0103) "
-                f"'Pixel Representation' of '{self.pixel_representation}' ({s} integers)"
+                f"'Pixel Representation' of '{self.pixel_representation}' "
+                f"({s} integers)"
             )
 
         # Check the dtype's itemsize is at least as large as *Bits Allocated*

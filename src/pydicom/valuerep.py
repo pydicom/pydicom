@@ -20,13 +20,13 @@ default_encoding = "iso8859"
 
 # Delimiters for text strings and person name that reset the encoding.
 # See PS3.5, Section 6.1.2.5.3
-# Note: We use character codes for Python 3
-# because those are the types yielded if iterating over a byte string.
+# Note: We use character codes because iterating over bytes objects
+# yields integers.
 
-# Characters/Character codes for text VR delimiters: LF, CR, TAB, FF
+# Character codes for text VR delimiters: LF, CR, TAB, FF
 TEXT_VR_DELIMS = {0x0D, 0x0A, 0x09, 0x0C}
 
-# Character/Character code for PN delimiter: name part separator '^'
+# Character code for PN delimiter: name part separator '^'
 # (the component separator '=' is handled separately)
 PN_DELIMS = {0x5E}
 
@@ -614,7 +614,6 @@ class _DateTimeBase:
         self.__dict__.update(state)
 
     def __reduce_ex__(self, protocol: int) -> tuple[Any, ...]:  # type: ignore[override]
-        # Python 3.8 - protocol: SupportsIndex (added in 3.8)
         # datetime.time, and datetime.datetime return Tuple[Any, ...]
         # datetime.date doesn't define __reduce_ex__
         reduce_ex = cast(tuple[Any, ...], super().__reduce_ex__(protocol))
@@ -1088,7 +1087,7 @@ class DSfloat(float):
                     f'Value "{self}" is not valid for elements with a VR of DS'
                 )
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: Any) -> bool:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
@@ -1100,7 +1099,7 @@ class DSfloat(float):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: Any) -> bool:
         return not self == other
 
     def __str__(self) -> str:
@@ -1229,7 +1228,7 @@ class DSdecimal(Decimal):
                     raise ValueError(msg)
                 warn_and_log(msg)
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: Any) -> bool:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
@@ -1239,7 +1238,7 @@ class DSdecimal(Decimal):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: Any) -> bool:
         return not self == other
 
     def __str__(self) -> str:
@@ -1395,7 +1394,7 @@ class IS(int):
         elif isinstance(val, IS) and hasattr(val, "original_string"):
             self.original_string = val.original_string
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: Any) -> bool:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
@@ -1405,7 +1404,7 @@ class IS(int):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: Any) -> bool:
         return not self == other
 
     def __str__(self) -> str:
@@ -1670,11 +1669,11 @@ class PersonName:
         except IndexError:
             return ""
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: Any) -> bool:
         """Return ``True`` if `other` equals the current name."""
-        return str(self) == other
+        return bool(str(self) == other)
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: Any) -> bool:
         """Return ``True`` if `other` doesn't equal the current name."""
         return not self == other
 

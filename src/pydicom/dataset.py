@@ -14,6 +14,7 @@ Dataset (dict subclass)
         * A Sequence (list subclass), where each item is a Dataset which
             contains its own DataElements, and so on in a recursive manner.
 """
+
 import copy
 import io
 import json
@@ -1162,7 +1163,7 @@ class Dataset:  # noqa: PLW1641
             raise ValueError("Tag must be private if private creator is given")
 
         # find block with matching private creator
-        block = self[(group, 0x10):(group, 0x100)]  # type: ignore[misc]
+        block = self[(group, 0x10) : (group, 0x100)]  # type: ignore[misc]
         data_el = next((elem for elem in block if elem.value == private_creator), None)
         if data_el is not None:
             return new_block(data_el.tag.element)
@@ -1209,7 +1210,7 @@ class Dataset:  # noqa: PLW1641
         if group % 2 == 0:
             raise ValueError("Group must be an odd number")
 
-        block = self[(group, 0x10):(group, 0x100)]  # type: ignore[misc]
+        block = self[(group, 0x10) : (group, 0x100)]  # type: ignore[misc]
         return [x.value for x in block]
 
     def get_private_item(
@@ -1569,6 +1570,7 @@ class Dataset:  # noqa: PLW1641
     def clear(self) -> None:
         """Delete all the elements from the :class:`Dataset`."""
         self._dict.clear()
+        self._private_blocks = {}
 
     def pop(self, key: "BaseTag | TagType", *args: Any) -> _DatasetValue:
         """Emulate :meth:`dict.pop` with support for tags and keywords.
@@ -1605,7 +1607,11 @@ class Dataset:  # noqa: PLW1641
         except Exception:
             pass
 
-        return self._dict.pop(cast(BaseTag, key), *args)
+        elem: _DatasetValue = self._dict.pop(cast(BaseTag, key), *args)
+        if self._private_blocks and isinstance(key, BaseTag) and key.is_private_creator:
+            self._private_blocks = {}
+
+        return elem
 
     def popitem(self) -> tuple[BaseTag, _DatasetValue]:
         """Emulate :meth:`dict.popitem`.
@@ -1614,7 +1620,11 @@ class Dataset:  # noqa: PLW1641
         -------
         tuple of (BaseTag, DataElement)
         """
-        return self._dict.popitem()
+        tag, elem = self._dict.popitem()
+        if self._private_blocks and tag.is_private_creator:
+            self._private_blocks = {}
+
+        return tag, elem
 
     def setdefault(self, key: TagType, default: Any | None = None) -> DataElement:
         """Emulate :meth:`dict.setdefault` with support for tags and keywords.
@@ -2039,7 +2049,7 @@ class Dataset:  # noqa: PLW1641
             Optional keyword parameters for the encoding plugin may also be
             present. See the :doc:`encoding plugins options
             </guides/encoding/encoder_plugin_options>` for more information.
-        """
+        """  # noqa: E501
         compress(
             self,
             transfer_syntax_uid,
@@ -2836,6 +2846,10 @@ class Dataset:  # noqa: PLW1641
                         elem, encoding=self._character_set, ds=self
                     )
                 elem.private_creator = self[private_creator_tag].value
+
+        # invalidate private blocks in case a private creator is replaced
+        if self._private_blocks and elem_tag.is_private_creator:
+            self._private_blocks = {}
 
         # Changing pixel data resets the stored array
         if elem_tag in PIXEL_KEYWORDS:
@@ -3720,7 +3734,8 @@ def _path_to(target: Any, node: Any) -> str | None:
     -------
     str | None:
         The path to the target object from the node.
-        During recursion, returns ``None`` if a leaf node is reached without finding target.
+        During recursion, returns ``None`` if a leaf node is reached without
+        finding target.
 
     Examples
     --------
@@ -3819,7 +3834,10 @@ def _trace_from(
             if new_elem:
                 note += "\n   with DataElement not yet assigned"
             if raw_elem:
-                note += f"\n  Converting RawDataElement(vr='{elem.VR}', value={elem.value!r}) "
+                note += (
+                    f"\n  Converting RawDataElement(vr='{elem.VR}', "
+                    f"value={elem.value!r}) "
+                )
             break
         else:
             new_elem = filename == "dataelem.py"

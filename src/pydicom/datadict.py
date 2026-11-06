@@ -225,7 +225,7 @@ def add_private_dict_entries(
         )
 
     new_entries = {
-        f"{tag >> 16:04X}xx{tag & 0xff:02X}": value
+        f"{tag >> 16:04X}xx{tag & 0xFF:02X}": value
         for tag, value in new_entries_dict.items()
     }
     private_dictionaries.setdefault(private_creator, {}).update(new_entries)
@@ -554,8 +554,7 @@ def get_private_entry(tag: TagType, private_creator: str) -> tuple[str, str, str
         ) from exc
     except TypeError as exc:
         msg = (
-            f"{tag.private_creator} '{private_creator}' "
-            f"is not a valid private creator"
+            f"{tag.private_creator} '{private_creator}' is not a valid private creator"
         )
         warn_and_log(msg)
         raise KeyError(msg) from exc

@@ -7,6 +7,7 @@ parm = "parm"
 universite = "universite"
 womens = "womens"
 observ = "observ"
+writeable = "writeable"
 
 [default]
 extend-ignore-re = [
