@@ -66,6 +66,8 @@ Fixes
   *Explicit VR Big Endian* byte ordering, including frames ending within a byte or word.
 * Fixed decoding text with *ISO 2022* escape sequences for *ISO_IR 58* (GB2312) character
   sets (:issue:`2383`).
+* Fixed :func:`~pydicom.valuerep.format_number_as_ds` returning a 17 character string
+  when rounding adds a digit before the decimal point, such as ``9.999999999999998``.
 
 Enhancements
 ------------

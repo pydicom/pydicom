@@ -451,6 +451,21 @@ class TestTruncateFloatForDS:
         """Test truncation of some basic values."""
         assert pydicom.valuerep.format_number_as_ds(val) == expected_str
 
+    @pytest.mark.parametrize(
+        "val,expected_str",
+        [
+            [9.999999999999998, "10.0000000000000"],
+            [99.99999999999997, "100.000000000000"],
+            [-99.99999999999993, "-100.00000000000"],
+            [Decimal("9.999999999999998"), "10.0000000000000"],
+        ],
+    )
+    def test_rounding_adds_a_digit(self, val: float | Decimal, expected_str: str):
+        """Test a value that rounds up to the next power of ten."""
+        s = pydicom.valuerep.format_number_as_ds(val)
+        assert s == expected_str
+        assert self.check_valid(s)
+
     @pytest.mark.parametrize("exp", [-101, -100, 100, 101] + list(range(-16, 17)))
     def test_powers_of_pi(self, exp: int):
         """Raise pi to various powers to test truncation."""
