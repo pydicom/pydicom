@@ -103,3 +103,4 @@ Enhancements
   pixel data for JPEG transfer syntaxes.
 * Warn when multiples of the same element are found within a dataset or sequence item
   (:issue:`2420`).
+* Improved memory usage for :func:`~pydicom.pixels.apply_windowing` (:pr:`2315`)
