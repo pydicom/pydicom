@@ -1041,6 +1041,33 @@ class TestCorrectAmbiguousVR:
         assert ds[0x00283002].VR == "US"
         assert ds.LUTDescriptor == [1, 0]
 
+    @pytest.mark.parametrize("implicit_vr", [True, False])
+    def test_write_lut_data_as_int_values(self, implicit_vr):
+        """Test writing LUTData set as a list of int values."""
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.ModalityLUTSequence = [Dataset()]
+        item = ds.ModalityLUTSequence[0]
+        item.LUTDescriptor = [4, 0, 16]
+        item.ModalityLUTType = "HU"
+        item.LUTData = [0, 100, 200, 65535]
+        assert item["LUTData"].VR == "US or OW"
+
+        fp = DicomBytesIO()
+        ds.save_as(fp, implicit_vr=implicit_vr)
+        assert item["LUTData"].VR == "US"
+        assert item.LUTData == [0, 100, 200, 65535]
+
+        fp.seek(0)
+        ds = dcmread(fp, force=True)
+        elem = ds.ModalityLUTSequence[0]["LUTData"]
+        if implicit_vr:
+            assert elem.VR == "OW"
+            assert elem.value == b"\x00\x00\x64\x00\xc8\x00\xff\xff"
+        else:
+            assert elem.VR == "US"
+            assert elem.value == [0, 100, 200, 65535]
+
     def dataset_with_modality_lut_sequence(self, pixel_repr):
         ds = Dataset()
         ds.PixelRepresentation = pixel_repr
