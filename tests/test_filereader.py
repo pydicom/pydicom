@@ -12,6 +12,7 @@ from struct import unpack
 import sys
 import tempfile
 import time
+import zlib
 
 import pytest
 
@@ -29,6 +30,7 @@ from pydicom.filereader import (
 from pydicom.dataelem import DataElement, convert_raw_data_element
 from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomBytesIO
+from pydicom.filewriter import write_dataset, write_file_meta_info
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag, TupleTag
@@ -288,6 +290,45 @@ class TestReader:
         assert "WSD" == ds.ConversionType
         assert isinstance(ds.buffer, DicomBytesIO)
         assert ds.filename == deflate_name
+
+    # UIDs hardcoded from PS3.5 Sections A.5, A.7 and A.12 rather than taken
+    #   from pydicom.uid so that an omission there is detectable here
+    @pytest.mark.parametrize(
+        "tsyntax",
+        [
+            "1.2.840.10008.1.2.1.99",  # Deflated Explicit VR Little Endian
+            "1.2.840.10008.1.2.4.95",  # JPIP Referenced Deflate
+            "1.2.840.10008.1.2.4.205",  # JPIP HTJ2K Referenced Deflate
+        ],
+    )
+    def test_read_deflated_syntaxes(self, tsyntax):
+        """A deflated dataset is inflated for every deflated transfer syntax."""
+        # Build the file by hand so the encoder isn't the oracle for the decoder
+        ds = Dataset()
+        ds.SOPClassUID = "1.2.840.10008.5.1.4.1.1.7"
+        ds.SOPInstanceUID = "1.2.3.4"
+        ds.PatientName = "CITIZEN^Jan"
+        buffer = DicomBytesIO()
+        buffer.is_implicit_VR = False
+        buffer.is_little_endian = True
+        write_dataset(buffer, ds)
+        compressor = zlib.compressobj(wbits=-zlib.MAX_WBITS)
+        deflated = compressor.compress(buffer.getvalue()) + compressor.flush()
+
+        meta = FileMetaDataset()
+        meta.MediaStorageSOPClassUID = "1.2.840.10008.5.1.4.1.1.7"
+        meta.MediaStorageSOPInstanceUID = "1.2.3.4"
+        meta.TransferSyntaxUID = tsyntax
+        meta.ImplementationClassUID = "1.2.3.4"
+        meta_buffer = DicomBytesIO()
+        meta_buffer.is_implicit_VR = False
+        meta_buffer.is_little_endian = True
+        write_file_meta_info(meta_buffer, meta, enforce_standard=True)
+
+        raw = b"\x00" * 128 + b"DICM" + meta_buffer.getvalue() + deflated
+        out = dcmread(BytesIO(raw))
+        assert out.PatientName == "CITIZEN^Jan"
+        assert out.SOPInstanceUID == "1.2.3.4"
 
     def test_sequence_with_implicit_vr(self):
         """Test that reading a UN sequence with unknown length and implicit VR
