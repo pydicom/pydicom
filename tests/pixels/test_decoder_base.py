@@ -2562,3 +2562,27 @@ class TestProcessColorSpace:
         assert runner._frame_meta[0]["photometric_interpretation"] == "YBR_FULL"
         assert runner._frame_meta[1]["photometric_interpretation"] == "RGB"
         assert np.array_equal(out, convert_color_space(arr, "YBR_FULL", "RGB"))
+
+
+@pytest.mark.skipif(not HAVE_NP, reason="NumPy is not available")
+def test_short_encapsulated_pixel_data_raises():
+    """Fewer frames than Number of Frames must not raise a bare StopIteration."""
+    from pydicom import examples
+    from pydicom.encaps import encapsulate, generate_frames
+
+    ds = examples.ct
+    ds.compress(RLELossless)
+    frames = list(generate_frames(ds.PixelData, number_of_frames=1))
+    ds.NumberOfFrames = 3
+    ds.PixelData = encapsulate(frames)
+
+    msg = (
+        r"Unable to decode frame at index 1: the encapsulated pixel data only "
+        r"contains 1 frames, but 'Number of Frames' is 3"
+    )
+    with pytest.raises(ValueError, match=msg):
+        ds.pixel_array
+
+    decoder = get_decoder(RLELossless)
+    with pytest.raises(ValueError, match=msg):
+        decoder.as_buffer(ds)
