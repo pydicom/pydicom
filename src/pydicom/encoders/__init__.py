@@ -6,7 +6,6 @@ from pydicom.misc import warn_and_log
 from pydicom.pixels import get_encoder as _get_encoder
 from pydicom.pixels.encoders import RLELosslessEncoder as _rle_encoder
 
-
 _DEPRECATED = {
     "get_encoder": _get_encoder,
     "RLELosslessEncoder": _rle_encoder,

@@ -3,8 +3,8 @@
 decode pixel transfer syntaxes.
 """
 
-from copy import deepcopy
 import sys
+from copy import deepcopy
 from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -26,17 +26,16 @@ try:
 except ImportError:
     HAVE_GDCM = False
 
-from pydicom import config
-from pydicom.encaps import generate_frames, generate_fragmented_frames
 import pydicom.uid
-from pydicom.uid import UID, JPEG2000, JPEG2000Lossless
+from pydicom import config
+from pydicom.encaps import generate_fragmented_frames, generate_frames
 from pydicom.pixels.utils import (
     get_expected_length,
-    pixel_dtype,
     get_j2k_parameters,
     get_nr_frames,
+    pixel_dtype,
 )
-
+from pydicom.uid import JPEG2000, UID, JPEG2000Lossless
 
 HANDLER_NAME = "GDCM"
 

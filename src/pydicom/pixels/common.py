@@ -5,16 +5,17 @@ from enum import Enum, unique
 from importlib import import_module
 from typing import TYPE_CHECKING, Any, TypedDict
 
+import pydicom.uid as sop
 from pydicom.misc import warn_and_log
 from pydicom.pixels.utils import as_pixel_options
-import pydicom.uid as sop
 from pydicom.uid import UID
 
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Callable
+
     from pydicom.dataset import Dataset
-    from pydicom.pixels.decoders.base import DecodeOptions, DecodeFunction
-    from pydicom.pixels.encoders.base import EncodeOptions, EncodeFunction
+    from pydicom.pixels.decoders.base import DecodeFunction, DecodeOptions
+    from pydicom.pixels.encoders.base import EncodeFunction, EncodeOptions
 
 
 Buffer = bytes | bytearray | memoryview

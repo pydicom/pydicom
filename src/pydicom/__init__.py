@@ -28,19 +28,19 @@ Quick Start
 
 """
 
+import pydicom.examples
 from pydicom.dataelem import DataElement
 from pydicom.dataset import Dataset, FileDataset, FileMetaDataset
-import pydicom.examples
 from pydicom.filereader import dcmread
 from pydicom.filewriter import dcmwrite
-from pydicom.pixels.utils import pixel_array, iter_pixels
+from pydicom.pixels.utils import iter_pixels, pixel_array
 from pydicom.sequence import Sequence
 
 from ._version import (
+    __concepts_version__,
+    __dicom_version__,
     __version__,
     __version_info__,
-    __dicom_version__,
-    __concepts_version__,
 )
 
 __all__ = [
@@ -49,12 +49,12 @@ __all__ = [
     "FileDataset",
     "FileMetaDataset",
     "Sequence",
-    "dcmread",
-    "dcmwrite",
-    "pixel_array",
-    "iter_pixels",
+    "__concepts_version__",
+    "__dicom_version__",
     "__version__",
     "__version_info__",
-    "__dicom_version__",
-    "__concepts_version__",
+    "dcmread",
+    "dcmwrite",
+    "iter_pixels",
+    "pixel_array",
 ]

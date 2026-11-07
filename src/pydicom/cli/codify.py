@@ -5,7 +5,6 @@ import argparse
 
 import pydicom.util.codify
 
-
 default_exclude_size = 100
 
 

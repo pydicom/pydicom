@@ -1,20 +1,19 @@
 # Copyright 2008-2024 pydicom authors. See LICENSE file for details.
 
-from typing import Any, TYPE_CHECKING, Protocol
-from collections.abc import MutableSequence, Callable
+from collections.abc import Callable, MutableSequence
+from typing import TYPE_CHECKING, Any, Protocol
 
 from pydicom import config
 from pydicom.datadict import dictionary_VR, private_dictionary_VR
 from pydicom.errors import BytesLengthException
 from pydicom.misc import warn_and_log
 from pydicom.multival import MultiValue
-from pydicom.tag import BaseTag, _LUT_DESCRIPTOR_TAGS
+from pydicom.tag import _LUT_DESCRIPTOR_TAGS, BaseTag
 from pydicom.valuerep import VR
 
-
 if TYPE_CHECKING:  # pragma: no cover
-    from pydicom.dataset import Dataset
     from pydicom.dataelem import RawDataElement
+    from pydicom.dataset import Dataset
 
     class RawDataHook(Protocol):
         def __call__(

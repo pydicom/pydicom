@@ -1,10 +1,10 @@
 # Copyright 2008-2025 pydicom authors. See LICENSE file for details.
 """Utility functions used in debugging writing and reading"""
 
-from io import BytesIO
 import os
 import sys
-from typing import BinaryIO, TYPE_CHECKING
+from io import BytesIO
+from typing import TYPE_CHECKING, BinaryIO
 
 from pydicom.valuerep import VR
 

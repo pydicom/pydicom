@@ -1,11 +1,10 @@
 """Module to support importing the datasets used by the documentation."""
 
-from typing import Any, cast
 from pathlib import Path
+from typing import Any, cast
 
 from pydicom.data import get_testdata_file
 from pydicom.filereader import dcmread
-
 
 # All datasets included here must be available in the package itself
 #   NOT via the pydicom-data download method
