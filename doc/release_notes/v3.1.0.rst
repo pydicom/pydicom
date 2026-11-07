@@ -68,7 +68,6 @@ Fixes
   (:issue:`2381`).
 * Fixed compression of packed one-bit pixel data stored as *OW* with
   *Explicit VR Big Endian* byte ordering, including frames ending within a byte or word.
-
 * Fixed decoding text with *ISO 2022* escape sequences for *ISO_IR 58* (GB2312) character
   sets (:issue:`2383`).
 
@@ -106,3 +105,6 @@ Enhancements
   :func:`~pydicom.pixels.convert_color_space` where applicable (:issue:`2228`)
 * Take the color space information from an Adobe APP14 marker into account when decoding
   pixel data for JPEG transfer syntaxes.
+* Warn when multiples of the same element are found within a dataset or sequence item
+  (:issue:`2420`).
+* Improved memory usage for :func:`~pydicom.pixels.apply_windowing` (:pr:`2315`)
