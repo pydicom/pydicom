@@ -555,7 +555,8 @@ class TestNumeric:
         ds.add_new(0x00091015, "DS", "3.14159265")
         ds.add_new(0x00091102, "US", 2)
         ds.add_new(0x00091103, "US", None)
-        ds.add_new(0x00091104, "US", "")
+        with pytest.warns(UserWarning):
+            ds.add_new(0x00091104, "US", "")
         ds.add_new(0x00091105, "US", [])
 
         ds_json = ds.to_json_dict()
