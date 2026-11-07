@@ -1868,6 +1868,92 @@ class TestFileLike:
 class TestDataElementGenerator:
     """Test filereader.data_element_generator"""
 
+    @pytest.mark.parametrize(
+        ("is_implicit_VR", "stop_tag", "stop_element"),
+        [
+            (
+                True,
+                Tag(0x7FE0, 0x0010),
+                # (7FE0,0010) implicit VR, 4-byte length = 4
+                b"\xe0\x7f\x10\x00\x04\x00\x00\x00DATA",
+            ),
+            (
+                False,
+                Tag(0x0010, 0x0010),
+                # (0010,0010) PN, 2-byte length = 4
+                b"\x10\x00\x10\x00PN\x04\x00DATA",
+            ),
+            (
+                False,
+                Tag(0x7FE0, 0x0010),
+                # (7FE0,0010) OB, 2 reserved bytes, 4-byte length = 4
+                b"\xe0\x7f\x10\x00OB\x00\x00\x04\x00\x00\x00DATA",
+            ),
+        ],
+        ids=["implicit-pixeldata", "explicit-2byte-length", "explicit-4byte-length"],
+    )
+    def test_stop_when_rewinds_to_start_of_element(
+        self, is_implicit_VR, stop_tag, stop_element
+    ):
+        """Test stop_when leaves the file positioned at the stopped element."""
+        # (0010,0020) PatientID, length 4, value "TEST"
+        first_element = b"\x10\x00\x20\x00"
+        if is_implicit_VR:
+            first_element += b"\x04\x00\x00\x00"  # 4-byte length = 4
+        else:
+            first_element += b"LO\x04\x00"  # LO, 2-byte length = 4
+        first_element += b"TEST"
+        fp = BytesIO(first_element + stop_element)
+        gen = data_element_generator(
+            fp,
+            is_implicit_VR=is_implicit_VR,
+            is_little_endian=True,
+            stop_when=lambda tag, vr, length: tag == stop_tag,
+        )
+
+        assert next(gen).tag == Tag(0x0010, 0x0020)
+        with pytest.raises(StopIteration):
+            next(gen)
+
+        assert fp.tell() == len(first_element)
+        assert fp.read() == stop_element
+
+    def test_stop_when_receives_none_vr_for_implicit_vr(self):
+        """Test stop_when is called with vr=None for implicit VR data."""
+        # (0010,0010) implicit VR, 4-byte length = 4
+        fp = BytesIO(b"\x10\x00\x10\x00\x04\x00\x00\x00DATA")
+        stop_when_args = []
+
+        def stop_when(tag, vr, length):
+            stop_when_args.append((tag, vr, length))
+            return True
+
+        gen = data_element_generator(
+            fp, is_implicit_VR=True, is_little_endian=True, stop_when=stop_when
+        )
+        with pytest.raises(StopIteration):
+            next(gen)
+
+        assert stop_when_args == [(Tag(0x0010, 0x0010), None, 4)]
+
+    def test_stop_when_receives_vr_for_explicit_vr(self):
+        """Test stop_when is called with the VR str for explicit VR data."""
+        # (0010,0010) PN, 2-byte length = 4
+        fp = BytesIO(b"\x10\x00\x10\x00PN\x04\x00DATA")
+        stop_when_args = []
+
+        def stop_when(tag, vr, length):
+            stop_when_args.append((tag, vr, length))
+            return True
+
+        gen = data_element_generator(
+            fp, is_implicit_VR=False, is_little_endian=True, stop_when=stop_when
+        )
+        with pytest.raises(StopIteration):
+            next(gen)
+
+        assert stop_when_args == [(Tag(0x0010, 0x0010), "PN", 4)]
+
     def test_little_endian_explicit(self):
         """Test reading little endian explicit VR data"""
         # (0010,0010) PatientName PN 6 ABCDEF

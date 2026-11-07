@@ -75,8 +75,10 @@ def data_element_generator(
         ``True`` if the data is encoded as little endian, ``False`` otherwise.
     stop_when : None, callable, optional
         If ``None`` (default), then the whole file is read. A callable which
-        takes tag, VR, length, and returns ``True`` or ``False``. If it
-        returns ``True``, ``read_data_element`` will just return.
+        takes ``(tag, vr, length)`` and returns ``True`` or ``False``. If it
+        returns ``True``, ``read_data_element`` will just return. For
+        implicit VR data `vr` is ``None``, as the VR has not yet been looked
+        up when `stop_when` is called.
     defer_size : int, str or float, optional
         See :func:`dcmread` for parameter info.
     encoding : str | MutableSequence[str]
