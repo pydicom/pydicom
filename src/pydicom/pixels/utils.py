@@ -33,6 +33,8 @@ from pydicom.uid import (
     JPEGLSNearLossless,
     JPEG2000,
     ExplicitVRLittleEndian,
+    DeflatedImageFrameCompression,
+    JPEGLSTransferSyntaxes,
     generate_uid,
 )
 from pydicom.valuerep import VR
@@ -470,6 +472,16 @@ def compress(
     # Clear `pixel_array` as lossy compression may give different results
     ds._pixel_array = None
     ds._pixel_id = {}
+
+    # Except for JPEG-LS and Deflated Image Frame Compression the encoded
+    #   data is always color-by-pixel
+    if (
+        ds.get("SamplesPerPixel", 1) > 1
+        and ds.get("PlanarConfiguration", 0) == 1
+        and uid not in JPEGLSTransferSyntaxes
+        and uid != DeflatedImageFrameCompression
+    ):
+        ds.PlanarConfiguration = 0
 
     # Set the correct *Transfer Syntax UID*
     if not hasattr(ds, "file_meta"):

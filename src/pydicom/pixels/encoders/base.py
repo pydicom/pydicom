@@ -149,6 +149,32 @@ class EncodeRunner(RunnerBase):
             return self._get_frame_array(index)
 
         frame = self._get_frame_buffer(index)
+
+        # Except for JPEG-LS, the encoders expect color-by-pixel data, so
+        #   color-by-plane data needs to be interleaved. Deflated Image Frame
+        #   Compression keeps the data as-is.
+        if (
+            self.samples_per_pixel > 1
+            and self.planar_configuration == 1
+            and self.transfer_syntax not in JPEGLSTransferSyntaxes
+            and self.transfer_syntax != DeflatedImageFrameCompression
+        ):
+            bits_allocated = self.get_frame_option(
+                0 if index is None else index, "bits_allocated", self.bits_allocated
+            )
+            bytes_per_sample = bits_allocated // 8
+            nr_samples = self.samples_per_pixel
+            plane_length = len(frame) // nr_samples
+            step = nr_samples * bytes_per_sample
+            out = bytearray(len(frame))
+            for sample in range(nr_samples):
+                plane = frame[sample * plane_length : (sample + 1) * plane_length]
+                for offset in range(bytes_per_sample):
+                    start = sample * bytes_per_sample + offset
+                    out[start::step] = plane[offset::bytes_per_sample]
+
+            frame = out
+
         return bytes(frame) if not isinstance(frame, bytes) else frame
 
     def _get_frame_array(self, index: int | None) -> bytes:
@@ -176,12 +202,12 @@ class EncodeRunner(RunnerBase):
         # JPEG-LS allows different ordering of the input image data via the
         #   interleave mode (ILV) parameter. ILV 0 matches a planar configuration
         #   of 1 and requires shape (samples, rows, columns). ILV 1 and 2 match
-        #   planar configuration 0 so no further action is needed
+        #   planar configuration 0 so no further action is needed. Deflated
+        #   Image Frame Compression keeps the data in its planar configuration
         if (
             self.transfer_syntax in JPEGLSTransferSyntaxes
-            and self.samples_per_pixel == 3
-            and self.planar_configuration == 1
-        ):
+            or self.transfer_syntax == DeflatedImageFrameCompression
+        ) and (self.samples_per_pixel == 3 and self.planar_configuration == 1):
             arr = arr.transpose(2, 0, 1)
 
         index = 0 if index is None else index

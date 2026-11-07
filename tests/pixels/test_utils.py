@@ -79,6 +79,7 @@ from .pixels_reference import (
     EXPL_8_3_1F,
     EXPL_8_3_1F_ODD,
     EXPL_8_3_1F_YBR422,
+    EXPL_16_3_1F,
     EXPL_32_3_1F,
     IMPL_16_1_1F,
     JPGB_08_08_3_0_1F_RGB_NO_APP14,
@@ -1787,6 +1788,20 @@ class TestCompressRLE:
         with pytest.raises(NotImplementedError, match=msg):
             compress(ds, JPEG2000MC, encoding_plugin="pydicom")
 
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    @pytest.mark.parametrize("path", [EXPL_8_3_1F.path, EXPL_16_3_1F.path])
+    def test_compress_planar_configuration_1(self, path):
+        """Test compressing color-by-plane pixel data."""
+        ds = dcmread(path)
+        ref = ds.pixel_array
+        ds.PixelData = ref.transpose(2, 0, 1).tobytes()
+        ds.PlanarConfiguration = 1
+        assert np.array_equal(pixel_array(ds), ref)
+
+        compress(ds, RLELossless, encoding_plugin="pydicom")
+        assert ds.PlanarConfiguration == 0
+        assert np.array_equal(ds.pixel_array, ref)
+
     def test_encapsulate_extended(self):
         """Test forcing extended encapsulation."""
         ds = dcmread(EXPL_16_16_1F.path)
@@ -1950,6 +1965,19 @@ class TestCompressJ2K:
         assert ds.SOPInstanceUID == original
         assert ds.SOPInstanceUID == ds.file_meta.MediaStorageSOPInstanceUID
 
+    def test_lossless_planar_configuration_1(self):
+        """Test JPEG 2000 Lossless with color-by-plane pixel data."""
+        path = EXPL_8_3_1F.path
+        ds = dcmread(path)
+        ref = ds.pixel_array
+        ds.PixelData = ref.transpose(2, 0, 1).tobytes()
+        ds.PlanarConfiguration = 1
+        assert np.array_equal(pixel_array(ds), ref)
+
+        compress(ds, JPEG2000Lossless, encoding_plugin="pylibjpeg")
+        assert ds.PlanarConfiguration == 0
+        assert np.array_equal(ds.pixel_array, ref)
+
     def test_lossy(self):
         """Test JPEG 2000 and the j2k_cr and j2k_psnr kwargs."""
         ds = dcmread(EXPL_16_16_1F.path)
@@ -2068,6 +2096,20 @@ class TestCompressDeflated:
             encoding_plugin="pydicom",
         )
         assert ds.file_meta.TransferSyntaxUID == DeflatedImageFrameCompression
+        assert np.array_equal(ds.pixel_array, ref)
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
+    def test_compress_arr_planar_configuration_1(self):
+        """Test compressing an arr with a Planar Configuration of 1."""
+        path = EXPL_8_3_1F.path
+        ds = dcmread(path)
+        ref = ds.pixel_array
+        ds.PixelData = ref.transpose(2, 0, 1).tobytes()
+        ds.PlanarConfiguration = 1
+        assert np.array_equal(pixel_array(ds), ref)
+
+        compress(ds, DeflatedImageFrameCompression, arr=ref, encoding_plugin="pydicom")
+        assert ds.PlanarConfiguration == 1
         assert np.array_equal(ds.pixel_array, ref)
 
     @pytest.mark.skipif(not HAVE_NP, reason="Numpy not available")
