@@ -18,6 +18,8 @@ Changes
 Fixes
 -----
 
+* Fixed JSON serialization of buffered binary element values, including use of
+  a bulk data URI handler without reading the buffer into memory.
 * Changed logging of missing plugin imports to use :attr:`logging.DEBUG` (:issue:`2128`).
 * Include all :mod:`~pydicom.examples` module datasets with the package (:issue:`2128`, :issue:`2131`).
 * Fixed an invalid VR value in the private data dictionary (:issue:`2132`).

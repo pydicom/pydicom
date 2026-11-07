@@ -33,7 +33,12 @@ from pydicom.multival import MultiValue
 from pydicom.tag import Tag, BaseTag, _LUT_DESCRIPTOR_TAGS
 from pydicom.uid import UID
 from pydicom import jsonrep
-from pydicom.fileutil import check_buffer, buffer_length, buffer_equality
+from pydicom.fileutil import (
+    check_buffer,
+    buffer_length,
+    buffer_equality,
+    reset_buffer_position,
+)
 import pydicom.valuerep  # don't import DS directly as can be changed by config
 from pydicom.valuerep import (
     BUFFERABLE_VRS,
@@ -351,12 +356,21 @@ class DataElement:  # noqa: PLW1641
         if self.VR in (BYTES_VR | AMBIGUOUS_VR) - {VR_.US_SS}:
             if not self.is_empty:
                 binary_value = self.value
+                length = (
+                    buffer_length(binary_value)
+                    if self.is_buffered
+                    else len(binary_value)
+                )
                 # Base64 makes the encoded value 1/3 longer.
-                if bulk_data_element_handler is not None and len(binary_value) > (
+                if bulk_data_element_handler is not None and length > (
                     (bulk_data_threshold // 4) * 3
                 ):
                     json_element["BulkDataURI"] = bulk_data_element_handler(self)
                 else:
+                    if self.is_buffered:
+                        with reset_buffer_position(binary_value):
+                            binary_value.seek(0)
+                            binary_value = binary_value.read()
                     # Json is exempt from padding to even length, see DICOM-CP1920
                     encoded_value = base64.b64encode(binary_value).decode("utf-8")
                     logger.info(f"encode bulk data element '{self.name}' inline")
