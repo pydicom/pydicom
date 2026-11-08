@@ -17,6 +17,7 @@ from pydicom.dataelem import (
     RawDataElement,
 )
 from pydicom.dataset import Dataset, validate_file_meta, FileMetaDataset
+from pydicom.errors import BytesLengthException
 from pydicom.filebase import DicomFile, DicomBytesIO, DicomIO, WriteableBuffer
 from pydicom.fileutil import (
     path_from_pathlike,
@@ -276,6 +277,10 @@ def correct_ambiguous_vr_element(
             _correct_ambiguous_vr_element(elem, ancestors, is_little_endian)
         except AttributeError as e:
             raise AttributeError(
+                f"Failed to resolve ambiguous VR for tag {elem.tag}: {e}"
+            )
+        except BytesLengthException as e:
+            raise BytesLengthException(
                 f"Failed to resolve ambiguous VR for tag {elem.tag}: {e}"
             )
 
