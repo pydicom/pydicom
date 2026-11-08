@@ -428,8 +428,8 @@ class TestModalityLUT:
         # For the Modality LUT the third value shall be 16, so a non-16 value
         # is invalid and warns while still being assumed to be 16-bit
         msg = (
-            r"Invalid value '12' for the third value of the Modality LUT "
-            r"Descriptor - assuming 16"
+            "A value of 12 bits per entry for 'LUT Descriptor' is not conformant "
+            "for a Modality LUT Sequence, using 16 bits instead"
         )
         with pytest.warns(UserWarning, match=msg):
             out = apply_modality_lut(ds.pixel_array, ds)
@@ -441,8 +441,8 @@ class TestModalityLUT:
         """Test an unsupported LUT entry bit depth raises (#2317)."""
         ds = dcmread(MOD_16_SEQ)
         seq = ds.ModalityLUTSequence[0]
-        seq.LUTDescriptor = [4096, -2048, 4]
-        msg = r"'4' bits per LUT entry is not supported"
+        seq.LUTDescriptor = [4096, -2048, 17]
+        msg = r"'17' bits per entry for 'LUT Descriptor' is not supported"
         with pytest.raises(NotImplementedError, match=msg):
             apply_modality_lut(ds.pixel_array, ds)
 
@@ -1698,13 +1698,16 @@ class TestApplyVOI:
         """Test bad LUT depth raises exception."""
         ds = dcmread(VOI_08_1F)
         item = ds.VOILUTSequence[0]
-        item.LUTDescriptor[2] = 7
-        msg = r"'7' bits per LUT entry is not supported"
-        with pytest.raises(NotImplementedError, match=msg):
+        item.LUTDescriptor[2] = 9
+        msg = (
+            "A value of 9 bits per entry for 'LUT Descriptor' is not conformant "
+            "for a VOI LUT Sequence"
+        )
+        with pytest.warns(UserWarning, match=msg):
             apply_voi(ds.pixel_array, ds)
 
         item.LUTDescriptor[2] = 17
-        msg = r"'17' bits per LUT entry is not supported"
+        msg = r"'17' bits per entry for 'LUT Descriptor' is not supported"
         with pytest.raises(NotImplementedError, match=msg):
             apply_voi(ds.pixel_array, ds)
 
