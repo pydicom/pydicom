@@ -92,11 +92,6 @@ dev = [
 ]
 
 
-[tool.black]
-exclude = ".venv|build|/_.*_dict.py$"
-force-exclude = ".venv|/_.*_dict.py$"  # to not do files pre-commit asks for
-
-
 [tool.ruff]
 include = ["src/*.py", "tests/*.py", "doc/*.py"]
 exclude = ["src/pydicom/*_dict.py", "src/pydicom/sr/_snomed_dict.py"]
