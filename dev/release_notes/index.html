@@ -603,6 +603,9 @@ wrapping out-of-range LUT indices instead of clamping them to the last entry
 <em>Explicit VR Big Endian</em> byte ordering, including frames ending within a byte or word.</p></li>
 <li><p>Fixed decoding text with <em>ISO 2022</em> escape sequences for <em>ISO_IR 58</em> (GB2312) character
 sets (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2383">#2383</a>).</p></li>
+<li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.pixel_array" title="pydicom.dataset.Dataset.pixel_array"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Dataset.pixel_array</span></code></a> raising
+<a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AttributeError</span></code></a> when <a class="reference internal" href="../reference/generated/pydicom.config.future_behavior.html#pydicom.config.future_behavior" title="pydicom.config.future_behavior"><code class="xref py py-func docutils literal notranslate"><span class="pre">future_behavior()</span></code></a> is enabled
+(<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2354">#2354</a>).</p></li>
 </ul>
 </section>
 <section id="enhancements">
