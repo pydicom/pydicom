@@ -1,0 +1,6 @@
+﻿pydicom.uid.DeflatedTransferSyntaxes
+====================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: DeflatedTransferSyntaxes

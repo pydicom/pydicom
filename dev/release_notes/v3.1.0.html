@@ -590,6 +590,11 @@ after the private creator was removed using <a class="reference internal" href="
 <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.popitem" title="pydicom.dataset.Dataset.popitem"><code class="xref py py-meth docutils literal notranslate"><span class="pre">popitem()</span></code></a> or <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.clear" title="pydicom.dataset.Dataset.clear"><code class="xref py py-meth docutils literal notranslate"><span class="pre">clear()</span></code></a>,
 or replaced by a different private creator. New private elements could be added
 without a private creator element.</p></li>
+<li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.uid.UID.html#pydicom.uid.UID.is_deflated" title="pydicom.uid.UID.is_deflated"><code class="xref py py-attr docutils literal notranslate"><span class="pre">UID.is_deflated</span></code></a> returning <code class="docutils literal notranslate"><span class="pre">False</span></code> for
+<em>JPIP Referenced Deflate</em> and <em>JPIP HTJ2K Referenced Deflate</em>, and fixed
+<a class="reference internal" href="../reference/generated/pydicom.filereader.dcmread.html#pydicom.filereader.dcmread" title="pydicom.filereader.dcmread"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmread()</span></code></a> and <a class="reference internal" href="../reference/generated/pydicom.filewriter.dcmwrite.html#pydicom.filewriter.dcmwrite" title="pydicom.filewriter.dcmwrite"><code class="xref py py-func docutils literal notranslate"><span class="pre">dcmwrite()</span></code></a> not
+inflating/deflating the dataset for those two transfer syntaxes (PS3.5 Sections A.7
+and A.12).</p></li>
 <li><p>Make float data elements with <cite>NaN</cite> value compare as equal - this is semantically better suited
 then the mathematical comparison, where <cite>NaN != NaN</cite> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2273">#2273</a>)</p></li>
 <li><p>Fixed fileset-uid-property-annotation with Python 3.14 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2358">#2358</a>)</p></li>
@@ -625,6 +630,7 @@ syntax or not (<a class="extlink-issue reference external" href="https://github.
 <li><p><a class="reference internal" href="../reference/generated/pydicom.uid.JPEGXLJPEGRecompression.html#pydicom.uid.JPEGXLJPEGRecompression" title="pydicom.uid.JPEGXLJPEGRecompression"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGXLJPEGRecompression</span></code></a></p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.uid.JPEGXL.html#pydicom.uid.JPEGXL" title="pydicom.uid.JPEGXL"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPEGXL</span></code></a></p></li>
 <li><p><a class="reference internal" href="../reference/generated/pydicom.uid.DeflatedImageFrameCompression.html#pydicom.uid.DeflatedImageFrameCompression" title="pydicom.uid.DeflatedImageFrameCompression"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DeflatedImageFrameCompression</span></code></a></p></li>
+<li><p><a class="reference internal" href="../reference/generated/pydicom.uid.JPIPReferencedDeflate.html#pydicom.uid.JPIPReferencedDeflate" title="pydicom.uid.JPIPReferencedDeflate"><code class="xref py py-attr docutils literal notranslate"><span class="pre">JPIPReferencedDeflate</span></code></a></p></li>
 </ul>
 </li>
 <li><p>Added ability to specify tag numbers in the CLI commands (allows private tags to be specified)</p></li>

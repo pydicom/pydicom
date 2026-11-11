@@ -1,0 +1,6 @@
+﻿pydicom.uid.JPIPReferencedDeflate
+=================================
+
+.. currentmodule:: pydicom.uid
+
+.. autodata:: JPIPReferencedDeflate
