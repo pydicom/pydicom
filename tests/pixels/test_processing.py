@@ -416,6 +416,50 @@ class TestModalityLUT:
         assert 52428 == out[228, 385]
         assert 58974 == out[291, 385]
 
+    def test_lut_sequence_12_bit(self):
+        """Test a 12-bit LUT entry depth is handled as 16-bit (#2317)."""
+        # The third LUT Descriptor value (bits per entry) of 10-16 should be
+        # read as 16-bit; previously a value such as 12 raised because of the
+        # invalid "uint12" dtype
+        ds = dcmread(MOD_16_SEQ)
+        seq = ds.ModalityLUTSequence[0]
+        seq.LUTDescriptor = [4096, -2048, 12]
+
+        # For the Modality LUT the third value shall be 16, so a non-16 value
+        # is invalid and warns while still being assumed to be 16-bit
+        msg = (
+            "A value of 12 bits per entry for 'LUT Descriptor' is not conformant "
+            "for a Modality LUT Sequence, using 16 bits instead"
+        )
+        with pytest.warns(UserWarning, match=msg):
+            out = apply_modality_lut(ds.pixel_array, ds)
+        assert out.dtype == np.uint16
+        # LUTData is unchanged so the mapping matches the 16-bit case
+        assert [32759, 32759, 49147, 49147, 32759] == list(out[0, 50:55])
+
+    def test_lut_sequence_unsupported_depth_raises(self):
+        """Test an unsupported LUT entry bit depth raises (#2317)."""
+        ds = dcmread(MOD_16_SEQ)
+        seq = ds.ModalityLUTSequence[0]
+        seq.LUTDescriptor = [4096, -2048, 17]
+        msg = r"'17' bits per entry for 'LUT Descriptor' is not supported"
+        with pytest.raises(NotImplementedError, match=msg):
+            apply_modality_lut(ds.pixel_array, ds)
+
+    def test_lut_sequence_8_bit(self):
+        """Test an 8-bit LUT entry depth is handled as 8-bit (#2317)."""
+        ds = dcmread(MOD_16_SEQ)
+        seq = ds.ModalityLUTSequence[0]
+        seq.LUTDescriptor = [4, 0, 8]
+        seq.LUTData = [0, 85, 170, 255]
+
+        # IVs below `first_map` (0) map to the first entry, IVs at or beyond
+        # the number of entries (4) map to the last entry
+        arr = np.asarray([-1, 0, 1, 2, 3, 9])
+        out = apply_modality_lut(arr, ds)
+        assert out.dtype == np.uint8
+        assert [0, 0, 85, 170, 255, 255] == list(out)
+
     def test_lut_sequence_zero_entries(self):
         """Test that 0 entries is interpreted correctly."""
         # LUTDescriptor[0] of 0 -> 65536, but only 4096 entries so any
@@ -433,6 +477,20 @@ class TestModalityLUT:
         seq.LUTData = [0] * 65535 + [1]
         out = apply_modality_lut(arr, ds)
         assert [0, 0, 0, 1] == list(out)
+
+    def test_lut_sequence_iv_exceeds_input_dtype(self):
+        """Test IVs that overflow the input dtype once shifted are clamped."""
+        # `first_map` of -2048 shifts IVs up by 2048, which overflows int16 for
+        #   IVs near the top of the range - those must clamp to the last entry
+        ds = Dataset()
+        ds.ModalityLUTSequence = [Dataset()]
+        item = ds.ModalityLUTSequence[0]
+        item.LUTDescriptor = [4096, -2048, 16]
+        item.LUTData = list(range(4096))
+        arr = np.asarray([-2049, -2048, 0, 2047, 32767], dtype="int16")
+
+        out = apply_modality_lut(arr, ds)
+        assert [0, 0, 2048, 4095, 4095] == out.tolist()
 
     def test_unchanged(self):
         """Test no modality LUT transform."""
@@ -1654,13 +1712,16 @@ class TestApplyVOI:
         """Test bad LUT depth raises exception."""
         ds = dcmread(VOI_08_1F)
         item = ds.VOILUTSequence[0]
-        item.LUTDescriptor[2] = 7
-        msg = r"'7' bits per LUT entry is not supported"
-        with pytest.raises(NotImplementedError, match=msg):
+        item.LUTDescriptor[2] = 9
+        msg = (
+            "A value of 9 bits per entry for 'LUT Descriptor' is not conformant "
+            "for a VOI LUT Sequence"
+        )
+        with pytest.warns(UserWarning, match=msg):
             apply_voi(ds.pixel_array, ds)
 
         item.LUTDescriptor[2] = 17
-        msg = r"'17' bits per LUT entry is not supported"
+        msg = r"'17' bits per entry for 'LUT Descriptor' is not supported"
         with pytest.raises(NotImplementedError, match=msg):
             apply_voi(ds.pixel_array, ds)
 
@@ -1679,6 +1740,23 @@ class TestApplyVOI:
         with pytest.warns(UserWarning, match=msg):
             out = apply_voi(arr, ds)
             assert [0, 127, 32768, 65535, 65535] == out.tolist()
+
+    def test_voi_8_bit_entries_more_than_256_entries(self):
+        """Test a LUT with 8-bit entries and more than 256 of them."""
+        # The number of entries is independent of the depth of each entry, so
+        #   an IV above 255 must still index the LUT rather than wrap around
+        ds = Dataset()
+        ds.PixelRepresentation = 0
+        ds.BitsStored = 16
+        ds.VOILUTSequence = [Dataset()]
+        item = ds.VOILUTSequence[0]
+        item.LUTDescriptor = [4096, 0, 8]
+        item.LUTData = [idx // 16 for idx in range(4096)]
+        arr = np.asarray([0, 255, 256, 1024, 4095, 60000], dtype="uint16")
+
+        out = apply_voi(arr, ds)
+        assert "uint8" == out.dtype
+        assert [0, 15, 16, 64, 255, 255] == out.tolist()
 
     def test_unchanged(self):
         """Test input array is unchanged if no VOI LUT"""

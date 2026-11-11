@@ -1570,6 +1570,7 @@ class Dataset:  # noqa: PLW1641
     def clear(self) -> None:
         """Delete all the elements from the :class:`Dataset`."""
         self._dict.clear()
+        self._private_blocks = {}
 
     def pop(self, key: "BaseTag | TagType", *args: Any) -> _DatasetValue:
         """Emulate :meth:`dict.pop` with support for tags and keywords.
@@ -1606,7 +1607,11 @@ class Dataset:  # noqa: PLW1641
         except Exception:
             pass
 
-        return self._dict.pop(cast(BaseTag, key), *args)
+        elem: _DatasetValue = self._dict.pop(cast(BaseTag, key), *args)
+        if self._private_blocks and isinstance(key, BaseTag) and key.is_private_creator:
+            self._private_blocks = {}
+
+        return elem
 
     def popitem(self) -> tuple[BaseTag, _DatasetValue]:
         """Emulate :meth:`dict.popitem`.
@@ -1615,7 +1620,11 @@ class Dataset:  # noqa: PLW1641
         -------
         tuple of (BaseTag, DataElement)
         """
-        return self._dict.popitem()
+        tag, elem = self._dict.popitem()
+        if self._private_blocks and tag.is_private_creator:
+            self._private_blocks = {}
+
+        return tag, elem
 
     def setdefault(self, key: TagType, default: Any | None = None) -> DataElement:
         """Emulate :meth:`dict.setdefault` with support for tags and keywords.
@@ -1738,6 +1747,13 @@ class Dataset:  # noqa: PLW1641
                 f"'{type(self).__name__}' object has no attribute 'convert_pixel_data'"
             )
 
+        self._convert_pixel_data(handler_name)
+
+    def _convert_pixel_data(self, handler_name: str = "") -> None:
+        """Convert pixel data to a :class:`numpy.ndarray` internally.
+
+        See :meth:`~Dataset.convert_pixel_data` for more information.
+        """
         # Check if already have converted to a NumPy array
         # Also check if pixel data has changed. If so, get new NumPy array
         already_have = True
@@ -2239,7 +2255,7 @@ class Dataset:  # noqa: PLW1641
             Similar to :func:`pydicom.pixels.pixel_array` but returns a generator
             that iterates through the image frames.
         """
-        self.convert_pixel_data()
+        self._convert_pixel_data()
         return cast("numpy.ndarray", self._pixel_array)
 
     def pixel_array_options(
@@ -2837,6 +2853,10 @@ class Dataset:  # noqa: PLW1641
                         elem, encoding=self._character_set, ds=self
                     )
                 elem.private_creator = self[private_creator_tag].value
+
+        # invalidate private blocks in case a private creator is replaced
+        if self._private_blocks and elem_tag.is_private_creator:
+            self._private_blocks = {}
 
         # Changing pixel data resets the stored array
         if elem_tag in PIXEL_KEYWORDS:

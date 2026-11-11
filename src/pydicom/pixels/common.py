@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, TypedDict
 
 from pydicom.misc import warn_and_log
 from pydicom.pixels.utils import as_pixel_options
+import pydicom.uid as sop
 from pydicom.uid import UID
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -194,7 +195,7 @@ class CoderBase:
             raise ValueError(f"Unable to remove '{label}', no such plugin'")
 
     @property
-    def UID(self) -> UID:
+    def UID(self) -> sop.UID:
         """Return the corresponding *Transfer Syntax UID* as :class:`~pydicom.uid.UID`."""  # noqa: E501
         return self._uid
 
