@@ -37,7 +37,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=6a604523" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../../_static/scripts/fontawesome.js?digest=75c7c72ae941e8b558d8"></script>
@@ -51,7 +51,7 @@
     <script src="../../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=ccdb6887"></script>
-    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script data-sd-tabs-storage-prefix="sphinx-design-tab-id-" src="../../_static/design-tabs.js?v=fcb327ea"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'guides/user/installation';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.24.0';
@@ -551,15 +551,15 @@ packages without admin privileges.</p>
 Python is supported, you can check <a class="reference internal" href="../../faq.html#faq-install-version"><span class="std std-ref">this table</span></a>.</p>
 <div class="sd-tab-set sd-width-content-min docutils">
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" data-sync-group="install" data-sync-id="pip" for="sd-tab-item-0">
-pip</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-0-content" class="sd-tab-label" data-sync-group="install" data-sync-id="pip" for="sd-tab-item-0">
+pip</label><div class="sd-tab-content docutils" id="sd-tab-item-0-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>pydicom
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
-<label class="sd-tab-label" data-sync-group="install" data-sync-id="conda" for="sd-tab-item-1">
-conda</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-1-content" class="sd-tab-label" data-sync-group="install" data-sync-id="conda" for="sd-tab-item-1">
+conda</label><div class="sd-tab-content docutils" id="sd-tab-item-1-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>pydicom
 </pre></div>
 </div>
@@ -605,15 +605,15 @@ one or more additional libraries.</p>
 <p>The quickest way to install NumPy and all the additional libraries is with:</p>
 <div class="sd-tab-set sd-width-content-min docutils">
 <input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" data-sync-group="install" data-sync-id="pip" for="sd-tab-item-2">
-pip</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-2-content" class="sd-tab-label" data-sync-group="install" data-sync-id="pip" for="sd-tab-item-2">
+pip</label><div class="sd-tab-content docutils" id="sd-tab-item-2-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>pydicom<span class="o">[</span>pixeldata<span class="o">]</span>
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
-<label class="sd-tab-label" data-sync-group="install" data-sync-id="conda" for="sd-tab-item-3">
-conda</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-3-content" class="sd-tab-label" data-sync-group="install" data-sync-id="conda" for="sd-tab-item-3">
+conda</label><div class="sd-tab-content docutils" id="sd-tab-item-3-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>pydicom<span class="o">[</span>pixeldata<span class="o">]</span>
 </pre></div>
 </div>
@@ -624,15 +624,15 @@ and can handle converting uncompressed pixel data to an <code class="docutils li
 packages:</p>
 <div class="sd-tab-set sd-width-content-min docutils">
 <input checked="checked" id="sd-tab-item-4" name="sd-tab-set-2" type="radio">
-<label class="sd-tab-label" data-sync-group="install" data-sync-id="pip" for="sd-tab-item-4">
-pip</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-4-content" class="sd-tab-label" data-sync-group="install" data-sync-id="pip" for="sd-tab-item-4">
+pip</label><div class="sd-tab-content docutils" id="sd-tab-item-4-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>numpy
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-5" name="sd-tab-set-2" type="radio">
-<label class="sd-tab-label" data-sync-group="install" data-sync-id="conda" for="sd-tab-item-5">
-conda</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-5-content" class="sd-tab-label" data-sync-group="install" data-sync-id="conda" for="sd-tab-item-5">
+conda</label><div class="sd-tab-content docutils" id="sd-tab-item-5-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>numpy
 </pre></div>
 </div>
@@ -650,15 +650,15 @@ JPEG support by default, however JPEG 2000 requires the
 <a class="reference external" href="https://www.openjpeg.org/">openjpeg</a>  library be installed.</p>
 <div class="sd-tab-set sd-width-content-min docutils">
 <input checked="checked" id="sd-tab-item-6" name="sd-tab-set-3" type="radio">
-<label class="sd-tab-label" data-sync-group="install" data-sync-id="pip" for="sd-tab-item-6">
-pip</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-6-content" class="sd-tab-label" data-sync-group="install" data-sync-id="pip" for="sd-tab-item-6">
+pip</label><div class="sd-tab-content docutils" id="sd-tab-item-6-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>pillow
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-7" name="sd-tab-set-3" type="radio">
-<label class="sd-tab-label" data-sync-group="install" data-sync-id="conda" for="sd-tab-item-7">
-conda</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-7-content" class="sd-tab-label" data-sync-group="install" data-sync-id="conda" for="sd-tab-item-7">
+conda</label><div class="sd-tab-content docutils" id="sd-tab-item-7-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>openjpeg<span class="w"> </span>jpeg
 conda<span class="w"> </span>install<span class="w"> </span>pillow
 </pre></div>
@@ -673,15 +673,15 @@ decompressing JPEG, JPEG-LS images and compressing or decompressing JPEG 2000 an
 RLE images, provided a suitable plugin is installed.</p>
 <div class="sd-tab-set sd-width-content-min docutils">
 <input checked="checked" id="sd-tab-item-8" name="sd-tab-set-4" type="radio">
-<label class="sd-tab-label" data-sync-group="install" data-sync-id="pip" for="sd-tab-item-8">
-pip</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-8-content" class="sd-tab-label" data-sync-group="install" data-sync-id="pip" for="sd-tab-item-8">
+pip</label><div class="sd-tab-content docutils" id="sd-tab-item-8-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>pylibjpeg<span class="o">[</span>all<span class="o">]</span>
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-9" name="sd-tab-set-4" type="radio">
-<label class="sd-tab-label" data-sync-group="install" data-sync-id="conda" for="sd-tab-item-9">
-conda</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-9-content" class="sd-tab-label" data-sync-group="install" data-sync-id="conda" for="sd-tab-item-9">
+conda</label><div class="sd-tab-content docutils" id="sd-tab-item-9-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>pylibjpeg<span class="o">[</span>all<span class="o">]</span>
 </pre></div>
 </div>
@@ -696,15 +696,15 @@ compress and decompress JPEG-LS images. It’s a fork of <a class="reference ext
 latest Python versions.</p>
 <div class="sd-tab-set sd-width-content-min docutils">
 <input checked="checked" id="sd-tab-item-10" name="sd-tab-set-5" type="radio">
-<label class="sd-tab-label" data-sync-group="install" data-sync-id="pip" for="sd-tab-item-10">
-pip</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-10-content" class="sd-tab-label" data-sync-group="install" data-sync-id="pip" for="sd-tab-item-10">
+pip</label><div class="sd-tab-content docutils" id="sd-tab-item-10-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>pyjpegls
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-11" name="sd-tab-set-5" type="radio">
-<label class="sd-tab-label" data-sync-group="install" data-sync-id="conda" for="sd-tab-item-11">
-conda</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-11-content" class="sd-tab-label" data-sync-group="install" data-sync-id="conda" for="sd-tab-item-11">
+conda</label><div class="sd-tab-content docutils" id="sd-tab-item-11-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>pyjpegls
 </pre></div>
 </div>
@@ -722,15 +722,15 @@ versions of Python on Windows, MacOS and Linux, and can be installed using pip.<
 tend to be older versions and may not be as well supported.</p>
 <div class="sd-tab-set sd-width-content-min docutils">
 <input checked="checked" id="sd-tab-item-12" name="sd-tab-set-6" type="radio">
-<label class="sd-tab-label" data-sync-group="install" data-sync-id="pip" for="sd-tab-item-12">
-pip</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-12-content" class="sd-tab-label" data-sync-group="install" data-sync-id="pip" for="sd-tab-item-12">
+pip</label><div class="sd-tab-content docutils" id="sd-tab-item-12-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-U<span class="w"> </span>python-gdcm
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-13" name="sd-tab-set-6" type="radio">
-<label class="sd-tab-label" data-sync-group="install" data-sync-id="conda" for="sd-tab-item-13">
-conda</label><div class="sd-tab-content docutils">
+<label aria-controls="sd-tab-item-13-content" class="sd-tab-label" data-sync-group="install" data-sync-id="conda" for="sd-tab-item-13">
+conda</label><div class="sd-tab-content docutils" id="sd-tab-item-13-content">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>gdcm
 </pre></div>
 </div>
