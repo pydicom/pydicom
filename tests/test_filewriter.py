@@ -3061,7 +3061,8 @@ class TestWriteText:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with invalid ASCII value
-        elem = DataElement(0x00180015, "CS", "Dionysios Διονυσιος")
+        with pytest.warns(UserWarning):
+            elem = DataElement(0x00180015, "CS", "Dionysios Διονυσιος")
         msg = "Not a valid ASCII string - using replacement characters"
         with pytest.warns(UserWarning, match=msg):
             write_string(fp, elem)
@@ -3085,6 +3086,7 @@ class TestWriteText:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
+
         elem = DataElement(0x00081039, "LO", "Dionysios Διονυσιος")
         with pytest.raises(UnicodeEncodeError, match=msg):
             # encode with two invalid encodings
@@ -3093,7 +3095,8 @@ class TestWriteText:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with invalid ASCII value
-        elem = DataElement(0x00180015, "CS", "Dionysios Διονυσιος")
+        with pytest.warns(UserWarning):
+            elem = DataElement(0x00180015, "CS", "Dionysios Διονυσιος")
         msg = (
             r"'latin-?1' codec can't encode characters in position 10-18:"
             r" ordinal not in range\(256\)"
