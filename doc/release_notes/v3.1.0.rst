@@ -66,6 +66,9 @@ Fixes
   *Explicit VR Big Endian* byte ordering, including frames ending within a byte or word.
 * Fixed decoding text with *ISO 2022* escape sequences for *ISO_IR 58* (GB2312) character
   sets (:issue:`2383`).
+* Fixed :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>` raising
+  :class:`AttributeError` when :func:`~pydicom.config.future_behavior` is enabled
+  (:issue:`2354`).
 * Fixed :mod:`~pydicom.util.codify` failing or producing invalid code for multi-valued
   **AT** and **PN** elements, empty multi-valued elements and empty **AT** elements, and
   failing for empty binary elements when excluding large values.
@@ -104,6 +107,9 @@ Enhancements
   :func:`~pydicom.pixels.convert_color_space` where applicable (:issue:`2228`)
 * Take the color space information from an Adobe APP14 marker into account when decoding
   pixel data for JPEG transfer syntaxes.
+* :func:`~pydicom.pixels.apply_modality_lut` and :func:`~pydicom.pixels.apply_voi`
+  now support *LUT Descriptor* bit depth per entry values in the range 1-16 bits, with a
+  warning for non-conformant values (:issue:`2317`).
 * Warn when multiples of the same element are found within a dataset or sequence item
   (:issue:`2420`).
 * Improved memory usage for :func:`~pydicom.pixels.apply_windowing` (:pr:`2315`)
