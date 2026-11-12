@@ -3166,7 +3166,7 @@ class TestFuture:
         Dataset.convert_pixel_data()"""
         fpath = get_testdata_file("CT_small.dcm")
         ds = dcmread(fpath)
-        assert numpy.array_equal(ds.pixel_array, pixel_array(fpath))
+        assert np.array_equal(ds.pixel_array, pixel_array(fpath))
         # The decoded array is cached
         assert ds.pixel_array is ds.pixel_array
 
