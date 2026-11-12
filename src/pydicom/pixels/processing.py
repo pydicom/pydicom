@@ -223,7 +223,11 @@ def apply_color_lut(
         raise ValueError("LUT data must be the same length")
 
     # IVs < `first_map` get set to first LUT entry (i.e. index 0)
-    clipped_iv = np.zeros(arr.shape, dtype=dtype)
+    # `dtype` describes the *entries'* bit depth (8 or 16-bit), not how many
+    # entries there are: `nr_entries` can be up to 2**16 even for an 8-bit
+    # LUT, so the index buffer needs its own, wider dtype or a legal index
+    # beyond 255/65535 wraps and maps to the wrong entry.
+    clipped_iv = np.zeros(arr.shape, dtype=np.int64)
     # IVs >= `first_map` are mapped by the Palette Color LUTs
     # `first_map` may be negative, positive or 0
     mapped_pixels = arr >= first_map
