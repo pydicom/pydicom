@@ -79,6 +79,9 @@ Fixes
   (:issue:`2427`).
 * Fixed :attr:`~pydicom.dataset.Dataset.pixel_array` raising a bare ``StopIteration`` when
   encapsulated *Pixel Data* contains fewer frames than *Number of Frames* (:issue:`2371`).
+* Fixed :mod:`~pydicom.util.codify` failing or producing invalid code for multi-valued
+  **AT** and **PN** elements, empty multi-valued elements and empty **AT** elements, and
+  failing for empty binary elements when excluding large values.
 
 Enhancements
 ------------
