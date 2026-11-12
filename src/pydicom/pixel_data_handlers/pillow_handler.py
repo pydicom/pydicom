@@ -11,7 +11,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
 
 try:
-    import numpy
+    import numpy as np
 
     HAVE_NP = True
 except ImportError:
@@ -136,7 +136,7 @@ def _decompress_single_frame(
     return image
 
 
-def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
+def get_pixeldata(ds: "Dataset") -> "np.ndarray":
     """Return a :class:`numpy.ndarray` of the *Pixel Data*.
 
     Parameters
@@ -208,7 +208,7 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
 
     logger.debug(f"Successfully read {len(pixel_bytes)} pixel bytes")
 
-    arr = numpy.frombuffer(pixel_bytes, pixel_dtype(ds))
+    arr = np.frombuffer(pixel_bytes, pixel_dtype(ds))
 
     if transfer_syntax in PillowJPEG2000TransferSyntaxes:
         # Pillow converts N-bit data to 8- or 16-bit unsigned data,
@@ -226,24 +226,24 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
             shift = bits_allocated - j2k_precision
             if not j2k_sign and j2k_sign != ds.PixelRepresentation:
                 # Convert unsigned J2K data to 2's complement
-                numpy.right_shift(arr, shift, out=arr)
+                np.right_shift(arr, shift, out=arr)
             else:
                 if ds.PixelRepresentation == 1:
                     # Pillow converts signed data to unsigned
                     #   so we need to undo this conversion
-                    arr -= numpy.uint32(2 ** (bits_allocated - 1))
+                    arr -= np.uint32(2 ** (bits_allocated - 1))
 
                 if shift:
-                    numpy.right_shift(arr, shift, out=arr)
+                    np.right_shift(arr, shift, out=arr)
         else:
             # Corrections based on dataset elements
             if ds.PixelRepresentation == 1:
-                arr -= numpy.uint32(2 ** (bits_allocated - 1))
+                arr -= np.uint32(2 ** (bits_allocated - 1))
 
             if shift:
-                numpy.right_shift(arr, shift, out=arr)
+                np.right_shift(arr, shift, out=arr)
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"
 
-    return cast("numpy.ndarray", arr)
+    return cast("np.ndarray", arr)

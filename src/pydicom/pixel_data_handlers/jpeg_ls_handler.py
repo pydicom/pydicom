@@ -7,7 +7,7 @@ package to decode *Pixel Data*.
 from typing import TYPE_CHECKING, cast
 
 try:
-    import numpy
+    import numpy as np
 
     HAVE_NP = True
 except ImportError:
@@ -76,7 +76,7 @@ def supports_transfer_syntax(transfer_syntax: pydicom.uid.UID) -> bool:
     return transfer_syntax in SUPPORTED_TRANSFER_SYNTAXES
 
 
-def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
+def get_pixeldata(ds: "Dataset") -> "np.ndarray":
     """Return the *Pixel Data* as a :class:`numpy.ndarray`.
 
     Returns
@@ -110,12 +110,12 @@ def get_pixeldata(ds: "Dataset") -> "numpy.ndarray":
 
     nr_frames = get_nr_frames(ds, warn=False)
     for frame in generate_frames(ds.PixelData, number_of_frames=nr_frames):
-        im = jpeg_ls.decode(numpy.frombuffer(frame, dtype="u1"))
+        im = jpeg_ls.decode(np.frombuffer(frame, dtype="u1"))
         pixel_bytes.extend(im.tobytes())
 
-    arr = numpy.frombuffer(pixel_bytes, pixel_dtype(ds))
+    arr = np.frombuffer(pixel_bytes, pixel_dtype(ds))
 
     if should_change_PhotometricInterpretation_to_RGB(ds):
         ds.PhotometricInterpretation = "RGB"
 
-    return cast("numpy.ndarray", arr)
+    return cast("np.ndarray", arr)
