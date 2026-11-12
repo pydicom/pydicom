@@ -79,6 +79,9 @@ Fixes
   (:issue:`2427`).
 * Fixed :attr:`~pydicom.dataset.Dataset.pixel_array` raising a bare ``StopIteration`` when
   encapsulated *Pixel Data* contains fewer frames than *Number of Frames* (:issue:`2371`).
+* Fixed a **SQ** element that couldn't be converted to a sequence being left in the
+  dataset with non-dataset items after raising an exception, so that only the first
+  access raised (:issue:`2425`).
 
 Enhancements
 ------------

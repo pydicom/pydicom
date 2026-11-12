@@ -7,7 +7,9 @@ import math
 from pathlib import Path
 import pickle
 from platform import python_implementation
+from struct import pack
 import sys
+import warnings
 import weakref
 import tempfile
 
@@ -2173,6 +2175,40 @@ class TestDatasetElements:
         # check also that assigning proper sequence *does* work
         self.ds.ConceptCodeSequence = [self.sub_ds1, self.sub_ds2]
         assert isinstance(self.ds.ConceptCodeSequence, Sequence)
+
+    def test_invalid_sequence_assignment_keeps_existing(self):
+        """A failed SQ assignment leaves the existing element unchanged."""
+        self.ds.ConceptCodeSequence = [self.sub_ds1]
+        # as made by convert_raw_data_element() from an unparsable SQ value
+        elem = DataElement(0x0040A168, "SQ", ["CodeValue"], already_converted=True)
+        msg = r"Sequence contents must be 'Dataset' instances"
+        with pytest.raises(TypeError, match=msg):
+            self.ds[0x0040A168] = elem
+
+        assert self.ds.ConceptCodeSequence == [self.sub_ds1]
+
+    def test_invalid_raw_sequence_raises_on_each_access(self):
+        """A raw SQ element that can't be parsed stays raw and raises again."""
+        # An item whose Specific Character Set has a length beyond its end,
+        #   so the SQ value is converted with the fallback VR SH instead
+        content = (
+            b"\x08\x00\x05\x00CS\x00\x1eISO 2022 IR 13\\ISO 2022 IR 87 "
+            b"\x08\x00\x00\x01SH\x0a\x00CodeValue "
+        )
+        item = b"\xfe\xff\x00\xe0" + pack("<I", len(content)) + content
+        # Requested Procedure Code Sequence, explicit VR little endian
+        data = b"\x32\x00\x64\x10SQ\x00\x00" + pack("<I", len(item)) + item
+        ds = dcmread(io.BytesIO(data), force=True)
+
+        msg = r"Sequence contents must be 'Dataset' instances"
+        for _ in range(2):
+            # the fallback conversion also warns about the SH value length
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                with pytest.raises(TypeError, match=msg):
+                    ds[0x00321064]
+
+            assert isinstance(ds._dict[0x00321064], RawDataElement)
 
     def test_formatted_DS_assignment(self):
         """Assigning an auto-formatted decimal string works as expected."""
