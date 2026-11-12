@@ -1165,6 +1165,41 @@ class TestDecoder_Array:
             assert arr.flags.writeable
             assert meta["bits_stored"] == 12
 
+    @pytest.mark.parametrize("as_binary", [False, True])
+    @pytest.mark.parametrize("raw", [False, True])
+    def test_native_single_bit_nonaligned_index(self, as_binary, raw):
+        """Test indexed decoding when a frame spans an extra byte."""
+        decoder = get_decoder(ExplicitVRLittleEndian)
+        word = 0x1A53D196C
+        src = pack("<IH", word & 0xFFFFFFFF, word >> 32)
+        if as_binary:
+            src = BytesIO(b"prefix" + src)
+            src.seek(6)
+
+        opts = {
+            "rows": 1,
+            "columns": 11,
+            "number_of_frames": 3,
+            "samples_per_pixel": 1,
+            "photometric_interpretation": PI.MONOCHROME2,
+            "bits_allocated": 1,
+            "bits_stored": 1,
+            "pixel_representation": 0,
+            "pixel_keyword": "PixelData",
+        }
+        expected = np.asarray(
+            [
+                [[(word >> (11 * frame + column)) & 1 for column in range(11)]]
+                for frame in range(3)
+            ],
+            dtype="u1",
+        )
+        arr, _ = decoder.as_array(src, raw=raw, **opts)
+        assert np.array_equal(arr, expected)
+        for index in range(3):
+            arr, _ = decoder.as_array(src, index=index, raw=raw, **opts)
+            assert np.array_equal(arr, expected[index])
+
     def test_native_view_only(self):
         """Test as_array(view_only=True)"""
         decoder = get_decoder(ExplicitVRLittleEndian)
