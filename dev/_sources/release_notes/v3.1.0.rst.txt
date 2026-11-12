@@ -74,6 +74,9 @@ Fixes
 * Fixed :attr:`Dataset.pixel_array<pydicom.dataset.Dataset.pixel_array>` raising
   :class:`AttributeError` when :func:`~pydicom.config.future_behavior` is enabled
   (:issue:`2354`).
+* Fixed :class:`~pydicom.valuerep.DSdecimal` not comparing ``NaN`` values as equal,
+  matching the behavior of :class:`~pydicom.valuerep.DSfloat` fixed in :issue:`2273`
+  (:issue:`2427`).
 * Fixed :attr:`~pydicom.dataset.Dataset.pixel_array` raising a bare ``StopIteration`` when
   encapsulated *Pixel Data* contains fewer frames than *Number of Frames* (:issue:`2371`).
 
