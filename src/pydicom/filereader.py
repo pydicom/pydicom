@@ -75,8 +75,10 @@ def data_element_generator(
         ``True`` if the data is encoded as little endian, ``False`` otherwise.
     stop_when : None, callable, optional
         If ``None`` (default), then the whole file is read. A callable which
-        takes tag, VR, length, and returns ``True`` or ``False``. If it
-        returns ``True``, ``read_data_element`` will just return.
+        takes ``(tag: BaseTag, vr: None | str, length: int)`` and returns
+        ``True`` or ``False``. If it returns ``True``, ``read_data_element``
+        will just return. For implicit VR data `vr` is ``None``, as the VR
+        has not yet been looked up when `stop_when` is called.
     defer_size : int, str or float, optional
         See :func:`dcmread` for parameter info.
     encoding : str | MutableSequence[str]
@@ -939,8 +941,8 @@ def read_partial(
     elif transfer_syntax == pydicom.uid.ExplicitVRBigEndian:
         is_implicit_VR = False
         is_little_endian = False
-    elif transfer_syntax == pydicom.uid.DeflatedExplicitVRLittleEndian:
-        # See PS3.5 section A.5
+    elif transfer_syntax in pydicom.uid.DeflatedTransferSyntaxes:
+        # See PS3.5 sections A.5, A.7 and A.12
         # when written, the entire dataset following
         #     the file metadata was prepared the normal way,
         #     then "deflate" compression applied.

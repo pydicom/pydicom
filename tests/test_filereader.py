@@ -12,6 +12,7 @@ from struct import unpack
 import sys
 import tempfile
 import time
+import zlib
 
 import pytest
 
@@ -29,6 +30,7 @@ from pydicom.filereader import (
 from pydicom.dataelem import DataElement, convert_raw_data_element
 from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomBytesIO
+from pydicom.filewriter import write_dataset, write_file_meta_info
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag, TupleTag
@@ -288,6 +290,45 @@ class TestReader:
         assert "WSD" == ds.ConversionType
         assert isinstance(ds.buffer, DicomBytesIO)
         assert ds.filename == deflate_name
+
+    # UIDs hardcoded from PS3.5 Sections A.5, A.7 and A.12 rather than taken
+    #   from pydicom.uid so that an omission there is detectable here
+    @pytest.mark.parametrize(
+        "tsyntax",
+        [
+            "1.2.840.10008.1.2.1.99",  # Deflated Explicit VR Little Endian
+            "1.2.840.10008.1.2.4.95",  # JPIP Referenced Deflate
+            "1.2.840.10008.1.2.4.205",  # JPIP HTJ2K Referenced Deflate
+        ],
+    )
+    def test_read_deflated_syntaxes(self, tsyntax):
+        """A deflated dataset is inflated for every deflated transfer syntax."""
+        # Build the file by hand so the encoder isn't the oracle for the decoder
+        ds = Dataset()
+        ds.SOPClassUID = "1.2.840.10008.5.1.4.1.1.7"
+        ds.SOPInstanceUID = "1.2.3.4"
+        ds.PatientName = "CITIZEN^Jan"
+        buffer = DicomBytesIO()
+        buffer.is_implicit_VR = False
+        buffer.is_little_endian = True
+        write_dataset(buffer, ds)
+        compressor = zlib.compressobj(wbits=-zlib.MAX_WBITS)
+        deflated = compressor.compress(buffer.getvalue()) + compressor.flush()
+
+        meta = FileMetaDataset()
+        meta.MediaStorageSOPClassUID = "1.2.840.10008.5.1.4.1.1.7"
+        meta.MediaStorageSOPInstanceUID = "1.2.3.4"
+        meta.TransferSyntaxUID = tsyntax
+        meta.ImplementationClassUID = "1.2.3.4"
+        meta_buffer = DicomBytesIO()
+        meta_buffer.is_implicit_VR = False
+        meta_buffer.is_little_endian = True
+        write_file_meta_info(meta_buffer, meta, enforce_standard=True)
+
+        raw = b"\x00" * 128 + b"DICM" + meta_buffer.getvalue() + deflated
+        out = dcmread(BytesIO(raw))
+        assert out.PatientName == "CITIZEN^Jan"
+        assert out.SOPInstanceUID == "1.2.3.4"
 
     def test_sequence_with_implicit_vr(self):
         """Test that reading a UN sequence with unknown length and implicit VR
@@ -1867,6 +1908,92 @@ class TestFileLike:
 
 class TestDataElementGenerator:
     """Test filereader.data_element_generator"""
+
+    @pytest.mark.parametrize(
+        ("is_implicit_VR", "stop_tag", "stop_element"),
+        [
+            (
+                True,
+                Tag(0x7FE0, 0x0010),
+                # (7FE0,0010) implicit VR, 4-byte length = 4
+                b"\xe0\x7f\x10\x00\x04\x00\x00\x00DATA",
+            ),
+            (
+                False,
+                Tag(0x0010, 0x0010),
+                # (0010,0010) PN, 2-byte length = 4
+                b"\x10\x00\x10\x00PN\x04\x00DATA",
+            ),
+            (
+                False,
+                Tag(0x7FE0, 0x0010),
+                # (7FE0,0010) OB, 2 reserved bytes, 4-byte length = 4
+                b"\xe0\x7f\x10\x00OB\x00\x00\x04\x00\x00\x00DATA",
+            ),
+        ],
+        ids=["implicit-pixeldata", "explicit-2byte-length", "explicit-4byte-length"],
+    )
+    def test_stop_when_rewinds_to_start_of_element(
+        self, is_implicit_VR, stop_tag, stop_element
+    ):
+        """Test stop_when leaves the file positioned at the stopped element."""
+        # (0010,0020) PatientID, length 4, value "TEST"
+        first_element = b"\x10\x00\x20\x00"
+        if is_implicit_VR:
+            first_element += b"\x04\x00\x00\x00"  # 4-byte length = 4
+        else:
+            first_element += b"LO\x04\x00"  # LO, 2-byte length = 4
+        first_element += b"TEST"
+        fp = BytesIO(first_element + stop_element)
+        gen = data_element_generator(
+            fp,
+            is_implicit_VR=is_implicit_VR,
+            is_little_endian=True,
+            stop_when=lambda tag, vr, length: tag == stop_tag,
+        )
+
+        assert next(gen).tag == Tag(0x0010, 0x0020)
+        with pytest.raises(StopIteration):
+            next(gen)
+
+        assert fp.tell() == len(first_element)
+        assert fp.read() == stop_element
+
+    def test_stop_when_receives_none_vr_for_implicit_vr(self):
+        """Test stop_when is called with vr=None for implicit VR data."""
+        # (0010,0010) implicit VR, 4-byte length = 4
+        fp = BytesIO(b"\x10\x00\x10\x00\x04\x00\x00\x00DATA")
+        stop_when_args = []
+
+        def stop_when(tag, vr, length):
+            stop_when_args.append((tag, vr, length))
+            return True
+
+        gen = data_element_generator(
+            fp, is_implicit_VR=True, is_little_endian=True, stop_when=stop_when
+        )
+        with pytest.raises(StopIteration):
+            next(gen)
+
+        assert stop_when_args == [(Tag(0x0010, 0x0010), None, 4)]
+
+    def test_stop_when_receives_vr_for_explicit_vr(self):
+        """Test stop_when is called with the VR str for explicit VR data."""
+        # (0010,0010) PN, 2-byte length = 4
+        fp = BytesIO(b"\x10\x00\x10\x00PN\x04\x00DATA")
+        stop_when_args = []
+
+        def stop_when(tag, vr, length):
+            stop_when_args.append((tag, vr, length))
+            return True
+
+        gen = data_element_generator(
+            fp, is_implicit_VR=False, is_little_endian=True, stop_when=stop_when
+        )
+        with pytest.raises(StopIteration):
+            next(gen)
+
+        assert stop_when_args == [(Tag(0x0010, 0x0010), "PN", 4)]
 
     def test_little_endian_explicit(self):
         """Test reading little endian explicit VR data"""

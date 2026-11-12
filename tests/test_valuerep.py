@@ -905,6 +905,15 @@ class TestDSdecimal:
             with pytest.raises(TypeError, match="'>=' not supported"):
                 val >= "1233"
 
+    def test_comparison_with_nan(self, disable_value_validation):
+        """DSdecimal NaN should compare equal, matching DSfloat (#2273)."""
+        nan_value = DSdecimal(Decimal("nan"))
+        assert nan_value == DSdecimal(Decimal("nan"))
+        assert nan_value == math.nan
+        assert nan_value == Decimal("nan")
+        assert nan_value != 1234.5
+        assert nan_value != "1234.5"
+
     def test_hash(self, allow_ds_float, disable_value_validation):
         """Test hash(DSdecimal)"""
         assert hash(DSdecimal(1.2345)) == hash(Decimal(1.2345))

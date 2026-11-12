@@ -1232,6 +1232,13 @@ class DSdecimal(Decimal):
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
+        # ponytail: mirror DSfloat.__eq__'s NaN handling (see #2296/#2273) so
+        # 'DS' compares equal for NaN regardless of which DS backing class
+        # (DSfloat vs DSdecimal, selected via config.use_DS_decimal) is used.
+        if isinstance(other, float) and math.isnan(other):
+            return self.is_nan()
+        if isinstance(other, Decimal) and other.is_nan():
+            return self.is_nan()
 
         return super().__eq__(other)
 

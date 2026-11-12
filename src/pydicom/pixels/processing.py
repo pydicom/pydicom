@@ -382,7 +382,25 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         first_map = cast(list[int], item.LUTDescriptor)[1]
         nominal_depth = cast(list[int], item.LUTDescriptor)[2]
 
-        dtype = f"uint{nominal_depth}"
+        # For the Modality LUT the third value shall be 8 or 16 (PS3.3 C.11.1.1)
+        #   however may as well support a more generic range
+        if 8 < nominal_depth < 17:
+            actual_depth = "16"
+        elif 0 < nominal_depth < 9:
+            actual_depth = "8"
+        else:
+            raise NotImplementedError(
+                f"'{nominal_depth}' bits per entry for 'LUT Descriptor' is not "
+                "supported"
+            )
+
+        if nominal_depth not in (8, 16):
+            warn_and_log(
+                f"A value of {nominal_depth} bits per entry for 'LUT Descriptor' is "
+                f"not conformant for a Modality LUT Sequence, using {actual_depth} "
+                "bits instead"
+            )
+        dtype = f"uint{actual_depth}"
 
         # Ambiguous VR, US or OW
         unc_data: Iterable[int]
@@ -646,15 +664,21 @@ def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
     nr_entries = lut_descriptor[0] or 2**16
     first_map = lut_descriptor[1]
 
-    # PS3.3 C.8.11.3.1.5: may be 8, 10-16
+    # PS3.3 C.8.11.3.1.5: may be 8, 10-16 - but make it more generic just in case
     nominal_depth = lut_descriptor[2]
-    if nominal_depth in list(range(10, 17)):
+    if 8 < nominal_depth < 17:
         dtype = "uint16"
-    elif nominal_depth == 8:
+    elif 0 < nominal_depth < 9:
         dtype = "uint8"
     else:
         raise NotImplementedError(
-            f"'{nominal_depth}' bits per LUT entry is not supported"
+            f"'{nominal_depth}' bits per entry for 'LUT Descriptor' is not supported"
+        )
+
+    if nominal_depth not in (8, 10, 11, 12, 13, 14, 15, 16):
+        warn_and_log(
+            f"A value of {nominal_depth} bits per entry for 'LUT Descriptor' is not "
+            "conformant for a VOI LUT Sequence"
         )
 
     # Ambiguous VR, US or OW
