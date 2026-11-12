@@ -382,7 +382,25 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         first_map = cast(list[int], item.LUTDescriptor)[1]
         nominal_depth = cast(list[int], item.LUTDescriptor)[2]
 
-        dtype = f"uint{nominal_depth}"
+        # For the Modality LUT the third value shall be 8 or 16 (PS3.3 C.11.1.1)
+        #   however may as well support a more generic range
+        if 8 < nominal_depth < 17:
+            actual_depth = "16"
+        elif 0 < nominal_depth < 9:
+            actual_depth = "8"
+        else:
+            raise NotImplementedError(
+                f"'{nominal_depth}' bits per entry for 'LUT Descriptor' is not "
+                "supported"
+            )
+
+        if nominal_depth not in (8, 16):
+            warn_and_log(
+                f"A value of {nominal_depth} bits per entry for 'LUT Descriptor' is "
+                f"not conformant for a Modality LUT Sequence, using {actual_depth} "
+                "bits instead"
+            )
+        dtype = f"uint{actual_depth}"
 
         # Ambiguous VR, US or OW
         unc_data: Iterable[int]
@@ -408,13 +426,17 @@ def apply_modality_lut(arr: "np.ndarray", ds: "Dataset") -> "np.ndarray":
         lut_data: np.ndarray = np.asarray(unc_data, dtype=dtype)
 
         # IVs < `first_map` get set to first LUT entry (i.e. index 0)
-        clipped_iv = np.zeros(arr.shape, dtype=arr.dtype)
+        # The index range is set by the number of LUT entries, not by `arr`
+        clipped_iv = np.zeros(arr.shape, dtype=np.min_scalar_type(nr_entries - 1))
         # IVs >= `first_map` are mapped by the Modality LUT
         # `first_map` may be negative, positive or 0
         mapped_pixels = arr >= first_map
-        clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
-        # IVs > number of entries get set to last entry
-        np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
+        # IVs > number of entries get set to last entry. Clip before narrowing
+        #   to the index dtype, otherwise `arr - first_map` may overflow and
+        #   wrap around rather than being clamped
+        clipped_iv[mapped_pixels] = np.clip(
+            arr[mapped_pixels].astype("int64") - first_map, 0, nr_entries - 1
+        )
 
         return lut_data[clipped_iv]
     elif "RescaleSlope" in ds and "RescaleIntercept" in ds:
@@ -642,15 +664,21 @@ def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
     nr_entries = lut_descriptor[0] or 2**16
     first_map = lut_descriptor[1]
 
-    # PS3.3 C.8.11.3.1.5: may be 8, 10-16
+    # PS3.3 C.8.11.3.1.5: may be 8, 10-16 - but make it more generic just in case
     nominal_depth = lut_descriptor[2]
-    if nominal_depth in list(range(10, 17)):
+    if 8 < nominal_depth < 17:
         dtype = "uint16"
-    elif nominal_depth == 8:
+    elif 0 < nominal_depth < 9:
         dtype = "uint8"
     else:
         raise NotImplementedError(
-            f"'{nominal_depth}' bits per LUT entry is not supported"
+            f"'{nominal_depth}' bits per entry for 'LUT Descriptor' is not supported"
+        )
+
+    if nominal_depth not in (8, 10, 11, 12, 13, 14, 15, 16):
+        warn_and_log(
+            f"A value of {nominal_depth} bits per entry for 'LUT Descriptor' is not "
+            "conformant for a VOI LUT Sequence"
         )
 
     # Ambiguous VR, US or OW
@@ -676,13 +704,18 @@ def apply_voi(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.ndarray":
     lut_data: np.ndarray = np.asarray(unc_data, dtype=dtype)
 
     # IVs < `first_map` get set to first LUT entry (i.e. index 0)
-    clipped_iv = np.zeros(arr.shape, dtype=dtype)
+    # The index range is set by the number of LUT entries, not by the depth of
+    #   the entries themselves, so `dtype` is not usable here
+    clipped_iv = np.zeros(arr.shape, dtype=np.min_scalar_type(nr_entries - 1))
     # IVs >= `first_map` are mapped by the VOI LUT
     # `first_map` may be negative, positive or 0
     mapped_pixels = arr >= first_map
-    clipped_iv[mapped_pixels] = arr[mapped_pixels] - first_map
-    # IVs > number of entries get set to last entry
-    np.clip(clipped_iv, 0, nr_entries - 1, out=clipped_iv)
+    # IVs > number of entries get set to last entry. Clip before narrowing to
+    #   the index dtype, otherwise out-of-range IVs wrap around rather than
+    #   being clamped
+    clipped_iv[mapped_pixels] = np.clip(
+        arr[mapped_pixels].astype("int64") - first_map, 0, nr_entries - 1
+    )
 
     return cast("np.ndarray", lut_data[clipped_iv])
 
@@ -799,14 +832,18 @@ def apply_windowing(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.nda
                 "for a 'LINEAR_EXACT' windowing operation"
             )
 
-        below = arr <= (center - width / 2)
-        above = arr > (center + width / 2)
-        between = np.logical_and(~below, ~above)
-
-        arr[below] = y_min
-        arr[above] = y_max
-        if between.any():
-            arr[between] = ((arr[between] - center) / width + 0.5) * y_range + y_min
+        if width == 0:
+            # Width 0 -> threshold: y_min if x <= center, y_max otherwise
+            arr -= center
+            np.sign(arr, out=arr)
+            np.clip(arr, 0, 1, out=arr)
+            arr *= y_range
+            arr += y_min
+        else:
+            # ((x - center) / width + 0.5) * y_range + y_min as m * x + b
+            arr *= y_range / width
+            arr += y_min + y_range * (0.5 - center / width)
+            np.clip(arr, y_min, y_max, out=arr)
     elif voi_func == "SIGMOID":
         # PS3.3 C.11.2.1.3.1
         if width <= 0:
@@ -815,7 +852,12 @@ def apply_windowing(arr: "np.ndarray", ds: "Dataset", index: int = 0) -> "np.nda
                 "for a 'SIGMOID' windowing operation"
             )
 
-        arr = y_range / (1 + np.exp(-4 * (arr - center) / width)) + y_min
+        arr -= center
+        arr *= -4.0 / width
+        np.exp(arr, out=arr)
+        arr += 1.0
+        np.divide(y_range, arr, out=arr)
+        arr += y_min
     else:
         raise ValueError(f"Unsupported (0028,1056) VOI LUT Function value '{voi_func}'")
 

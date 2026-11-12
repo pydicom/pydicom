@@ -38,6 +38,7 @@ from pydicom.dataset import (
 from pydicom.encaps import encapsulate
 from pydicom.errors import BytesLengthException
 from pydicom.filebase import DicomBytesIO
+from pydicom.pixels import pixel_array
 from pydicom.pixels.utils import get_image_pixel_ids
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag
@@ -1268,6 +1269,41 @@ class TestDataset:
         block.add_new(0x01, "SH", "Poodle")
         assert len(ds) == 2
         assert ds[0x000B0010].value == "dog^2"
+
+    def test_create_private_tag_after_pop_and_clear(self):
+        ds = Dataset()
+        block = ds.private_block(0x000B, "dog^1", create=True)
+        block.add_new(0x01, "SH", "Border Collie")
+
+        ds.pop(0x000B0010)
+        block = ds.private_block(0x000B, "dog^1", create=True)
+        block.add_new(0x02, "SH", "Poodle")
+        assert len(ds) == 3
+        assert ds[0x000B0010].value == "dog^1"
+
+        ds.clear()
+        block = ds.private_block(0x000B, "dog^1", create=True)
+        block.add_new(0x01, "SH", "Pug")
+        assert len(ds) == 2
+        assert ds[0x000B0010].value == "dog^1"
+
+        ds.popitem()
+        ds.popitem()
+        block = ds.private_block(0x000B, "dog^1", create=True)
+        block.add_new(0x01, "SH", "Pug")
+        assert len(ds) == 2
+        assert ds[0x000B0010].value == "dog^1"
+
+    def test_private_block_after_replacing_private_creator(self):
+        ds = Dataset()
+        ds.private_block(0x000B, "dog^1", create=True)
+        ds[0x000B0010] = DataElement(0x000B0010, "LO", "cat^1")
+        with pytest.raises(KeyError, match="Private creator 'dog\\^1' not found"):
+            ds.private_block(0x000B, "dog^1")
+
+        block = ds.private_block(0x000B, "dog^1", create=True)
+        assert block.block_start == 0x1100
+        assert ds[0x000B0011].value == "dog^1"
 
     def test_read_invalid_private_tag_number_as_un(self):
         # regression test for #1347
@@ -3123,6 +3159,16 @@ class TestFuture:
         msg = "'Dataset' object has no attribute 'convert_pixel_data'"
         with pytest.raises(AttributeError, match=msg):
             Dataset().convert_pixel_data()
+
+    @pytest.mark.skipif(not HAVE_NP, reason="Numpy is not available")
+    def test_pixel_array(self, use_future):
+        """Test Dataset.pixel_array is unaffected by the removal of
+        Dataset.convert_pixel_data()"""
+        fpath = get_testdata_file("CT_small.dcm")
+        ds = dcmread(fpath)
+        assert numpy.array_equal(ds.pixel_array, pixel_array(fpath))
+        # The decoded array is cached
+        assert ds.pixel_array is ds.pixel_array
 
     def test_pixel_array_options(self, use_future):
         msg = (
