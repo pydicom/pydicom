@@ -59,6 +59,10 @@ Fixes
   :func:`~pydicom.filereader.dcmread` and :func:`~pydicom.filewriter.dcmwrite` not
   inflating/deflating the dataset for those two transfer syntaxes (PS3.5 Sections A.7
   and A.12).
+* Fixed :meth:`~pydicom.valuerep.PersonName.from_named_components` and
+  :meth:`~pydicom.valuerep.PersonName.from_named_components_veterinary` replacing
+  non-ASCII characters in :class:`str` components with ``?`` when no `encodings` are
+  given; the value is now encoded when written using the character set of the dataset.
 * Make float data elements with `NaN` value compare as equal - this is semantically better suited
   then the mathematical comparison, where `NaN != NaN` (:issue:`2273`)
 * Fixed fileset-uid-property-annotation with Python 3.14 (:issue:`2358`)

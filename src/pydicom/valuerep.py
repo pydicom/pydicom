@@ -1796,8 +1796,8 @@ class PersonName:
         ideographic_group: Sequence[str | bytes],
         phonetic_group: Sequence[str | bytes],
         encodings: list[str] | None = None,
-    ) -> bytes:
-        """Creates a byte string for a person name from lists of parts.
+    ) -> str | bytes:
+        """Creates a person name value from lists of parts.
 
         Each of the three component groups (alphabetic, ideographic, phonetic)
         are supplied as a list of components.
@@ -1815,8 +1815,10 @@ class PersonName:
 
         Returns
         -------
-        bytes:
-            Bytes string representation of the person name.
+        str | bytes:
+            If all components are :class:`str`, the decoded person name value
+            as :class:`str`, otherwise the byte string representation of the
+            person name encoded using `encodings`.
 
         Raises
         ------
@@ -1826,6 +1828,26 @@ class PersonName:
         """
         from pydicom.charset import encode_string, decode_bytes
 
+        disallowed_chars = ["\\", "=", "^"]
+
+        def check_chars(val: str) -> None:
+            for c in disallowed_chars:
+                if c in val:
+                    raise ValueError(f"Strings may not contain the {c} character")
+
+        groups = [alphabetic_group, ideographic_group, phonetic_group]
+        if not any(isinstance(c, bytes) for group in groups for c in group):
+            # All components are str - leave the value decoded so that it
+            # gets encoded on writing using the character set of the dataset
+            str_groups: list[str] = []
+            for group in groups:
+                str_components = [cast(str, c) for c in group]
+                for component in str_components:
+                    check_chars(component)
+                str_groups.append("^".join(str_components).rstrip("^"))
+
+            return "=".join(str_groups).rstrip("=")
+
         def enc(s: str) -> bytes:
             return encode_string(s, encodings or [default_encoding])
 
@@ -1834,8 +1856,6 @@ class PersonName:
 
         encoded_component_sep = enc("^")
         encoded_group_sep = enc("=")
-
-        disallowed_chars = ["\\", "=", "^"]
 
         def standardize_encoding(val: str | bytes) -> bytes:
             # Return a byte encoded string regardless of the input type
@@ -1849,9 +1869,7 @@ class PersonName:
                 val_dec = val
 
             # Check for disallowed chars in the decoded string
-            for c in disallowed_chars:
-                if c in val_dec:
-                    raise ValueError(f"Strings may not contain the {c} character")
+            check_chars(val_dec)
 
             # Return the encoded string
             return val_enc
@@ -2003,14 +2021,14 @@ class PersonName:
             name_suffix_phonetic,
         ]
 
-        encoded_value: bytes = cls._encode_component_groups(
+        value = cls._encode_component_groups(
             alphabetic_group,
             ideographic_group,
             phonetic_group,
             encodings,
         )
 
-        return cls(encoded_value, encodings=encodings)
+        return cls(value, encodings=encodings)
 
     @classmethod
     def from_named_components_veterinary(
@@ -2095,8 +2113,8 @@ class PersonName:
             patient_name_phonetic,
         ]
 
-        encoded_value: bytes = cls._encode_component_groups(
+        value = cls._encode_component_groups(
             alphabetic_group, ideographic_group, phonetic_group, encodings
         )
 
-        return cls(encoded_value, encodings=encodings)
+        return cls(value, encodings=encodings)
