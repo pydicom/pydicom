@@ -79,6 +79,9 @@ Fixes
   (:issue:`2427`).
 * Fixed :attr:`~pydicom.dataset.Dataset.pixel_array` raising a bare ``StopIteration`` when
   encapsulated *Pixel Data* contains fewer frames than *Number of Frames* (:issue:`2371`).
+* Fixed writing *LUT Data* set as a list of integers failing with a ``TypeError``
+  because its ambiguous VR was resolved to **OW**; it is now written as **US**
+  (:issue:`2400`).
 
 Enhancements
 ------------
