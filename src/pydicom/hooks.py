@@ -262,6 +262,16 @@ def raw_element_value(
         warn_and_log(f"{msg} Setting VR to 'UN'.")
         data["VR"] = VR.UN
         value = raw.value
+    except ValueError as exc:
+        # Unless reading validation is RAISE, only a SQ value gets here
+        if vr != VR.SQ or config.settings.reading_validation_mode == config.RAISE:
+            raise
+
+        warn_and_log(
+            f"Unable to parse the sequence in {raw.tag}: {exc}. Setting VR to 'UN'."
+        )
+        data["VR"] = VR.UN
+        value = raw.value
 
     if raw.tag in _LUT_DESCRIPTOR_TAGS:
         # We only fix the first value as the third value is 8 or 16

@@ -9,7 +9,6 @@ import pickle
 from platform import python_implementation
 from struct import pack
 import sys
-import warnings
 import weakref
 import tempfile
 
@@ -2187,26 +2186,48 @@ class TestDatasetElements:
 
         assert self.ds.ConceptCodeSequence == [self.sub_ds1]
 
-    def test_invalid_raw_sequence_raises_on_each_access(self):
-        """A raw SQ element that can't be parsed stays raw and raises again."""
-        # An item whose Specific Character Set has a length beyond its end,
-        #   so the SQ value is converted with the fallback VR SH instead
-        content = (
-            b"\x08\x00\x05\x00CS\x00\x1eISO 2022 IR 13\\ISO 2022 IR 87 "
-            b"\x08\x00\x00\x01SH\x0a\x00CodeValue "
-        )
+    @staticmethod
+    def unparsable_sequence_dataset(monkeypatch):
+        """Return a dataset with a raw SQ element that fails to parse."""
+        content = b"\x08\x00\x00\x01SH\x0a\x00CodeValue "
         item = b"\xfe\xff\x00\xe0" + pack("<I", len(content)) + content
         # Requested Procedure Code Sequence, explicit VR little endian
         data = b"\x32\x00\x64\x10SQ\x00\x00" + pack("<I", len(item)) + item
         ds = dcmread(io.BytesIO(data), force=True)
 
-        msg = r"Sequence contents must be 'Dataset' instances"
+        def read_sequence(*args, **kwargs):
+            raise ValueError("Bad sequence item")
+
+        # How a sequence fails to parse depends on the Python implementation,
+        #   e.g. an embedded null in a character set raises only on CPython
+        monkeypatch.setattr(pydicom.values, "read_sequence", read_sequence)
+        return ds, data[12:]
+
+    def test_unparsable_raw_sequence_converted_to_un(
+        self, monkeypatch, allow_reading_invalid_values
+    ):
+        """A raw SQ element that can't be parsed is converted to UN."""
+        ds, value = self.unparsable_sequence_dataset(monkeypatch)
+        msg = (
+            r"Unable to parse the sequence in \(0032,1064\): Bad sequence item. "
+            r"Setting VR to 'UN'."
+        )
+        with pytest.warns(UserWarning, match=msg):
+            elem = ds[0x00321064]
+
+        assert elem.VR == VR.UN
+        assert elem.value == value
+        # the converted element is kept, so a second access gives the same
+        assert ds[0x00321064] is elem
+
+    def test_unparsable_raw_sequence_raises_on_each_access(
+        self, monkeypatch, enforce_valid_values
+    ):
+        """A raw SQ element that can't be parsed stays raw and raises again."""
+        ds, _ = self.unparsable_sequence_dataset(monkeypatch)
         for _ in range(2):
-            # the fallback conversion also warns about the SH value length
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                with pytest.raises(TypeError, match=msg):
-                    ds[0x00321064]
+            with pytest.raises(ValueError, match="Bad sequence item"):
+                ds[0x00321064]
 
             assert isinstance(ds._dict[0x00321064], RawDataElement)
 
