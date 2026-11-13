@@ -639,7 +639,7 @@ class TestEncodeRunner_GetFrame:
         self.ds.Rows = 4
         self.ds.Columns = 2
         self.ds.PlanarConfiguration = 0
-        ref = b"".join([bytes([b]) + b"\x00" for b in bytes(range(1, 25))])
+        ref = b"".join(bytes([b]) + b"\x00" for b in bytes(range(1, 25)))
 
         for dtype in (">u2", "<u2", "=u2"):
             arr = self.arr_3s.astype(dtype)
@@ -677,7 +677,7 @@ class TestEncodeRunner_GetFrame:
         self.ds.Rows = 4
         self.ds.Columns = 2
         self.ds.PlanarConfiguration = 0
-        ref = b"".join([bytes([b]) + b"\x00" for b in bytes(range(1, 25))])
+        ref = b"".join(bytes([b]) + b"\x00" for b in bytes(range(1, 25)))
 
         for dtype in (">i2", "<i2", "=i2"):
             arr = self.arr_3s.astype(dtype)
@@ -716,7 +716,7 @@ class TestEncodeRunner_GetFrame:
         self.ds.Rows = 4
         self.ds.Columns = 2
         self.ds.PlanarConfiguration = 0
-        ref = b"".join([bytes([b]) + b"\x00" * 3 for b in bytes(range(1, 25))])
+        ref = b"".join(bytes([b]) + b"\x00" * 3 for b in bytes(range(1, 25)))
 
         for dtype in (">u4", "<u4", "=u4"):
             arr = self.arr_3s.astype(dtype)
@@ -755,7 +755,7 @@ class TestEncodeRunner_GetFrame:
         self.ds.Rows = 4
         self.ds.Columns = 2
         self.ds.PlanarConfiguration = 0
-        ref = b"".join([bytes([b]) + b"\x00" * 3 for b in bytes(range(1, 25))])
+        ref = b"".join(bytes([b]) + b"\x00" * 3 for b in bytes(range(1, 25)))
 
         for dtype in (">i4", "<i4", "=i4"):
             arr = self.arr_3s.astype(dtype)

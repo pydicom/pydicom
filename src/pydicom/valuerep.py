@@ -236,7 +236,7 @@ def validate_length_and_type_and_regex(vr: str, value: Any) -> tuple[bool, str]:
         return valid, msg
     is_valid_len, msg1 = validate_vr_length(vr, value)
     is_valid_expr, msg2 = validate_regex(vr, value)
-    msg = " ".join([msg1, msg2]).strip()
+    msg = f"{msg1} {msg2}".strip()
     if msg:
         msg += (
             " Please see <https://dicom.nema.org/medical/dicom/current/output"
@@ -992,7 +992,7 @@ def format_number_as_ds(val: float | Decimal) -> str:
     else:
         if logval >= 1.0:
             # chars remaining for digits after sign, digits left of '.' and '.'
-            remaining_chars = 14 - sign_chars - int(floor(logval))
+            remaining_chars = 14 - sign_chars - floor(logval)
         else:
             remaining_chars = 14 - sign_chars
         return f"{val:.{remaining_chars}f}"
@@ -1087,7 +1087,7 @@ class DSfloat(float):
                     f'Value "{self}" is not valid for elements with a VR of DS'
                 )
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
@@ -1099,7 +1099,7 @@ class DSfloat(float):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self == other
 
     def __str__(self) -> str:
@@ -1228,7 +1228,7 @@ class DSdecimal(Decimal):
                     raise ValueError(msg)
                 warn_and_log(msg)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
@@ -1245,7 +1245,7 @@ class DSdecimal(Decimal):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self == other
 
     def __str__(self) -> str:
@@ -1401,7 +1401,7 @@ class IS(int):
         elif isinstance(val, IS) and hasattr(val, "original_string"):
             self.original_string = val.original_string
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
@@ -1411,7 +1411,7 @@ class IS(int):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self == other
 
     def __str__(self) -> str:
@@ -1676,11 +1676,11 @@ class PersonName:
         except IndexError:
             return ""
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Return ``True`` if `other` equals the current name."""
         return bool(str(self) == other)
 
-    def __ne__(self, other: Any) -> bool:
+    def __ne__(self, other: object) -> bool:
         """Return ``True`` if `other` doesn't equal the current name."""
         return not self == other
 
