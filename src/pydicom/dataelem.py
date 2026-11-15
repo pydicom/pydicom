@@ -13,7 +13,7 @@ from collections.abc import Callable, MutableSequence
 import copy
 from io import BufferedIOBase
 import json
-from typing import Any, TYPE_CHECKING, NamedTuple
+from typing import Any, TYPE_CHECKING, NamedTuple, cast
 
 from pydicom import config  # don't import datetime_conversion directly
 from pydicom.config import logger
@@ -49,7 +49,7 @@ from pydicom.valuerep import (
 )
 
 if config.have_numpy:
-    import numpy
+    import numpy as np
 
 if TYPE_CHECKING:  # pragma: no cover
     from pydicom.dataset import Dataset
@@ -573,11 +573,7 @@ class DataElement:  # noqa: PLW1641
         Uses the element's VR in order to determine the conversion method and
         resulting type.
         """
-        if (
-            self.tag == 0x7FE00010
-            and config.have_numpy
-            and isinstance(val, numpy.ndarray)
-        ):
+        if self.tag == 0x7FE00010 and config.have_numpy and isinstance(val, np.ndarray):
             raise TypeError(
                 "The value for (7FE0,0010) 'Pixel Data' should be set using 'bytes' "
                 "not 'numpy.ndarray'. See the Dataset.set_pixel_data() method for "
@@ -665,7 +661,7 @@ class DataElement:  # noqa: PLW1641
 
         return result
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: Any) -> bool:
         """Compare `self` and `other` for equality.
 
         Returns
@@ -686,15 +682,15 @@ class DataElement:  # noqa: PLW1641
                 return False
 
             # tag and VR match, now check the value
-            if config.have_numpy and isinstance(self.value, numpy.ndarray):
-                return len(self.value) == len(other.value) and numpy.allclose(
+            if config.have_numpy and isinstance(self.value, np.ndarray):
+                return len(self.value) == len(other.value) and np.allclose(
                     self.value, other.value
                 )
 
             if not self.is_buffered and not other.is_buffered:
                 if isinstance(self.value, float) and math.isnan(self.value):
                     return other.value is not None and math.isnan(other.value)
-                return self.value == other.value
+                return cast(bool, self.value == other.value)
 
             try:
                 # `self` is buffered, `other` may or may not be buffered
@@ -708,7 +704,7 @@ class DataElement:  # noqa: PLW1641
 
         return NotImplemented
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: Any) -> bool:
         """Compare `self` and `other` for inequality."""
         return not (self == other)
 

@@ -10,6 +10,7 @@ import platform
 import re
 import struct
 import tempfile
+from decimal import Decimal
 
 import pytest
 
@@ -213,6 +214,20 @@ class TestDataElement:
 
         ee = DataElement(0x00080018, "PN", "1.2.3.4")
         assert not dd == ee
+
+    def test_equality_ds_decimal_nan(self):
+        """DataElement: NaN DS values compare equal when use_DS_decimal is set"""
+        original = config.use_DS_decimal
+        config.DS_decimal(True)
+        try:
+            dd = DataElement(0x00100010, "DS", Decimal("nan"))
+            ee = DataElement(0x00100010, "DS", Decimal("nan"))
+            assert dd == ee
+
+            ee = DataElement(0x00100010, "DS", Decimal("1.5"))
+            assert not dd == ee
+        finally:
+            config.DS_decimal(original)
 
     def test_equality_private_element(self):
         """DataElement: equality returns correct value for private elements"""

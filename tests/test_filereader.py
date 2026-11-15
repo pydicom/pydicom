@@ -12,6 +12,7 @@ from struct import unpack
 import sys
 import tempfile
 import time
+import zlib
 
 import pytest
 
@@ -29,6 +30,7 @@ from pydicom.filereader import (
 from pydicom.dataelem import DataElement, convert_raw_data_element
 from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomBytesIO
+from pydicom.filewriter import write_dataset, write_file_meta_info
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag, TupleTag
@@ -50,7 +52,7 @@ have_gdcm_handler = gdcm_handler.is_available()
 
 have_numpy = pydicom.config.have_numpy
 if have_numpy:
-    import numpy
+    import numpy as np
 
 try:
     import jpeg_ls
@@ -157,8 +159,8 @@ class TestReader:
         assert expected == got
         got = cp0.BeamLimitingDevicePositionSequence[0].LeafJawPositions
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([DS("-100"), DS("100.0")])
-            assert numpy.allclose(got, expected)
+            expected = np.array([DS("-100"), DS("100.0")])
+            assert np.allclose(got, expected)
         else:
             expected = [DS("-100"), DS("100.0")]
             assert got == expected
@@ -187,8 +189,8 @@ class TestReader:
         got = ct.ImagePositionPatient
         DS = pydicom.valuerep.DS
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([-158.135803, -179.035797, -75.699997])
-            assert numpy.allclose(got, expected)
+            expected = np.array([-158.135803, -179.035797, -75.699997])
+            assert np.allclose(got, expected)
         else:
             expected = [DS("-158.135803"), DS("-179.035797"), DS("-75.699997")]
             assert got == expected
@@ -273,8 +275,8 @@ class TestReader:
         DS = pydicom.valuerep.DS
 
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([0.3125, 0.3125])
-            assert numpy.allclose(mr.PixelSpacing, expected)
+            expected = np.array([0.3125, 0.3125])
+            assert np.allclose(mr.PixelSpacing, expected)
         else:
             assert [DS("0.3125"), DS("0.3125")] == mr.PixelSpacing
 
@@ -288,6 +290,45 @@ class TestReader:
         assert "WSD" == ds.ConversionType
         assert isinstance(ds.buffer, DicomBytesIO)
         assert ds.filename == deflate_name
+
+    # UIDs hardcoded from PS3.5 Sections A.5, A.7 and A.12 rather than taken
+    #   from pydicom.uid so that an omission there is detectable here
+    @pytest.mark.parametrize(
+        "tsyntax",
+        [
+            "1.2.840.10008.1.2.1.99",  # Deflated Explicit VR Little Endian
+            "1.2.840.10008.1.2.4.95",  # JPIP Referenced Deflate
+            "1.2.840.10008.1.2.4.205",  # JPIP HTJ2K Referenced Deflate
+        ],
+    )
+    def test_read_deflated_syntaxes(self, tsyntax):
+        """A deflated dataset is inflated for every deflated transfer syntax."""
+        # Build the file by hand so the encoder isn't the oracle for the decoder
+        ds = Dataset()
+        ds.SOPClassUID = "1.2.840.10008.5.1.4.1.1.7"
+        ds.SOPInstanceUID = "1.2.3.4"
+        ds.PatientName = "CITIZEN^Jan"
+        buffer = DicomBytesIO()
+        buffer.is_implicit_VR = False
+        buffer.is_little_endian = True
+        write_dataset(buffer, ds)
+        compressor = zlib.compressobj(wbits=-zlib.MAX_WBITS)
+        deflated = compressor.compress(buffer.getvalue()) + compressor.flush()
+
+        meta = FileMetaDataset()
+        meta.MediaStorageSOPClassUID = "1.2.840.10008.5.1.4.1.1.7"
+        meta.MediaStorageSOPInstanceUID = "1.2.3.4"
+        meta.TransferSyntaxUID = tsyntax
+        meta.ImplementationClassUID = "1.2.3.4"
+        meta_buffer = DicomBytesIO()
+        meta_buffer.is_implicit_VR = False
+        meta_buffer.is_little_endian = True
+        write_file_meta_info(meta_buffer, meta, enforce_standard=True)
+
+        raw = b"\x00" * 128 + b"DICM" + meta_buffer.getvalue() + deflated
+        out = dcmread(BytesIO(raw))
+        assert out.PatientName == "CITIZEN^Jan"
+        assert out.SOPInstanceUID == "1.2.3.4"
 
     def test_sequence_with_implicit_vr(self):
         """Test that reading a UN sequence with unknown length and implicit VR
@@ -331,7 +372,7 @@ class TestReader:
         """
         ds = Dataset()
         ds.InstanceNumber = 1
-        ds.FloatPixelData = numpy.random.random((3, 3)).tobytes()
+        ds.FloatPixelData = np.random.random((3, 3)).tobytes()
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
@@ -516,7 +557,7 @@ class TestReader:
         if have_numpy:
             px_data = px_data_ds.pixel_array
             pl_data = pl_data_ds.pixel_array
-            assert numpy.all(px_data == pl_data)
+            assert np.all(px_data == pl_data)
 
     def test_correct_ambiguous_vr(self):
         """Test correcting ambiguous VR elements read from file"""
@@ -1028,6 +1069,92 @@ class TestReader:
         assert ds.file_meta.TransferSyntaxUID == uid
         assert ds.original_encoding == (True, True)
 
+    def test_duplicate_elem_non_SQ_explicit_VR(self, caplog):
+        """Test duplicate element detection for non-SQ element with explicit VR."""
+        with pytest.warns(UserWarning):
+            with caplog.at_level(logging.WARNING, logger="pydicom"):
+                read_dataset(
+                    BytesIO(
+                        b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                        b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                    ),
+                    False,
+                    True,
+                )
+        assert (
+            "Element (0008,0005) found multiple times at the same level of the "
+            "dataset - initially at offset 0 and again at offset 18"
+        ) in caplog.text
+
+    def test_duplicate_elem_non_SQ_implicit_VR(self, caplog):
+        """Test duplicate element detection for non-SQ element with implicit VR."""
+        with pytest.warns(UserWarning):
+            with caplog.at_level(logging.WARNING, logger="pydicom"):
+                read_dataset(
+                    BytesIO(
+                        b"\x08\x00\x05\x00\x0a\x00\x00\x00ISO_IR 100"
+                        b"\x08\x00\x05\x00\x0a\x00\x00\x00ISO_IR 100"
+                    ),
+                    True,
+                    True,
+                )
+        assert (
+            "Element (0008,0005) found multiple times at the same level of the "
+            "dataset - initially at offset 0 and again at offset 18"
+        ) in caplog.text
+
+    def test_duplicate_elem_SQ_explicit_VR(self, caplog):
+        """Test duplicate element detection for SQ element with explicit VR."""
+        with pytest.warns(UserWarning):
+            with caplog.at_level(logging.WARNING, logger="pydicom"):
+                read_dataset(
+                    BytesIO(
+                        b"\x06\x30\x14\x00\x53\x51\x00\x00\x00\x00\x00\x00"
+                        b"\x06\x30\x14\x00\x53\x51\x00\x00\x00\x00\x00\x00"
+                    ),
+                    False,
+                    True,
+                )
+        assert (
+            "Element (3006,0014) found multiple times at the same level of the "
+            "dataset - initially at offset 0 and again at offset 12"
+        ) in caplog.text
+
+    def test_duplicate_elem_SQ_implicit_VR(self, caplog):
+        """Test duplicate element detection for SQ element with implicit VR."""
+        with pytest.warns(UserWarning):
+            with caplog.at_level(logging.WARNING, logger="pydicom"):
+                read_dataset(
+                    BytesIO(
+                        b"\x06\x30\x14\x00\x00\x00\x00\x00"
+                        b"\x06\x30\x14\x00\x00\x00\x00\x00"
+                    ),
+                    True,
+                    True,
+                )
+        assert (
+            "Element (3006,0014) found multiple times at the same level of the "
+            "dataset - initially at offset 0 and again at offset 8"
+        ) in caplog.text
+
+    def test_duplicate_elem_read_length(self, caplog):
+        """Test duplicate element detection when reading a specific length."""
+        with pytest.warns(UserWarning):
+            with caplog.at_level(logging.WARNING, logger="pydicom"):
+                read_dataset(
+                    BytesIO(
+                        b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                        b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                    ),
+                    False,
+                    True,
+                    bytelength=36,
+                )
+        assert (
+            "Element (0008,0005) found multiple times at the same level of the "
+            "dataset - initially at offset 0 and again at offset 18"
+        ) in caplog.text
+
 
 class TestIncorrectVR:
     def setup_method(self):
@@ -1524,12 +1651,12 @@ class TestDSISnumpy:
         config.use_IS_numpy = True
         rtss = dcmread(rtstruct_name, force=True)
         col = rtss.ROIContourSequence[0].ROIDisplayColor  # VR is IS
-        assert isinstance(col, numpy.ndarray)
+        assert isinstance(col, np.ndarray)
         assert "int64" == col.dtype
 
         # Check a conversion with only a single value
         roi_num = rtss.ROIContourSequence[0].ReferencedROINumber
-        assert isinstance(roi_num, numpy.int64)
+        assert isinstance(roi_num, np.int64)
 
     def test_IS_not_numpy(self):
         """Test class of the object matches the config,
@@ -1553,12 +1680,12 @@ class TestDSISnumpy:
         rtss = dcmread(rtstruct_name, force=True)
         # ContourData has VR of DS
         cd = rtss.ROIContourSequence[0].ContourSequence[0].ContourData
-        assert isinstance(cd, numpy.ndarray)
+        assert isinstance(cd, np.ndarray)
         assert "float64" == cd.dtype
 
         # Check conversion with only a single value
         roi_vol = rtss.StructureSetROISequence[0].ROIVolume
-        assert isinstance(roi_vol, numpy.float64)
+        assert isinstance(roi_vol, np.float64)
 
     def test_DS_not_numpy(self):
         """Test class of the object matches the config."""
@@ -1642,8 +1769,8 @@ class TestDeferredRead:
         for data_elem in ds_norm:
             tag = data_elem.tag
 
-            if have_numpy and isinstance(data_elem.value, numpy.ndarray):
-                assert numpy.allclose(data_elem.value, ds_defer[tag].value)
+            if have_numpy and isinstance(data_elem.value, np.ndarray):
+                assert np.allclose(data_elem.value, ds_defer[tag].value)
             else:
                 assert data_elem.value == ds_defer[tag].value
 
@@ -1700,8 +1827,8 @@ class TestReadTruncatedFile:
         DS = pydicom.valuerep.DS
 
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([0.3125, 0.3125])
-            assert numpy.allclose(mr.PixelSpacing, expected)
+            expected = np.array([0.3125, 0.3125])
+            assert np.allclose(mr.PixelSpacing, expected)
         else:
             assert [DS("0.3125"), DS("0.3125")] == mr.PixelSpacing
 
@@ -1737,8 +1864,8 @@ class TestFileLike:
 
         got = ct.ImagePositionPatient
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([-158.135803, -179.035797, -75.699997])
-            assert numpy.allclose(got, expected)
+            expected = np.array([-158.135803, -179.035797, -75.699997])
+            assert np.allclose(got, expected)
         else:
             expected = [DS("-158.135803"), DS("-179.035797"), DS("-75.699997")]
             assert expected == got
@@ -1766,8 +1893,8 @@ class TestFileLike:
         DS = pydicom.valuerep.DS
 
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([-158.135803, -179.035797, -75.699997])
-            assert numpy.allclose(got, expected)
+            expected = np.array([-158.135803, -179.035797, -75.699997])
+            assert np.allclose(got, expected)
         else:
             expected = [DS("-158.135803"), DS("-179.035797"), DS("-75.699997")]
             assert expected == got
@@ -1781,6 +1908,92 @@ class TestFileLike:
 
 class TestDataElementGenerator:
     """Test filereader.data_element_generator"""
+
+    @pytest.mark.parametrize(
+        ("is_implicit_VR", "stop_tag", "stop_element"),
+        [
+            (
+                True,
+                Tag(0x7FE0, 0x0010),
+                # (7FE0,0010) implicit VR, 4-byte length = 4
+                b"\xe0\x7f\x10\x00\x04\x00\x00\x00DATA",
+            ),
+            (
+                False,
+                Tag(0x0010, 0x0010),
+                # (0010,0010) PN, 2-byte length = 4
+                b"\x10\x00\x10\x00PN\x04\x00DATA",
+            ),
+            (
+                False,
+                Tag(0x7FE0, 0x0010),
+                # (7FE0,0010) OB, 2 reserved bytes, 4-byte length = 4
+                b"\xe0\x7f\x10\x00OB\x00\x00\x04\x00\x00\x00DATA",
+            ),
+        ],
+        ids=["implicit-pixeldata", "explicit-2byte-length", "explicit-4byte-length"],
+    )
+    def test_stop_when_rewinds_to_start_of_element(
+        self, is_implicit_VR, stop_tag, stop_element
+    ):
+        """Test stop_when leaves the file positioned at the stopped element."""
+        # (0010,0020) PatientID, length 4, value "TEST"
+        first_element = b"\x10\x00\x20\x00"
+        if is_implicit_VR:
+            first_element += b"\x04\x00\x00\x00"  # 4-byte length = 4
+        else:
+            first_element += b"LO\x04\x00"  # LO, 2-byte length = 4
+        first_element += b"TEST"
+        fp = BytesIO(first_element + stop_element)
+        gen = data_element_generator(
+            fp,
+            is_implicit_VR=is_implicit_VR,
+            is_little_endian=True,
+            stop_when=lambda tag, vr, length: tag == stop_tag,
+        )
+
+        assert next(gen).tag == Tag(0x0010, 0x0020)
+        with pytest.raises(StopIteration):
+            next(gen)
+
+        assert fp.tell() == len(first_element)
+        assert fp.read() == stop_element
+
+    def test_stop_when_receives_none_vr_for_implicit_vr(self):
+        """Test stop_when is called with vr=None for implicit VR data."""
+        # (0010,0010) implicit VR, 4-byte length = 4
+        fp = BytesIO(b"\x10\x00\x10\x00\x04\x00\x00\x00DATA")
+        stop_when_args = []
+
+        def stop_when(tag, vr, length):
+            stop_when_args.append((tag, vr, length))
+            return True
+
+        gen = data_element_generator(
+            fp, is_implicit_VR=True, is_little_endian=True, stop_when=stop_when
+        )
+        with pytest.raises(StopIteration):
+            next(gen)
+
+        assert stop_when_args == [(Tag(0x0010, 0x0010), None, 4)]
+
+    def test_stop_when_receives_vr_for_explicit_vr(self):
+        """Test stop_when is called with the VR str for explicit VR data."""
+        # (0010,0010) PN, 2-byte length = 4
+        fp = BytesIO(b"\x10\x00\x10\x00PN\x04\x00DATA")
+        stop_when_args = []
+
+        def stop_when(tag, vr, length):
+            stop_when_args.append((tag, vr, length))
+            return True
+
+        gen = data_element_generator(
+            fp, is_implicit_VR=False, is_little_endian=True, stop_when=stop_when
+        )
+        with pytest.raises(StopIteration):
+            next(gen)
+
+        assert stop_when_args == [(Tag(0x0010, 0x0010), "PN", 4)]
 
     def test_little_endian_explicit(self):
         """Test reading little endian explicit VR data"""
