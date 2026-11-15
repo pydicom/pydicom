@@ -80,6 +80,7 @@ Fixes
 * Fixed :attr:`~pydicom.dataset.Dataset.pixel_array` raising a bare ``StopIteration`` when
   encapsulated *Pixel Data* contains fewer frames than *Number of Frames* (:issue:`2371`).
 
+
 Enhancements
 ------------
 * Python 3.12, 3.13 and 3.14 are now supported.
@@ -121,3 +122,6 @@ Enhancements
 * Warn when multiples of the same element are found within a dataset or sequence item
   (:issue:`2420`).
 * Improved memory usage for :func:`~pydicom.pixels.apply_windowing` (:pr:`2315`)
+* When parsing fails because a value's length doesn't match the VR determined from a data
+  dictionary lookup, report that VR in the error message (previously ``None``) and suggest
+  :meth:`~pydicom.dataset.Dataset.update_raw_element` (:issue:`2170`)

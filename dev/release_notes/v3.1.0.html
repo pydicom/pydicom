@@ -661,6 +661,9 @@ warning for non-conformant values (<a class="extlink-issue reference external" h
 <li><p>Warn when multiples of the same element are found within a dataset or sequence item
 (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2420">#2420</a>).</p></li>
 <li><p>Improved memory usage for <a class="reference internal" href="../reference/generated/pydicom.pixels.apply_windowing.html#pydicom.pixels.apply_windowing" title="pydicom.pixels.apply_windowing"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_windowing()</span></code></a> (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/2315">#2315</a>)</p></li>
+<li><p>When parsing fails because a value’s length doesn’t match the VR determined from a data
+dictionary lookup, report that VR in the error message (previously <code class="docutils literal notranslate"><span class="pre">None</span></code>) and suggest
+<a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.update_raw_element" title="pydicom.dataset.Dataset.update_raw_element"><code class="xref py py-meth docutils literal notranslate"><span class="pre">update_raw_element()</span></code></a> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2170">#2170</a>)</p></li>
 </ul>
 </section>
 </section>
