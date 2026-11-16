@@ -1333,8 +1333,11 @@ class TestUnknownVR:
             False,
             True,
         )
-        msg = r"Unknown Value Representation '{}' in tag \(0008,0006\)"
-        msg = msg.format(str_output)
+        msg = (
+            r"Unknown Value Representation '{}' \(pydicom .+ implements DICOM "
+            r"Standard {}\) in tag \(0008,0006\)"
+        )
+        msg = msg.format(str_output, pydicom.__dicom_version__)
         with pytest.raises(NotImplementedError, match=msg):
             print(ds)
 

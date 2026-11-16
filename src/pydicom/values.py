@@ -15,6 +15,7 @@ from pydicom.charset import default_encoding, decode_bytes
 from pydicom.config import logger, have_numpy
 from pydicom.dataelem import empty_value_for_VR, RawDataElement
 from pydicom.errors import BytesLengthException
+from pydicom._version import __version__, __dicom_version__
 from pydicom.filereader import read_sequence
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
@@ -751,7 +752,10 @@ def convert_value(
         # If the VR characters are outside that range then print hex values
         if ord(VR[0]) not in char_range or ord(VR[1]) not in char_range:
             VR = " ".join([f"0x{ord(ch):02x}" for ch in VR])
-        raise NotImplementedError(f"Unknown Value Representation '{VR}'")
+        raise NotImplementedError(
+            f"Unknown Value Representation '{VR}' (pydicom {__version__} "
+            f"implements DICOM Standard {__dicom_version__})"
+        )
 
     if raw_data_element.length == 0:
         return empty_value_for_VR(VR)
