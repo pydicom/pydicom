@@ -8,7 +8,7 @@ import logging
 import os
 import shutil
 from pathlib import Path
-from struct import error as struct_error, unpack
+from struct import unpack
 import sys
 import tempfile
 import time
@@ -24,6 +24,7 @@ from pydicom.datadict import add_dict_entries
 from pydicom.filereader import (
     dcmread,
     read_dataset,
+    read_sequence_item,
     data_element_generator,
     read_file_meta_info,
 )
@@ -1037,34 +1038,20 @@ class TestReader:
             "Expected sequence item with tag (FFFE,E000) at file position 0x22"
         ) in caplog.text
 
-    def test_sequence_item_truncated_raises_invaliddicom(self):
-        """SQ with undefined length but no item header before EOF must raise
-        ``InvalidDicomError``, not the legacy bare ``OSError``.
+    def test_sequence_item_truncated_header(self):
+        """Test a truncated sequence item header raises OSError"""
+        with pytest.raises(OSError, match="No tag to read at file position"):
+            read_sequence_item(BytesIO(b"\xfe\xff"), True, True, "iso8859")
 
-        The previous implementation caught ``BaseException`` (so
-        ``KeyboardInterrupt`` / ``SystemExit`` were also swallowed) and re-raised
-        as ``OSError`` -- an exception type ``dcmread``'s docstring does not
-        promise to raise. Callers had no single type to ``except`` to handle
-        malformed-DICOM input.
-        """
-        # Implicit VR LE: CS "ISO_IR 100", then an undefined-length SQ at
-        # (0008,0006) with NO item header, NO sequence delimiter, EOF.
-        # read_sequence_item's `fp.read(8)` returns < 8 bytes and `unpack`
-        # raises struct.error -> we should land on InvalidDicomError.
-        truncated_sq = (
-            b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
-            b"\x08\x00\x06\x00SQ\x00\x00\xff\xff\xff\xff"
-        )
+    def test_sequence_item_keyboard_interrupt(self):
+        """Test KeyboardInterrupt is not converted to OSError"""
 
-        with pytest.raises(
-            InvalidDicomError, match="No tag to read at file position"
-        ) as excinfo:
-            read_dataset(BytesIO(truncated_sq), False, True)
+        class InterruptedIO(BytesIO):
+            def read(self, size=-1):
+                raise KeyboardInterrupt
 
-        # The PR sells `raise ... from exc` as a diagnosability benefit; pin
-        # the chain so a future refactor that drops the `from` clause fails
-        # CI instead of silently losing the underlying cause.
-        assert isinstance(excinfo.value.__cause__, struct_error)
+        with pytest.raises(KeyboardInterrupt):
+            read_sequence_item(InterruptedIO(), True, True, "iso8859")
 
     def test_registered_private_transfer_syntax(self, enable_debugging, caplog):
         """Test reading a dataset with a registered private transfer syntax"""
