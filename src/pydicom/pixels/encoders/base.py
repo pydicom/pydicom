@@ -367,10 +367,10 @@ class EncodeRunner(RunnerBase):
         if getattr(file_meta, "TransferSyntaxUID", None) != ExplicitVRBigEndian:
             return src
 
-        # 8-bit OW stores pairs of samples in 16-bit words. Normalize the
-        # complete value before slicing frames, which may contain odd samples.
+        # OW stores packed 1-bit or 8-bit pixels in 16-bit words. Normalize
+        # the complete value before slicing frames, which may end mid-word.
         nr_bytes = self.bits_allocated // 8
-        if self.bits_allocated == 8 and ds[0x7FE00010].VR == "OW":
+        if self.bits_allocated in (1, 8) and ds[0x7FE00010].VR == "OW":
             nr_bytes = 2
         if nr_bytes < 2 or len(src) % nr_bytes:
             return src

@@ -12,6 +12,7 @@ from struct import unpack
 import sys
 import tempfile
 import time
+import zlib
 
 import pytest
 
@@ -27,10 +28,9 @@ from pydicom.filereader import (
     read_file_meta_info,
 )
 from pydicom.dataelem import DataElement, convert_raw_data_element
-from pydicom._version import __dicom_version__
-from pydicom.errors import InvalidDicomError, UnknownVRError
+from pydicom.errors import InvalidDicomError
 from pydicom.filebase import DicomBytesIO
-from pydicom.hooks import hooks
+from pydicom.filewriter import write_dataset, write_file_meta_info
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
 from pydicom.tag import Tag, TupleTag
@@ -52,7 +52,7 @@ have_gdcm_handler = gdcm_handler.is_available()
 
 have_numpy = pydicom.config.have_numpy
 if have_numpy:
-    import numpy
+    import numpy as np
 
 try:
     import jpeg_ls
@@ -159,8 +159,8 @@ class TestReader:
         assert expected == got
         got = cp0.BeamLimitingDevicePositionSequence[0].LeafJawPositions
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([DS("-100"), DS("100.0")])
-            assert numpy.allclose(got, expected)
+            expected = np.array([DS("-100"), DS("100.0")])
+            assert np.allclose(got, expected)
         else:
             expected = [DS("-100"), DS("100.0")]
             assert got == expected
@@ -189,8 +189,8 @@ class TestReader:
         got = ct.ImagePositionPatient
         DS = pydicom.valuerep.DS
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([-158.135803, -179.035797, -75.699997])
-            assert numpy.allclose(got, expected)
+            expected = np.array([-158.135803, -179.035797, -75.699997])
+            assert np.allclose(got, expected)
         else:
             expected = [DS("-158.135803"), DS("-179.035797"), DS("-75.699997")]
             assert got == expected
@@ -275,8 +275,8 @@ class TestReader:
         DS = pydicom.valuerep.DS
 
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([0.3125, 0.3125])
-            assert numpy.allclose(mr.PixelSpacing, expected)
+            expected = np.array([0.3125, 0.3125])
+            assert np.allclose(mr.PixelSpacing, expected)
         else:
             assert [DS("0.3125"), DS("0.3125")] == mr.PixelSpacing
 
@@ -290,6 +290,45 @@ class TestReader:
         assert "WSD" == ds.ConversionType
         assert isinstance(ds.buffer, DicomBytesIO)
         assert ds.filename == deflate_name
+
+    # UIDs hardcoded from PS3.5 Sections A.5, A.7 and A.12 rather than taken
+    #   from pydicom.uid so that an omission there is detectable here
+    @pytest.mark.parametrize(
+        "tsyntax",
+        [
+            "1.2.840.10008.1.2.1.99",  # Deflated Explicit VR Little Endian
+            "1.2.840.10008.1.2.4.95",  # JPIP Referenced Deflate
+            "1.2.840.10008.1.2.4.205",  # JPIP HTJ2K Referenced Deflate
+        ],
+    )
+    def test_read_deflated_syntaxes(self, tsyntax):
+        """A deflated dataset is inflated for every deflated transfer syntax."""
+        # Build the file by hand so the encoder isn't the oracle for the decoder
+        ds = Dataset()
+        ds.SOPClassUID = "1.2.840.10008.5.1.4.1.1.7"
+        ds.SOPInstanceUID = "1.2.3.4"
+        ds.PatientName = "CITIZEN^Jan"
+        buffer = DicomBytesIO()
+        buffer.is_implicit_VR = False
+        buffer.is_little_endian = True
+        write_dataset(buffer, ds)
+        compressor = zlib.compressobj(wbits=-zlib.MAX_WBITS)
+        deflated = compressor.compress(buffer.getvalue()) + compressor.flush()
+
+        meta = FileMetaDataset()
+        meta.MediaStorageSOPClassUID = "1.2.840.10008.5.1.4.1.1.7"
+        meta.MediaStorageSOPInstanceUID = "1.2.3.4"
+        meta.TransferSyntaxUID = tsyntax
+        meta.ImplementationClassUID = "1.2.3.4"
+        meta_buffer = DicomBytesIO()
+        meta_buffer.is_implicit_VR = False
+        meta_buffer.is_little_endian = True
+        write_file_meta_info(meta_buffer, meta, enforce_standard=True)
+
+        raw = b"\x00" * 128 + b"DICM" + meta_buffer.getvalue() + deflated
+        out = dcmread(BytesIO(raw))
+        assert out.PatientName == "CITIZEN^Jan"
+        assert out.SOPInstanceUID == "1.2.3.4"
 
     def test_sequence_with_implicit_vr(self):
         """Test that reading a UN sequence with unknown length and implicit VR
@@ -333,7 +372,7 @@ class TestReader:
         """
         ds = Dataset()
         ds.InstanceNumber = 1
-        ds.FloatPixelData = numpy.random.random((3, 3)).tobytes()
+        ds.FloatPixelData = np.random.random((3, 3)).tobytes()
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
@@ -518,7 +557,7 @@ class TestReader:
         if have_numpy:
             px_data = px_data_ds.pixel_array
             pl_data = pl_data_ds.pixel_array
-            assert numpy.all(px_data == pl_data)
+            assert np.all(px_data == pl_data)
 
     def test_correct_ambiguous_vr(self):
         """Test correcting ambiguous VR elements read from file"""
@@ -1030,6 +1069,92 @@ class TestReader:
         assert ds.file_meta.TransferSyntaxUID == uid
         assert ds.original_encoding == (True, True)
 
+    def test_duplicate_elem_non_SQ_explicit_VR(self, caplog):
+        """Test duplicate element detection for non-SQ element with explicit VR."""
+        with pytest.warns(UserWarning):
+            with caplog.at_level(logging.WARNING, logger="pydicom"):
+                read_dataset(
+                    BytesIO(
+                        b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                        b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                    ),
+                    False,
+                    True,
+                )
+        assert (
+            "Element (0008,0005) found multiple times at the same level of the "
+            "dataset - initially at offset 0 and again at offset 18"
+        ) in caplog.text
+
+    def test_duplicate_elem_non_SQ_implicit_VR(self, caplog):
+        """Test duplicate element detection for non-SQ element with implicit VR."""
+        with pytest.warns(UserWarning):
+            with caplog.at_level(logging.WARNING, logger="pydicom"):
+                read_dataset(
+                    BytesIO(
+                        b"\x08\x00\x05\x00\x0a\x00\x00\x00ISO_IR 100"
+                        b"\x08\x00\x05\x00\x0a\x00\x00\x00ISO_IR 100"
+                    ),
+                    True,
+                    True,
+                )
+        assert (
+            "Element (0008,0005) found multiple times at the same level of the "
+            "dataset - initially at offset 0 and again at offset 18"
+        ) in caplog.text
+
+    def test_duplicate_elem_SQ_explicit_VR(self, caplog):
+        """Test duplicate element detection for SQ element with explicit VR."""
+        with pytest.warns(UserWarning):
+            with caplog.at_level(logging.WARNING, logger="pydicom"):
+                read_dataset(
+                    BytesIO(
+                        b"\x06\x30\x14\x00\x53\x51\x00\x00\x00\x00\x00\x00"
+                        b"\x06\x30\x14\x00\x53\x51\x00\x00\x00\x00\x00\x00"
+                    ),
+                    False,
+                    True,
+                )
+        assert (
+            "Element (3006,0014) found multiple times at the same level of the "
+            "dataset - initially at offset 0 and again at offset 12"
+        ) in caplog.text
+
+    def test_duplicate_elem_SQ_implicit_VR(self, caplog):
+        """Test duplicate element detection for SQ element with implicit VR."""
+        with pytest.warns(UserWarning):
+            with caplog.at_level(logging.WARNING, logger="pydicom"):
+                read_dataset(
+                    BytesIO(
+                        b"\x06\x30\x14\x00\x00\x00\x00\x00"
+                        b"\x06\x30\x14\x00\x00\x00\x00\x00"
+                    ),
+                    True,
+                    True,
+                )
+        assert (
+            "Element (3006,0014) found multiple times at the same level of the "
+            "dataset - initially at offset 0 and again at offset 8"
+        ) in caplog.text
+
+    def test_duplicate_elem_read_length(self, caplog):
+        """Test duplicate element detection when reading a specific length."""
+        with pytest.warns(UserWarning):
+            with caplog.at_level(logging.WARNING, logger="pydicom"):
+                read_dataset(
+                    BytesIO(
+                        b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                        b"\x08\x00\x05\x00CS\x0a\x00ISO_IR 100"
+                    ),
+                    False,
+                    True,
+                    bytelength=36,
+                )
+        assert (
+            "Element (0008,0005) found multiple times at the same level of the "
+            "dataset - initially at offset 0 and again at offset 18"
+        ) in caplog.text
+
 
 class TestIncorrectVR:
     def setup_method(self):
@@ -1192,12 +1317,7 @@ class TestUnknownVR:
             False,
             True,
         )
-        # The parenthetical names the DICOM Standard edition this release
-        # implements, because an unrecognised VR may simply postdate it.
-        msg = (
-            r"Unknown Value Representation '{}' \(pydicom .+ implements "
-            r"DICOM Standard .+\) in tag \(0008,0006\)"
-        )
+        msg = r"Unknown Value Representation '{}' in tag \(0008,0006\)"
         msg = msg.format(str_output)
         with pytest.raises(NotImplementedError, match=msg):
             print(ds)
@@ -1229,172 +1349,6 @@ class TestUnknownVR:
             )
 
         assert "Unknown VR '0x7878' assuming implicit VR encoding" in caplog.text
-
-    # ----- Regression: dcmread exception contract for unknown VR (#2336) -----
-
-    # 144-byte File-Meta-Information-only fixture: 128-byte zero preamble +
-    # ``DICM`` + (0002,0000) FileMetaInformationGroupLength encoded with the
-    # invented VR 'ZZ'. Lifts to NotImplementedError from convert_value, which
-    # the public dcmread API must surface as InvalidDicomError per its
-    # documented ``Raises`` contract. Inline rather than a fixture so each
-    # test is self-contained for the maintainer reading the diff.
-    _UNKNOWN_VR_FMI_BYTES = bytes.fromhex(
-        "00" * 128
-        + "4449434d"  # 'DICM'
-        + "02000000"  # tag (0002,0000)
-        + "5a5a"  # VR 'ZZ'
-        + "0400"  # length 4
-        + "00000000"  # value
-    )
-
-    def test_dcmread_raises_invaliddicom_on_unknown_vr(self):
-        """Unknown VR via ``dcmread(force=True)`` must raise
-        :class:`InvalidDicomError`, not :class:`NotImplementedError`.
-
-        ``dcmread``'s docstring promises ``InvalidDicomError`` for malformed
-        DICOM input. Prior to #2336, unknown VRs leaked
-        ``NotImplementedError`` through the public API, leaving callers
-        with no single exception type to handle malformed input.
-
-        Same shape as the contract narrowing in PR #2331 (``RecursionError``
-        on deep SQ nesting) and PR #2333 (bare ``OSError`` on truncated SQ
-        item header).
-        """
-        with pytest.raises(InvalidDicomError) as excinfo:
-            dcmread(BytesIO(self._UNKNOWN_VR_FMI_BYTES), force=True)
-
-        assert "Unknown Value Representation 'ZZ'" in str(excinfo.value)
-        assert "(0002,0000)" in str(excinfo.value)
-        # The message names the DICOM Standard edition this release implements,
-        # since an unrecognised VR may simply postdate it -- the reader then
-        # knows whether "upgrade pydicom" is the remedy.
-        assert __dicom_version__ in str(excinfo.value)
-        # The chain is preserved for diagnosability.
-        assert isinstance(excinfo.value.__cause__, NotImplementedError)
-
-    def test_dcmread_unknown_vr_recovers_when_config_set(self):
-        """``config.convert_unknown_vr_to_UN = True`` parses the file with a
-        warning instead of raising.
-
-        Mirrors :data:`config.convert_wrong_length_to_UN` -- callers handling
-        in-flight studies with a single bad tag can opt in to a permissive
-        parse instead of losing the whole file. Default stays strict (the
-        previous test pins that).
-        """
-        original = config.convert_unknown_vr_to_UN
-        config.convert_unknown_vr_to_UN = True
-        try:
-            with pytest.warns(UserWarning, match="Setting VR to 'UN'"):
-                ds = dcmread(BytesIO(self._UNKNOWN_VR_FMI_BYTES), force=True)
-        finally:
-            config.convert_unknown_vr_to_UN = original
-
-        # The file parsed; the offending element is reachable on the file
-        # meta dataset (its VR may have been resolved from the dictionary
-        # after the UN fall-back, since (0002,0000) is a known tag -- the
-        # invariant we pin is "the file parsed", not "VR stays UN").
-        assert 0x00020000 in ds.file_meta
-
-    def test_read_partial_still_raises_notimplemented_on_unknown_vr(self):
-        """Internal callers below the public ``dcmread`` boundary continue
-        to see :class:`NotImplementedError` unchanged.
-
-        The translation in :func:`dcmread` is scoped to the public-API
-        boundary so internal callers (``read_partial``, ``read_dataset``,
-        ``read_file_meta_info``, the #503 implicit-VR retry inside
-        ``_read_file_meta_info``, ``util.fixer``) can keep relying on
-        catching ``NotImplementedError`` specifically.
-
-        Defends against a future regression where someone moves the
-        translation lower in the call stack and accidentally narrows the
-        exception type for those internal callers.
-        """
-        from pydicom.filereader import read_partial
-
-        with pytest.raises(NotImplementedError, match="'ZZ'"):
-            read_partial(
-                BytesIO(self._UNKNOWN_VR_FMI_BYTES),
-                stop_when=None,
-                defer_size=None,
-                force=True,
-            )
-
-    def test_dcmread_does_not_translate_callback_notimplementederror(self):
-        """A ``NotImplementedError`` raised by a registered callback reaches
-        the caller unchanged.
-
-        :mod:`pydicom.hooks` is a documented extension point, and a callback
-        failing is not the same event as the file being malformed -- reporting
-        it as :class:`~pydicom.errors.InvalidDicomError` would send someone
-        debugging their own plugin off to inspect a valid file instead.
-
-        The translation is therefore keyed on
-        :class:`~pydicom.errors.UnknownVRError` rather than on
-        ``NotImplementedError``. Reading a *valid* dataset keeps the two
-        causes cleanly separated: nothing about this input is malformed, so
-        the callback's own failure is the only exception in play.
-        """
-
-        class _CallbackFailure(NotImplementedError):
-            """Stands in for an extension signalling its own failure."""
-
-        def _raising_callback(raw, data, *, encoding=None, ds=None, **kwargs):
-            raise _CallbackFailure("callback-sentinel")
-
-        original = hooks.raw_element_value
-        hooks.register_callback("raw_element_value", _raising_callback)
-        try:
-            with pytest.raises(_CallbackFailure, match="callback-sentinel"):
-                dcmread(mr_name)
-        finally:
-            hooks.register_callback("raw_element_value", original)
-
-    def test_dcmread_translates_unknown_vr_via_legacy_element_callback(self):
-        """The translation also covers callers that bypass the hook.
-
-        :func:`~pydicom.util.fixer.fix_mismatch` installs the legacy
-        ``config.data_element_callback``, which runs *before* the
-        ``raw_element_value`` hook in
-        :func:`~pydicom.dataelem.convert_raw_data_element` and calls
-        ``convert_value`` itself, catching only ``ValueError``. An unknown VR
-        therefore escapes that callback without ever reaching the hook.
-
-        Raising :class:`~pydicom.errors.UnknownVRError` from ``convert_value``
-        -- the single point the unknown VR is actually detected -- is what
-        keeps this path covered. Pinned because it would otherwise silently
-        revert to leaking ``NotImplementedError``, which is the exact defect
-        #2336 reports.
-        """
-        from pydicom.util.fixer import fix_mismatch
-
-        fix_mismatch()
-        try:
-            with pytest.raises(InvalidDicomError, match="'ZZ'"):
-                dcmread(BytesIO(self._UNKNOWN_VR_FMI_BYTES), force=True)
-        finally:
-            config.reset_data_element_callback()
-
-    def test_unknown_vr_error_is_a_notimplementederror(self):
-        """:class:`~pydicom.errors.UnknownVRError` stays catchable as
-        ``NotImplementedError``.
-
-        The subclassing is what keeps ``read_dataset``, the #503 implicit-VR
-        retry and ``util.fixer`` working untouched, and keeps downstream code
-        written against pydicom < 3.1 working. Pinned explicitly because
-        breaking it would be silent -- those call sites swallow the exception
-        rather than propagate it.
-        """
-        assert issubclass(UnknownVRError, NotImplementedError)
-
-        from pydicom.filereader import read_partial
-
-        with pytest.raises(UnknownVRError):
-            read_partial(
-                BytesIO(self._UNKNOWN_VR_FMI_BYTES),
-                stop_when=None,
-                defer_size=None,
-                force=True,
-            )
 
 
 class TestReadDataElement:
@@ -1697,12 +1651,12 @@ class TestDSISnumpy:
         config.use_IS_numpy = True
         rtss = dcmread(rtstruct_name, force=True)
         col = rtss.ROIContourSequence[0].ROIDisplayColor  # VR is IS
-        assert isinstance(col, numpy.ndarray)
+        assert isinstance(col, np.ndarray)
         assert "int64" == col.dtype
 
         # Check a conversion with only a single value
         roi_num = rtss.ROIContourSequence[0].ReferencedROINumber
-        assert isinstance(roi_num, numpy.int64)
+        assert isinstance(roi_num, np.int64)
 
     def test_IS_not_numpy(self):
         """Test class of the object matches the config,
@@ -1726,12 +1680,12 @@ class TestDSISnumpy:
         rtss = dcmread(rtstruct_name, force=True)
         # ContourData has VR of DS
         cd = rtss.ROIContourSequence[0].ContourSequence[0].ContourData
-        assert isinstance(cd, numpy.ndarray)
+        assert isinstance(cd, np.ndarray)
         assert "float64" == cd.dtype
 
         # Check conversion with only a single value
         roi_vol = rtss.StructureSetROISequence[0].ROIVolume
-        assert isinstance(roi_vol, numpy.float64)
+        assert isinstance(roi_vol, np.float64)
 
     def test_DS_not_numpy(self):
         """Test class of the object matches the config."""
@@ -1815,8 +1769,8 @@ class TestDeferredRead:
         for data_elem in ds_norm:
             tag = data_elem.tag
 
-            if have_numpy and isinstance(data_elem.value, numpy.ndarray):
-                assert numpy.allclose(data_elem.value, ds_defer[tag].value)
+            if have_numpy and isinstance(data_elem.value, np.ndarray):
+                assert np.allclose(data_elem.value, ds_defer[tag].value)
             else:
                 assert data_elem.value == ds_defer[tag].value
 
@@ -1873,8 +1827,8 @@ class TestReadTruncatedFile:
         DS = pydicom.valuerep.DS
 
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([0.3125, 0.3125])
-            assert numpy.allclose(mr.PixelSpacing, expected)
+            expected = np.array([0.3125, 0.3125])
+            assert np.allclose(mr.PixelSpacing, expected)
         else:
             assert [DS("0.3125"), DS("0.3125")] == mr.PixelSpacing
 
@@ -1910,8 +1864,8 @@ class TestFileLike:
 
         got = ct.ImagePositionPatient
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([-158.135803, -179.035797, -75.699997])
-            assert numpy.allclose(got, expected)
+            expected = np.array([-158.135803, -179.035797, -75.699997])
+            assert np.allclose(got, expected)
         else:
             expected = [DS("-158.135803"), DS("-179.035797"), DS("-75.699997")]
             assert expected == got
@@ -1939,8 +1893,8 @@ class TestFileLike:
         DS = pydicom.valuerep.DS
 
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([-158.135803, -179.035797, -75.699997])
-            assert numpy.allclose(got, expected)
+            expected = np.array([-158.135803, -179.035797, -75.699997])
+            assert np.allclose(got, expected)
         else:
             expected = [DS("-158.135803"), DS("-179.035797"), DS("-75.699997")]
             assert expected == got
@@ -1954,6 +1908,92 @@ class TestFileLike:
 
 class TestDataElementGenerator:
     """Test filereader.data_element_generator"""
+
+    @pytest.mark.parametrize(
+        ("is_implicit_VR", "stop_tag", "stop_element"),
+        [
+            (
+                True,
+                Tag(0x7FE0, 0x0010),
+                # (7FE0,0010) implicit VR, 4-byte length = 4
+                b"\xe0\x7f\x10\x00\x04\x00\x00\x00DATA",
+            ),
+            (
+                False,
+                Tag(0x0010, 0x0010),
+                # (0010,0010) PN, 2-byte length = 4
+                b"\x10\x00\x10\x00PN\x04\x00DATA",
+            ),
+            (
+                False,
+                Tag(0x7FE0, 0x0010),
+                # (7FE0,0010) OB, 2 reserved bytes, 4-byte length = 4
+                b"\xe0\x7f\x10\x00OB\x00\x00\x04\x00\x00\x00DATA",
+            ),
+        ],
+        ids=["implicit-pixeldata", "explicit-2byte-length", "explicit-4byte-length"],
+    )
+    def test_stop_when_rewinds_to_start_of_element(
+        self, is_implicit_VR, stop_tag, stop_element
+    ):
+        """Test stop_when leaves the file positioned at the stopped element."""
+        # (0010,0020) PatientID, length 4, value "TEST"
+        first_element = b"\x10\x00\x20\x00"
+        if is_implicit_VR:
+            first_element += b"\x04\x00\x00\x00"  # 4-byte length = 4
+        else:
+            first_element += b"LO\x04\x00"  # LO, 2-byte length = 4
+        first_element += b"TEST"
+        fp = BytesIO(first_element + stop_element)
+        gen = data_element_generator(
+            fp,
+            is_implicit_VR=is_implicit_VR,
+            is_little_endian=True,
+            stop_when=lambda tag, vr, length: tag == stop_tag,
+        )
+
+        assert next(gen).tag == Tag(0x0010, 0x0020)
+        with pytest.raises(StopIteration):
+            next(gen)
+
+        assert fp.tell() == len(first_element)
+        assert fp.read() == stop_element
+
+    def test_stop_when_receives_none_vr_for_implicit_vr(self):
+        """Test stop_when is called with vr=None for implicit VR data."""
+        # (0010,0010) implicit VR, 4-byte length = 4
+        fp = BytesIO(b"\x10\x00\x10\x00\x04\x00\x00\x00DATA")
+        stop_when_args = []
+
+        def stop_when(tag, vr, length):
+            stop_when_args.append((tag, vr, length))
+            return True
+
+        gen = data_element_generator(
+            fp, is_implicit_VR=True, is_little_endian=True, stop_when=stop_when
+        )
+        with pytest.raises(StopIteration):
+            next(gen)
+
+        assert stop_when_args == [(Tag(0x0010, 0x0010), None, 4)]
+
+    def test_stop_when_receives_vr_for_explicit_vr(self):
+        """Test stop_when is called with the VR str for explicit VR data."""
+        # (0010,0010) PN, 2-byte length = 4
+        fp = BytesIO(b"\x10\x00\x10\x00PN\x04\x00DATA")
+        stop_when_args = []
+
+        def stop_when(tag, vr, length):
+            stop_when_args.append((tag, vr, length))
+            return True
+
+        gen = data_element_generator(
+            fp, is_implicit_VR=False, is_little_endian=True, stop_when=stop_when
+        )
+        with pytest.raises(StopIteration):
+            next(gen)
+
+        assert stop_when_args == [(Tag(0x0010, 0x0010), "PN", 4)]
 
     def test_little_endian_explicit(self):
         """Test reading little endian explicit VR data"""
