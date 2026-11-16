@@ -37,7 +37,7 @@ from pydicom.tag import (
     _LUT_DESCRIPTOR_TAGS,
 )
 from pydicom.uid import (
-    DeflatedExplicitVRLittleEndian,
+    DeflatedTransferSyntaxes,
     UID,
     ImplicitVRLittleEndian,
     ExplicitVRBigEndian,
@@ -57,7 +57,7 @@ from pydicom.valuerep import (
 from pydicom.values import convert_numbers
 
 if config.have_numpy:
-    import numpy
+    import numpy as np
 
 # Ambiguous VR Correction
 # (0018,9810) Zero Velocity Pixel Value
@@ -428,7 +428,7 @@ def write_UI(fp: DicomIO, elem: DataElement) -> None:
 
 def _is_multi_value(val: Any) -> bool:
     """Return True if `val` is a multi-value container."""
-    if config.have_numpy and isinstance(val, numpy.ndarray):
+    if config.have_numpy and isinstance(val, np.ndarray):
         return True
 
     return isinstance(val, MultiValue | list | tuple)
@@ -1454,8 +1454,8 @@ def dcmwrite(
         if file_meta:  # May be empty
             write_file_meta_info(fp, file_meta, enforce_standard=enforce_file_format)
 
-        if tsyntax == DeflatedExplicitVRLittleEndian:
-            # See PS3.5 section A.5
+        if tsyntax in DeflatedTransferSyntaxes:
+            # See PS3.5 sections A.5, A.7 and A.12
             # When writing, the entire dataset following the file meta data
             #   is encoded normally, then "deflate" compression applied
             buffer = DicomBytesIO()

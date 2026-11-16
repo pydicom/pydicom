@@ -327,6 +327,38 @@ class TestWriteFile:
 
         assert unzipped_rewritten == unzipped_original
 
+    # UIDs hardcoded from PS3.5 Sections A.5, A.7 and A.12 rather than taken
+    #   from pydicom.uid so that an omission there is detectable here
+    @pytest.mark.parametrize(
+        "tsyntax",
+        [
+            "1.2.840.10008.1.2.1.99",  # Deflated Explicit VR Little Endian
+            "1.2.840.10008.1.2.4.95",  # JPIP Referenced Deflate
+            "1.2.840.10008.1.2.4.205",  # JPIP HTJ2K Referenced Deflate
+        ],
+    )
+    def test_write_deflated_syntaxes(self, tsyntax):
+        """The dataset is deflated for every deflated transfer syntax."""
+        ds = Dataset()
+        ds.file_meta = FileMetaDataset()
+        ds.file_meta.MediaStorageSOPClassUID = "1.2.840.10008.5.1.4.1.1.7"
+        ds.file_meta.MediaStorageSOPInstanceUID = "1.2.3.4"
+        ds.file_meta.TransferSyntaxUID = tsyntax
+        ds.SOPClassUID = "1.2.840.10008.5.1.4.1.1.7"
+        ds.SOPInstanceUID = "1.2.3.4"
+        ds.PatientName = "CITIZEN^Jan"
+        ds.save_as(self.file_out, enforce_file_format=True)
+
+        self.file_out.seek(0)
+        written = self.file_out.read()
+        # An undeflated dataset would contain the value as plain text
+        assert b"CITIZEN^Jan" not in written
+
+        # Everything past the file meta must be a raw deflate stream
+        group_length = unpack("<I", written[140:144])[0]
+        deflated = written[144 + group_length :]
+        assert b"CITIZEN^Jan" in zlib.decompress(deflated, -zlib.MAX_WBITS)
+
     def test_write_dataset_without_encoding(self):
         """Test that write_dataset() raises if encoding not set."""
         msg = (
@@ -402,8 +434,8 @@ class TestWriteDataElement:
 
         Returns
         -------
-        str or bytes
-            The encoded element as str (python2) or bytes (python3)
+        bytes
+            The encoded element
         """
         with DicomBytesIO() as fp:
             fp.is_implicit_VR = is_implicit_VR
@@ -3029,7 +3061,8 @@ class TestWriteText:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with invalid ASCII value
-        elem = DataElement(0x00180015, "CS", "Dionysios Διονυσιος")
+        with pytest.warns(UserWarning):
+            elem = DataElement(0x00180015, "CS", "Dionysios Διονυσιος")
         msg = "Not a valid ASCII string - using replacement characters"
         with pytest.warns(UserWarning, match=msg):
             write_string(fp, elem)
@@ -3053,6 +3086,7 @@ class TestWriteText:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with decoded value
+
         elem = DataElement(0x00081039, "LO", "Dionysios Διονυσιος")
         with pytest.raises(UnicodeEncodeError, match=msg):
             # encode with two invalid encodings
@@ -3061,7 +3095,8 @@ class TestWriteText:
         fp = DicomBytesIO()
         fp.is_little_endian = True
         # data element with invalid ASCII value
-        elem = DataElement(0x00180015, "CS", "Dionysios Διονυσιος")
+        with pytest.warns(UserWarning):
+            elem = DataElement(0x00180015, "CS", "Dionysios Διονυσιος")
         msg = (
             r"'latin-?1' codec can't encode characters in position 10-18:"
             r" ordinal not in range\(256\)"
