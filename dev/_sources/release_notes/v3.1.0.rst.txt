@@ -129,3 +129,5 @@ Enhancements
 * When parsing fails because a value's length doesn't match the VR determined from a data
   dictionary lookup, report that VR in the error message (previously ``None``) and suggest
   :meth:`~pydicom.dataset.Dataset.update_raw_element` (:issue:`2170`)
+* The error for an unknown VR now names the pydicom version and the edition of the DICOM
+  Standard it implements (:issue:`2336`)
