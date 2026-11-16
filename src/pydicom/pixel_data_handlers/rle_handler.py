@@ -365,7 +365,7 @@ def _rle_decode_segment(data: bytes) -> bytearray:
     bytearray
         The decoded segment.
     """
-    data = bytearray(data)  # type: ignore[assignment]
+    mutable_data = bytearray(data)
     result = bytearray()
     pos = 0
     result_extend = result.extend
@@ -373,17 +373,17 @@ def _rle_decode_segment(data: bytes) -> bytearray:
     try:
         while True:
             # header_byte is N + 1
-            header_byte = data[pos] + 1
+            header_byte = mutable_data[pos] + 1
             pos += 1
             if header_byte > 129:
                 # Extend by copying the next byte (-N + 1) times
                 # however since using uint8 instead of int8 this will be
                 # (256 - N + 1) times
-                result_extend(data[pos : pos + 1] * (258 - header_byte))
+                result_extend(mutable_data[pos : pos + 1] * (258 - header_byte))
                 pos += 1
             elif header_byte < 129:
                 # Extend by literally copying the next (N + 1) bytes
-                result_extend(data[pos : pos + header_byte])
+                result_extend(mutable_data[pos : pos + header_byte])
                 pos += header_byte
 
     except IndexError:
