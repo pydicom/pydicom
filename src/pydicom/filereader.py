@@ -609,7 +609,7 @@ def read_sequence_item(
     try:
         bytes_read = fp.read(8)
         group, element, length = unpack(tag_length_format, bytes_read)
-    except BaseException:
+    except Exception:
         raise OSError(f"No tag to read at file position {fp.tell() + offset:X}")
 
     tag = (group, element)

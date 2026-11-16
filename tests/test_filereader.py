@@ -24,6 +24,7 @@ from pydicom.datadict import add_dict_entries
 from pydicom.filereader import (
     dcmread,
     read_dataset,
+    read_sequence_item,
     data_element_generator,
     read_file_meta_info,
 )
@@ -1036,6 +1037,21 @@ class TestReader:
         assert (
             "Expected sequence item with tag (FFFE,E000) at file position 0x22"
         ) in caplog.text
+
+    def test_sequence_item_truncated_header(self):
+        """Test a truncated sequence item header raises OSError"""
+        with pytest.raises(OSError, match="No tag to read at file position"):
+            read_sequence_item(BytesIO(b"\xfe\xff"), True, True, "iso8859")
+
+    def test_sequence_item_keyboard_interrupt(self):
+        """Test KeyboardInterrupt is not converted to OSError"""
+
+        class InterruptedIO(BytesIO):
+            def read(self, size=-1):
+                raise KeyboardInterrupt
+
+        with pytest.raises(KeyboardInterrupt):
+            read_sequence_item(InterruptedIO(), True, True, "iso8859")
 
     def test_registered_private_transfer_syntax(self, enable_debugging, caplog):
         """Test reading a dataset with a registered private transfer syntax"""
