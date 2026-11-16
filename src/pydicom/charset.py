@@ -730,20 +730,29 @@ def _python_encoding_for_corrected_encoding(encoding: str) -> str:
             return default_encoding
 
     # fallback: assume that it is already a python encoding
-    # Pre-check for embedded NUL characters: codecs.lookup raises ValueError
-    # (not LookupError) on NUL-containing strings, which would leak out of
-    # dcmread's public contract.  See #2338.
-    if "\x00" in encoding:
-        # Pass the original exception message from codecs.lookup
-        # (ValueError: embedded null character) for clarity.  See #2338.
-        _warn_about_invalid_encoding(encoding, reason="embedded null character")
-        return default_encoding
+    # Embedded NUL characters make codecs.lookup raise ValueError (not
+    # LookupError), which would leak out of dcmread's public contract.
+    # Warn about the NULs, strip them, and let the try/except below decide
+    # whether the stripped name is a valid encoding; fall back to the
+    # default only if it is not.  See #2338.
+    original_encoding = encoding
+    has_embedded_nul = "\x00" in encoding
+    if has_embedded_nul:
+        warn_and_log(
+            f"Specific Character Set '{encoding}' contains an embedded null "
+            "character - stripping it",
+            stacklevel=2,
+        )
+        encoding = encoding.replace("\x00", "")
 
     try:
         codecs.lookup(encoding)
         return encoding
     except LookupError:
-        _warn_about_invalid_encoding(encoding)
+        _warn_about_invalid_encoding(
+            original_encoding,
+            reason="embedded null character" if has_embedded_nul else None,
+        )
         return default_encoding
 
 
