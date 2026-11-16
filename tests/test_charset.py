@@ -536,9 +536,7 @@ class TestCharset:
         assert "Buc^Jérôme" == elem.value
         messages = [str(w.message) for w in recwarn.list]
         # warned about the NULs ...
-        assert any(
-            "contains an embedded null character" in msg for msg in messages
-        )
+        assert any("contains an embedded null character" in msg for msg in messages)
         # ... and about falling back to the default encoding
         assert any(
             "Unknown encoding" in msg and "using default encoding" in msg
