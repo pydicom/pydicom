@@ -734,7 +734,9 @@ def _python_encoding_for_corrected_encoding(encoding: str) -> str:
     # (not LookupError) on NUL-containing strings, which would leak out of
     # dcmread's public contract.  See #2338.
     if "\x00" in encoding:
-        _warn_about_invalid_encoding(encoding)
+        # Pass the original exception message from codecs.lookup
+        # (ValueError: embedded null character) for clarity.  See #2338.
+        _warn_about_invalid_encoding(encoding, reason="embedded null character")
         return default_encoding
 
     try:
@@ -746,7 +748,9 @@ def _python_encoding_for_corrected_encoding(encoding: str) -> str:
 
 
 def _warn_about_invalid_encoding(
-    encoding: str, patched_encoding: str | None = None
+    encoding: str,
+    patched_encoding: str | None = None,
+    reason: str | None = None,
 ) -> None:
     """Issue a warning for the given invalid encoding.
     If patched_encoding is given, it is mentioned as the
@@ -754,12 +758,21 @@ def _warn_about_invalid_encoding(
     If no replacement encoding is given, and
     :attr:`~pydicom.config.settings.reading_validation_mode` is set to
     ``RAISE``, `LookupError` is raised.
+    If reason is given, it is included in the message, e.g. the original
+    exception message for an encoding that cannot be looked up.
     """
     if patched_encoding is None:
+        if reason is not None:
+            reason_msg = f" ({reason})"
+        else:
+            reason_msg = ""
         if config.settings.reading_validation_mode == config.RAISE:
-            raise LookupError(f"Unknown encoding '{encoding}'")
+            raise LookupError(f"Unknown encoding '{encoding}'{reason_msg}")
 
-        msg = f"Unknown encoding '{encoding}' - using default encoding instead"
+        msg = (
+            f"Unknown encoding '{encoding}'{reason_msg} - "
+            "using default encoding instead"
+        )
     else:
         msg = (
             f"Incorrect value for Specific Character Set '{encoding}' - "

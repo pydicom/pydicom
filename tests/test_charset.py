@@ -496,7 +496,8 @@ class TestCharset:
         elem = DataElement(0x00100010, "PN", b"Buc^J\xe9r\xf4me")
         with pytest.warns(
             UserWarning,
-            match=r"Unknown encoding .*ISO_IR 100.* using default encoding",
+            match=r"Unknown encoding .*ISO_IR 100.*\(embedded null character\).*"
+            " using default encoding",
         ):
             pydicom.charset.decode_element(elem, ["\x00ISO_IR 100"])
 
@@ -504,7 +505,8 @@ class TestCharset:
         elem = DataElement(0x00100010, "PN", b"Buc^J\xe9r\xf4me")
         with pytest.warns(
             UserWarning,
-            match=r"Unknown encoding .*ISO.*IR 100.* using default encoding",
+            match=r"Unknown encoding .*ISO.*IR 100.*\(embedded null character\).*"
+            " using default encoding",
         ):
             pydicom.charset.decode_element(elem, ["ISO\x00_IR 100"])
 
@@ -514,7 +516,7 @@ class TestCharset:
         elem = DataElement(0x00100010, "PN", b"Buc^J\xe9r\xf4me")
         with pytest.raises(
             LookupError,
-            match=r"Unknown encoding .*ISO_IR 100",
+            match=r"Unknown encoding .*ISO_IR 100.*\(embedded null character\)",
         ):
             pydicom.charset.decode_element(elem, ["\x00ISO_IR 100"])
 
