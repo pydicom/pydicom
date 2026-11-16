@@ -81,6 +81,8 @@ Fixes
   (:issue:`2427`).
 * Fixed :attr:`~pydicom.dataset.Dataset.pixel_array` raising a bare ``StopIteration`` when
   encapsulated *Pixel Data* contains fewer frames than *Number of Frames* (:issue:`2371`).
+* Fixed :func:`~pydicom.filereader.read_sequence_item` converting ``KeyboardInterrupt``
+  and ``SystemExit`` to ``OSError`` (:pr:`2333`).
 
 
 Enhancements
