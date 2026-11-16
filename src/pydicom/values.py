@@ -801,6 +801,11 @@ def convert_value(
             # The user really wants an exception here
             raise
 
+        if VR == VR_.SQ:
+            # A sequence value can't be read as one of the retry VRs,
+            #   so leave it to the caller
+            raise
+
     logger.debug(
         f"Unable to convert tag {raw_data_element.tag} with VR {VR} using "
         "the standard value converter"

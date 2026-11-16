@@ -224,8 +224,11 @@ class DataElement:  # noqa: PLW1641
         # a known tag shall only have the VR 'UN' if it has a length that
         # exceeds the size that can be encoded in 16 bit - all other cases
         # can be seen as an encoding error and can be corrected
+        # (for a converted raw element the 'raw_element_vr' hook has already
+        # done this, and a 'UN' set by the value conversion is kept)
         if (
             VR == VR_.UN
+            and not already_converted
             and not tag.is_private
             and config.replace_un_with_known_vr
             and (is_undefined_length or value is None or len(value) < 0xFFFF)

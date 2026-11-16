@@ -2854,6 +2854,12 @@ class Dataset:  # noqa: PLW1641
                     )
                 elem.private_creator = self[private_creator_tag].value
 
+        # Convert an SQ value before changing the dataset, so that a value
+        #   that isn't a valid sequence raises and leaves the dataset as it was
+        is_sequence = elem.VR == VR_.SQ and isinstance(elem, DataElement)
+        if is_sequence and not isinstance(elem.value, pydicom.Sequence):
+            elem.value = pydicom.Sequence(elem.value)  # type: ignore
+
         # invalidate private blocks in case a private creator is replaced
         if self._private_blocks and elem_tag.is_private_creator:
             self._private_blocks = {}
@@ -2865,10 +2871,7 @@ class Dataset:  # noqa: PLW1641
 
         self._dict[elem_tag] = elem
 
-        if elem.VR == VR_.SQ and isinstance(elem, DataElement):
-            if not isinstance(elem.value, pydicom.Sequence):
-                elem.value = pydicom.Sequence(elem.value)  # type: ignore
-
+        if is_sequence:
             # Update the `_pixel_rep` attribute when nested sequences
             #   containing RawDataElements are being added to a different
             #   dataset
