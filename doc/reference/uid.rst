@@ -27,6 +27,7 @@ Transfer Syntax UIDs
    JPEG2000
    JPEG2000MCLossless
    JPEG2000MC
+   JPIPReferencedDeflate
    MPEG2MPML
    MPEG2MPMLF
    MPEG2MPHL
@@ -71,6 +72,7 @@ Transfer Syntax Lists
    JPEGXLTransferSyntaxes
    MPEGTransferSyntaxes
    RLETransferSyntaxes
+   DeflatedTransferSyntaxes
    UncompressedTransferSyntaxes
    PrivateTransferSyntaxes
 
