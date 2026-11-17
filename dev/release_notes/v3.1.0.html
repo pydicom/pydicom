@@ -556,6 +556,8 @@ when decoding.</p></li>
 <ul class="simple">
 <li><p>Restore buffered element positions when an operation using
 <code class="xref py py-func docutils literal notranslate"><span class="pre">reset_buffer_position()</span></code> raises an exception.</p></li>
+<li><p>Fixed JSON serialization of buffered binary element values, including use of
+a bulk data URI handler without reading the buffer into memory.</p></li>
 <li><p>Changed logging of missing plugin imports to use <code class="xref py py-attr docutils literal notranslate"><span class="pre">logging.DEBUG</span></code> (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2128">#2128</a>).</p></li>
 <li><p>Include all <a class="reference internal" href="../reference/examples.html#module-pydicom.examples" title="pydicom.examples"><code class="xref py py-mod docutils literal notranslate"><span class="pre">examples</span></code></a> module datasets with the package (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2128">#2128</a>, <a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2131">#2131</a>).</p></li>
 <li><p>Fixed an invalid VR value in the private data dictionary (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2132">#2132</a>).</p></li>
