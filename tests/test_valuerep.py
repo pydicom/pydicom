@@ -17,7 +17,9 @@ from pydicom.config import settings
 from pydicom.data import get_testdata_file
 from pydicom.dataset import Dataset
 from pydicom._dicom_dict import DicomDictionary, RepeatersDictionary
+from pydicom.filebase import DicomBytesIO
 from pydicom.filereader import read_dataset
+from pydicom.filewriter import write_dataset
 from pydicom.multival import MultiValue
 from pydicom.tag import Tag
 from pydicom.valuerep import (
@@ -1453,6 +1455,71 @@ class TestPersonName:
         assert ("Yamada", "Tarou") == (pn.family_name, pn.given_name)
         assert "山田^太郎" == pn.ideographic
         assert "やまだ^たろう" == pn.phonetic
+
+    def test_from_named_components_jp_from_unicode_no_encodings(self):
+        # Non-ASCII str components without encodings must not be encoded
+        # (lossily) with the default encoding on construction
+        pn = PersonName.from_named_components(
+            family_name="Yamada",
+            given_name="Tarou",
+            family_name_ideographic="山田",
+            given_name_ideographic="太郎",
+            family_name_phonetic="やまだ",
+            given_name_phonetic="たろう",
+        )
+        assert pn == "Yamada^Tarou=山田^太郎=やまだ^たろう"
+        assert ("Yamada", "Tarou") == (pn.family_name, pn.given_name)
+        assert "山田^太郎" == pn.ideographic
+        assert "やまだ^たろう" == pn.phonetic
+        assert pn.encodings is None
+        assert pn.encode([default_encoding, "iso2022_jp"]) == (
+            b"Yamada^Tarou="
+            b"\033$B;3ED\033(B^\033$BB@O:\033(B="
+            b"\033$B$d$^$@\033(B^\033$B$?$m$&\033(B"
+        )
+
+    def test_from_named_components_written_with_dataset_charset(self):
+        # The dataset's Specific Character Set is used when writing a
+        # name created from str components without encodings
+        ds = Dataset()
+        ds.SpecificCharacterSet = ["", "ISO 2022 IR 87"]
+        ds.PatientName = PersonName.from_named_components(
+            family_name="Yamada",
+            given_name="Tarou",
+            family_name_ideographic="山田",
+            given_name_ideographic="太郎",
+        )
+        fp = DicomBytesIO()
+        fp.is_little_endian = True
+        fp.is_implicit_VR = False
+        write_dataset(fp, ds)
+        fp.seek(0)
+        ds_in = read_dataset(fp, is_implicit_VR=False, is_little_endian=True)
+        assert ds_in.PatientName == "Yamada^Tarou=山田^太郎"
+        assert ds_in.PatientName.ideographic == "山田^太郎"
+
+    def test_from_named_components_veterinary_from_unicode_no_encodings(self):
+        pn = PersonName.from_named_components_veterinary(
+            responsible_party_name="ABC Farms",
+            patient_name="Running on Water",
+            responsible_party_name_ideographic="農場",
+            patient_name_ideographic="水面走",
+        )
+        assert pn == "ABC Farms^Running on Water=農場^水面走"
+        assert "農場^水面走" == pn.ideographic
+        assert pn.encodings is None
+
+    def test_from_named_components_mixed_str_bytes(self):
+        # Mixing str and bytes components still encodes the value
+        pn = PersonName.from_named_components(
+            family_name="Yamada",
+            given_name="Tarou",
+            family_name_ideographic=b"\033$B;3ED\033(B",
+            given_name_ideographic="太郎",
+            encodings=[default_encoding, "iso2022_jp"],
+        )
+        assert pn.original_string == (b"Yamada^Tarou=\033$B;3ED\033(B^\033$BB@O:\033(B")
+        assert "山田^太郎" == pn.ideographic
 
     def test_from_named_components_veterinary(self):
         # Example from DICOM standard, part 5, sect 6.2.1.1
