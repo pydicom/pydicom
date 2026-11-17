@@ -5,7 +5,7 @@ from collections.abc import Iterator
 from io import BytesIO, BufferedIOBase
 import os
 from struct import pack, unpack
-from typing import Any
+from typing import Any, BinaryIO
 
 from pydicom import config
 from pydicom.misc import warn_and_log
@@ -388,7 +388,7 @@ def generate_fragmented_frames(
 
 
 def generate_frames(
-    buffer: bytes | ReadableBuffer,
+    buffer: bytes | bytearray | ReadableBuffer | BinaryIO,
     *,
     number_of_frames: int | None = None,
     extended_offsets: tuple[list[int], list[int]] | tuple[bytes, bytes] | None = None,
@@ -446,7 +446,7 @@ def generate_frames(
 
 
 def get_frame(
-    buffer: bytes | bytearray | ReadableBuffer,
+    buffer: bytes | bytearray | ReadableBuffer | BinaryIO,
     index: int,
     *,
     extended_offsets: tuple[list[int], list[int]] | tuple[bytes, bytes] | None = None,

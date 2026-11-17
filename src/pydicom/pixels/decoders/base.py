@@ -66,7 +66,7 @@ if TYPE_CHECKING:  # pragma: no cover
 LOGGER = logging.getLogger(__name__)
 
 
-DecodeFunction = Callable[[bytes, "DecodeRunner"], bytes | bytearray]
+DecodeFunction = Callable[[bytes, "DecodeRunner"], bytes]
 
 
 class DecodeOptions(RunnerOptions, total=False):
@@ -533,6 +533,7 @@ class DecodeRunner(RunnerBase):
 
         # For encapsulated data `self.src` should not be memoryview to avoid
         #   creating a duplicate object in memory by the encapsulation functions
+        assert not isinstance(self.src, memoryview)
         src = get_frame(
             self.src,
             index,
@@ -669,7 +670,7 @@ class DecodeRunner(RunnerBase):
             reached before ``offset + length``.
         """
         if self.is_dataset or self.is_buffer:
-            src = cast(Buffer, src)
+            src = cast(bytes, src)
             return src[offset : offset + length]
 
         src = cast(BinaryIO, src)
@@ -693,6 +694,7 @@ class DecodeRunner(RunnerBase):
 
         # For encapsulated data `self.src` should not be memoryview as doing so
         #   will create a duplicate object in memory by `generate_frames`
+        assert not isinstance(self.src, memoryview)
         # May yield more frames than `number_of_frames` for JPEG!
         encoded_frames = generate_frames(
             self.src,
