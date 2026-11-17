@@ -48,7 +48,7 @@ from typing import (
 )
 
 try:
-    import numpy
+    import numpy as np
 except ImportError:
     pass
 
@@ -410,7 +410,7 @@ class Dataset:  # noqa: PLW1641
         # known private creator blocks
         self._private_blocks: dict[tuple[int, str], PrivateBlock] = {}
 
-        self._pixel_array: numpy.ndarray | None = None
+        self._pixel_array: np.ndarray | None = None
         self._pixel_array_opts: dict[str, Any] = {"use_pdh": False}
         self._pixel_id: dict[str, int] = {}
 
@@ -544,9 +544,9 @@ class Dataset:  # noqa: PLW1641
             vr = get_private_entry((group, element_offset), private_creator)[0]
         block.add_new(element_offset, vr, value)
 
-    def __array__(self) -> "numpy.ndarray":
+    def __array__(self) -> "np.ndarray":
         """Support accessing the dataset from a numpy array."""
-        return numpy.asarray(self._dict)
+        return np.asarray(self._dict)
 
     def data_element(self, name: str) -> DataElement | None:
         """Return the element corresponding to the element keyword `name`.
@@ -1570,6 +1570,7 @@ class Dataset:  # noqa: PLW1641
     def clear(self) -> None:
         """Delete all the elements from the :class:`Dataset`."""
         self._dict.clear()
+        self._private_blocks = {}
 
     def pop(self, key: "BaseTag | TagType", *args: Any) -> _DatasetValue:
         """Emulate :meth:`dict.pop` with support for tags and keywords.
@@ -1606,7 +1607,11 @@ class Dataset:  # noqa: PLW1641
         except Exception:
             pass
 
-        return self._dict.pop(cast(BaseTag, key), *args)
+        elem: _DatasetValue = self._dict.pop(cast(BaseTag, key), *args)
+        if self._private_blocks and isinstance(key, BaseTag) and key.is_private_creator:
+            self._private_blocks = {}
+
+        return elem
 
     def popitem(self) -> tuple[BaseTag, _DatasetValue]:
         """Emulate :meth:`dict.popitem`.
@@ -1615,7 +1620,11 @@ class Dataset:  # noqa: PLW1641
         -------
         tuple of (BaseTag, DataElement)
         """
-        return self._dict.popitem()
+        tag, elem = self._dict.popitem()
+        if self._private_blocks and tag.is_private_creator:
+            self._private_blocks = {}
+
+        return tag, elem
 
     def setdefault(self, key: TagType, default: Any | None = None) -> DataElement:
         """Emulate :meth:`dict.setdefault` with support for tags and keywords.
@@ -1738,6 +1747,13 @@ class Dataset:  # noqa: PLW1641
                 f"'{type(self).__name__}' object has no attribute 'convert_pixel_data'"
             )
 
+        self._convert_pixel_data(handler_name)
+
+    def _convert_pixel_data(self, handler_name: str = "") -> None:
+        """Convert pixel data to a :class:`numpy.ndarray` internally.
+
+        See :meth:`~Dataset.convert_pixel_data` for more information.
+        """
         # Check if already have converted to a NumPy array
         # Also check if pixel data has changed. If so, get new NumPy array
         already_have = True
@@ -1897,7 +1913,7 @@ class Dataset:  # noqa: PLW1641
     def compress(
         self,
         transfer_syntax_uid: str,
-        arr: "numpy.ndarray | None" = None,
+        arr: "np.ndarray | None" = None,
         encoding_plugin: str = "",
         encapsulate_ext: bool = False,
         *,
@@ -2150,7 +2166,7 @@ class Dataset:  # noqa: PLW1641
             **opts,
         )
 
-    def overlay_array(self, group: int) -> "numpy.ndarray":
+    def overlay_array(self, group: int) -> "np.ndarray":
         """Return the *Overlay Data* in `group` as a :class:`numpy.ndarray`.
 
         Parameters
@@ -2180,7 +2196,7 @@ class Dataset:  # noqa: PLW1641
         return get_overlay_array(self, group)
 
     @property
-    def pixel_array(self) -> "numpy.ndarray":
+    def pixel_array(self) -> "np.ndarray":
         """Return the pixel data as a :class:`numpy.ndarray`.
 
         .. warning::
@@ -2239,8 +2255,8 @@ class Dataset:  # noqa: PLW1641
             Similar to :func:`pydicom.pixels.pixel_array` but returns a generator
             that iterates through the image frames.
         """
-        self.convert_pixel_data()
-        return cast("numpy.ndarray", self._pixel_array)
+        self._convert_pixel_data()
+        return cast("np.ndarray", self._pixel_array)
 
     def pixel_array_options(
         self,
@@ -2352,7 +2368,7 @@ class Dataset:  # noqa: PLW1641
         self._pixel_array = None
         self._pixel_id = {}
 
-    def waveform_array(self, index: int) -> "numpy.ndarray":
+    def waveform_array(self, index: int) -> "np.ndarray":
         """Return an :class:`~numpy.ndarray` for the multiplex group at
         `index` in the (5400,0100) *Waveform Sequence*.
 
@@ -2838,6 +2854,10 @@ class Dataset:  # noqa: PLW1641
                     )
                 elem.private_creator = self[private_creator_tag].value
 
+        # invalidate private blocks in case a private creator is replaced
+        if self._private_blocks and elem_tag.is_private_creator:
+            self._private_blocks = {}
+
         # Changing pixel data resets the stored array
         if elem_tag in PIXEL_KEYWORDS:
             self._pixel_array = None
@@ -2847,7 +2867,7 @@ class Dataset:  # noqa: PLW1641
 
         if elem.VR == VR_.SQ and isinstance(elem, DataElement):
             if not isinstance(elem.value, pydicom.Sequence):
-                elem.value = pydicom.Sequence(elem.value)  # type: ignore
+                elem.value = pydicom.Sequence(elem.value)
 
             # Update the `_pixel_rep` attribute when nested sequences
             #   containing RawDataElements are being added to a different
@@ -2856,7 +2876,7 @@ class Dataset:  # noqa: PLW1641
 
     def set_pixel_data(
         self,
-        arr: "numpy.ndarray",
+        arr: "np.ndarray",
         photometric_interpretation: str,
         bits_stored: int,
         *,

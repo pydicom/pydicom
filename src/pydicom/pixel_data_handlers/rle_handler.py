@@ -40,7 +40,6 @@ from typing import TYPE_CHECKING, cast
 
 try:
     import numpy as np
-    import numpy  # noqa: F401
 
     HAVE_RLE = True
 except ImportError:
@@ -366,7 +365,6 @@ def _rle_decode_segment(data: bytes) -> bytearray:
     bytearray
         The decoded segment.
     """
-    data = bytearray(data)
     result = bytearray()
     pos = 0
     result_extend = result.extend

@@ -139,15 +139,7 @@ class UID(str):
     def is_deflated(self) -> bool:
         """Return ``True`` if a deflated transfer syntax UID."""
         if self.is_transfer_syntax:
-            # Deflated Explicit VR Little Endian
-            if self == "1.2.840.10008.1.2.1.99":
-                return True
-
-            # Explicit VR Little Endian
-            # Implicit VR Little Endian
-            # Explicit VR Big Endian
-            # All encapsulated transfer syntaxes
-            return False
+            return self in DeflatedTransferSyntaxes
 
         raise ValueError("UID is not a transfer syntax.")
 
@@ -292,6 +284,8 @@ with disable_value_validation():
     """1.2.840.10008.1.2.4.92"""
     JPEG2000MC = UID("1.2.840.10008.1.2.4.93")
     """1.2.840.10008.1.2.4.93"""
+    JPIPReferencedDeflate = UID("1.2.840.10008.1.2.4.95")
+    """1.2.840.10008.1.2.4.95"""
     MPEG2MPML = UID("1.2.840.10008.1.2.4.100")
     """1.2.840.10008.1.2.4.100"""
     MPEG2MPMLF = UID("1.2.840.10008.1.2.4.100.1")
@@ -351,7 +345,7 @@ with disable_value_validation():
     DeflatedImageFrameCompression = UID("1.2.840.10008.1.2.8.1")
     """1.2.840.10008.1.2.8.1"""
 
-AllTransferSyntaxes = [
+AllTransferSyntaxes: list[UID] = [
     ImplicitVRLittleEndian,
     ExplicitVRLittleEndian,
     DeflatedExplicitVRLittleEndian,
@@ -398,7 +392,7 @@ AllTransferSyntaxes = [
 ]
 """All non-retired transfer syntaxes and *Explicit VR Big Endian*."""
 
-JPEGTransferSyntaxes = [
+JPEGTransferSyntaxes: list[UID] = [
     JPEGBaseline8Bit,
     JPEGExtended12Bit,
     JPEGLossless,
@@ -406,10 +400,10 @@ JPEGTransferSyntaxes = [
 ]
 """JPEG (ISO/IEC 10918-1) transfer syntaxes"""
 
-JPEGLSTransferSyntaxes = [JPEGLSLossless, JPEGLSNearLossless]
+JPEGLSTransferSyntaxes: list[UID] = [JPEGLSLossless, JPEGLSNearLossless]
 """JPEG-LS (ISO/IEC 14495-1) transfer syntaxes."""
 
-JPEG2000TransferSyntaxes = [
+JPEG2000TransferSyntaxes: list[UID] = [
     JPEG2000Lossless,
     JPEG2000,
     JPEG2000MCLossless,
@@ -420,10 +414,10 @@ JPEG2000TransferSyntaxes = [
 ]
 """JPEG 2000 (ISO/IEC 15444-1) transfer syntaxes."""
 
-JPEGXLTransferSyntaxes = [JPEGXLLossless, JPEGXLJPEGRecompression, JPEGXL]
+JPEGXLTransferSyntaxes: list[UID] = [JPEGXLLossless, JPEGXLJPEGRecompression, JPEGXL]
 """JPEG XL (ISO/IEC 18181-1) transfer syntaxes."""
 
-MPEGTransferSyntaxes = [
+MPEGTransferSyntaxes: list[UID] = [
     MPEG2MPML,
     MPEG2MPMLF,
     MPEG2MPHL,
@@ -443,10 +437,20 @@ MPEGTransferSyntaxes = [
 ]
 """MPEG transfer syntaxes."""
 
-RLETransferSyntaxes = [RLELossless]
+RLETransferSyntaxes: list[UID] = [RLELossless]
 """RLE transfer syntaxes."""
 
-UncompressedTransferSyntaxes = [
+DeflatedTransferSyntaxes: list[UID] = [
+    DeflatedExplicitVRLittleEndian,
+    JPIPReferencedDeflate,
+    JPIPHTJ2KReferencedDeflate,
+]
+"""Transfer syntaxes where the encoded *Data Set* following the *File Meta
+Information* is compressed using the Deflate algorithm, from Sections A.5, A.7
+and A.12 of :dcm:`Part 5 of the DICOM Standard<part05/chapter_A.html>`.
+"""
+
+UncompressedTransferSyntaxes: list[UID] = [
     ExplicitVRLittleEndian,
     ImplicitVRLittleEndian,
     DeflatedExplicitVRLittleEndian,
@@ -454,7 +458,7 @@ UncompressedTransferSyntaxes = [
 ]
 """Uncompressed (native) transfer syntaxes."""
 
-PrivateTransferSyntaxes = []
+PrivateTransferSyntaxes: list[UID] = []
 """Private transfer syntaxes added using the
 :func:`~pydicom.uid.register_transfer_syntax` function.
 """
@@ -573,11 +577,15 @@ def generate_uid(
         generated using the :func:`uuid.uuid4` algorithm.
     entropy_srcs : list of str, optional
         If `prefix` is used then the `prefix` will be appended with a
-        SHA512 hash of the supplied :class:`list` which means the result is
-        deterministic and should make the original data unrecoverable. If
-        `entropy_srcs` isn't used then a random number from
-        :func:`secrets.randbelow` will be appended to the `prefix`. If `prefix`
-        is ``None`` then `entropy_srcs` has no effect.
+        SHA512 hash of the supplied :class:`list`. The result is deterministic
+        (the same input always produces the same UID), which is useful for
+        stable remapping. SHA512 is a one-way hash, but it is applied here
+        without a salt, so it provides no protection against brute-force or
+        dictionary attacks on low-entropy inputs and should not be relied upon
+        as an irreversible de-identification mechanism. If `entropy_srcs`
+        isn't used then a random number from :func:`secrets.randbelow` will be
+        appended to the `prefix`. If `prefix` is ``None`` then `entropy_srcs`
+        has no effect.
 
     Returns
     -------

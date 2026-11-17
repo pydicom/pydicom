@@ -489,6 +489,71 @@ class TestCharset:
         with pytest.raises(LookupError, match="Unknown encoding 'ISO 2022 IR 146'"):
             pydicom.charset.decode_element(elem, ["ISO 2022 IR 100", "ISO 2022 IR 146"])
 
+    def test_embedded_null_in_encoding(self, allow_reading_invalid_values):
+        """Test that embedded NUL in SpecificCharacterSet does not raise
+        ValueError, and that the encoding is used once the NULs are stripped
+        instead of falling back to the default. Regression test for #2338."""
+        # leading NUL, stripped name is a valid encoding
+        elem = DataElement(0x00100010, "PN", b"Buc^J\xe9r\xf4me")
+        with pytest.warns(
+            UserWarning,
+            match=r"Specific Character Set '.*ISO_IR 100' contains an "
+            "embedded null character",
+        ):
+            pydicom.charset.decode_element(elem, ["\x00ISO_IR 100"])
+        assert "Buc^Jérôme" == elem.value
+
+        # middle NUL
+        elem = DataElement(0x00100010, "PN", b"Buc^J\xe9r\xf4me")
+        with pytest.warns(
+            UserWarning,
+            match=r"Specific Character Set '.*ISO.*IR 100' contains an "
+            "embedded null character",
+        ):
+            pydicom.charset.decode_element(elem, ["ISO\x00_IR 100"])
+        assert "Buc^Jérôme" == elem.value
+
+        # the stripped encoding is used, not the default: these UTF-8 bytes
+        # decode differently under UTF-8 than under the default encoding
+        elem = DataElement(0x00100010, "PN", b"Buc^J\xc3\xa9r\xc3\xb4me")
+        with pytest.warns(
+            UserWarning,
+            match=r"Specific Character Set '.*UTF-8' contains an "
+            "embedded null character",
+        ):
+            pydicom.charset.decode_element(elem, ["\x00UTF-8"])
+        assert "Buc^Jérôme" == elem.value
+
+    def test_embedded_null_in_encoding_still_invalid(
+        self, allow_reading_invalid_values, recwarn
+    ):
+        """Test that an embedded NUL in SpecificCharacterSet falls back to
+        the default encoding if the name is still invalid after stripping
+        the NULs. Regression test for #2338."""
+        elem = DataElement(0x00100010, "PN", b"Buc^J\xe9r\xf4me")
+        pydicom.charset.decode_element(elem, ["\x00ISO_IR 999"])
+        # decoded with the default encoding
+        assert "Buc^Jérôme" == elem.value
+        messages = [str(w.message) for w in recwarn.list]
+        # warned about the NULs ...
+        assert any("contains an embedded null character" in msg for msg in messages)
+        # ... and about falling back to the default encoding
+        assert any(
+            "Unknown encoding" in msg and "using default encoding" in msg
+            for msg in messages
+        )
+
+    def test_embedded_null_in_encoding_strict(self, enforce_valid_values):
+        """Test that embedded NUL in SpecificCharacterSet raises LookupError
+        (not ValueError) when reading_validation_mode is RAISE and the name
+        is still invalid after stripping the NULs. #2338."""
+        elem = DataElement(0x00100010, "PN", b"Buc^J\xe9r\xf4me")
+        with pytest.raises(
+            LookupError,
+            match=r"Unknown encoding .*ISO_IR 999.*\(embedded null character\)",
+        ):
+            pydicom.charset.decode_element(elem, ["\x00ISO_IR 999"])
+
     def test_japanese_multi_byte_personname(self):
         """Test japanese person name which has multi byte strings are
         correctly encoded."""
