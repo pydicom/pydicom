@@ -51,12 +51,18 @@ print(f"skipped, no SliceLocation: {skipcount}")
 # ensure they are in the correct order
 slices = sorted(slices, key=lambda s: s.SliceLocation)
 
-# pixel aspects, assuming all slices are the same
-ps = slices[0].PixelSpacing
-ss = slices[0].SliceThickness
-ax_aspect = ps[1] / ps[0]
-sag_aspect = ps[1] / ss
-cor_aspect = ss / ps[0]
+# pixel aspects, assuming all slices are the same.
+# PixelSpacing is the space BETWEEN rows and BETWEEN columns respectively: the first
+# value is the distance between the centers of adjacent rows (vertical spacing) and the
+# second the distance between the centers of adjacent columns (horizontal spacing).
+# See DICOM PS3.3 Section 10.7.1.3.
+row_spacing, col_spacing = slices[0].PixelSpacing
+slice_spacing = slices[0].SliceThickness
+# set_aspect() takes the displayed size of one y unit over one x unit, for the
+# array that each subplot below actually shows.
+ax_aspect = row_spacing / col_spacing  # img3d[:, :, k] is (row, column)
+sag_aspect = row_spacing / slice_spacing  # img3d[:, j, :] is (row, slice)
+cor_aspect = slice_spacing / col_spacing  # img3d[i, :, :].T is (slice, column)
 
 # create 3D array
 img_shape = list(slices[0].pixel_array.shape)

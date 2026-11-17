@@ -1,6 +1,7 @@
 # Copyright 2008-2019 pydicom authors. See LICENSE file for details.
 import json
 import logging
+from io import BytesIO
 from unittest import mock
 
 import pytest
@@ -332,6 +333,27 @@ class TestDataSetToJson:
 
 
 class TestEmptyJsonValues:
+    @pytest.mark.parametrize("vr", ["DS", "IS"])
+    @pytest.mark.parametrize("empty_value", ["", None])
+    def test_multivalue_numeric_to_json(self, vr, empty_value):
+        ds = Dataset()
+        ds.add_new(0x00091001, vr, [1, empty_value, 2])
+
+        result = ds.to_json()
+
+        assert json.loads(result) == {"00091001": {"vr": vr, "Value": [1, None, 2]}}
+        restored = Dataset.from_json(result)
+        assert restored[0x00091001].value == [1, None, 2]
+        assert restored[0x00091001].VM == 3
+
+    @pytest.mark.parametrize("vr", ["DS", "IS"])
+    @pytest.mark.parametrize("empty_value", ["", None])
+    def test_multivalue_numeric_from_json(self, vr, empty_value):
+        ds = Dataset.from_json({"00091001": {"vr": vr, "Value": [1, empty_value, 2]}})
+
+        assert ds[0x00091001].value == [1, None, 2]
+        assert ds[0x00091001].VM == 3
+
     @pytest.fixture
     def test_json(self):
         yield Dataset.from_json(
@@ -388,6 +410,36 @@ class TestSequence:
 
 
 class TestBinary:
+    @pytest.mark.parametrize("vr", ["OB", "OW"])
+    def test_inline_binary_buffered(self, vr):
+        buffer = BytesIO(b"abcdefgh")
+        buffer.seek(3)
+        ds = Dataset()
+        ds.add_new(0x7FE00010, vr, buffer)
+
+        assert json.loads(ds.to_json()) == {
+            "7FE00010": {"vr": vr, "InlineBinary": "YWJjZGVmZ2g="}
+        }
+        assert buffer.tell() == 3
+        assert Dataset.from_json(ds.to_json())[0x7FE00010].value == b"abcdefgh"
+
+    def test_bulk_data_uri_buffered_without_reading(self):
+        class UnreadBuffer(BytesIO):
+            def read(self, *args):
+                raise AssertionError("Bulk data should be handled without reading it")
+
+        buffer = UnreadBuffer(b"abcdefgh")
+        buffer.seek(3)
+        ds = Dataset()
+        ds.add_new(0x7FE00010, "OB", buffer)
+        handler = mock.Mock(return_value="https://example.com/bulk")
+
+        assert ds.to_json_dict(
+            bulk_data_threshold=4, bulk_data_element_handler=handler
+        ) == {"7FE00010": {"vr": "OB", "BulkDataURI": "https://example.com/bulk"}}
+        handler.assert_called_once_with(ds[0x7FE00010])
+        assert buffer.tell() == 3
+
     def test_inline_binary(self):
         ds = Dataset()
         ds.add_new(0x00091002, "OB", b"BinaryContent")
@@ -534,7 +586,8 @@ class TestNumeric:
         ds.add_new(0x00091015, "DS", "3.14159265")
         ds.add_new(0x00091102, "US", 2)
         ds.add_new(0x00091103, "US", None)
-        ds.add_new(0x00091104, "US", "")
+        with pytest.warns(UserWarning):
+            ds.add_new(0x00091104, "US", "")
         ds.add_new(0x00091105, "US", [])
 
         ds_json = ds.to_json_dict()
