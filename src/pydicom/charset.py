@@ -771,10 +771,7 @@ def _warn_about_invalid_encoding(
     exception message for an encoding that cannot be looked up.
     """
     if patched_encoding is None:
-        if reason is not None:
-            reason_msg = f" ({reason})"
-        else:
-            reason_msg = ""
+        reason_msg = f" ({reason})" if reason is not None else ""
         if config.settings.reading_validation_mode == config.RAISE:
             raise LookupError(f"Unknown encoding '{encoding}'{reason_msg}")
 
