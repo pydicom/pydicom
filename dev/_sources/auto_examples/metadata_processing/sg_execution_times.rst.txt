@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.010** total execution time for 3 files **from auto_examples/metadata_processing**:
+**00:00.009** total execution time for 3 files **from auto_examples/metadata_processing**:
 
 .. container::
 
