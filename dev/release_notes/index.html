@@ -627,6 +627,8 @@ encapsulated <em>Pixel Data</em> contains fewer frames than <em>Number of Frames
 <li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.filereader.read_sequence_item.html#pydicom.filereader.read_sequence_item" title="pydicom.filereader.read_sequence_item"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_sequence_item()</span></code></a> converting <code class="docutils literal notranslate"><span class="pre">KeyboardInterrupt</span></code>
 and <code class="docutils literal notranslate"><span class="pre">SystemExit</span></code> to <code class="docutils literal notranslate"><span class="pre">OSError</span></code> (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/2333">#2333</a>).</p></li>
 <li><p>Fixed codify generating invalid Python for standard data elements without keywords.</p></li>
+<li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.valuerep.format_number_as_ds.html#pydicom.valuerep.format_number_as_ds" title="pydicom.valuerep.format_number_as_ds"><code class="xref py py-func docutils literal notranslate"><span class="pre">format_number_as_ds()</span></code></a> returning a 17 character string
+when rounding adds a digit before the decimal point, such as <code class="docutils literal notranslate"><span class="pre">9.999999999999998</span></code>.</p></li>
 </ul>
 </section>
 <section id="enhancements">
