@@ -97,7 +97,7 @@ ENCODINGS_TO_CODES["shift_jis"] = ESC + b")I"
 # Multi-byte character sets except Korean are handled by Python.
 # To decode them, the escape sequence shall be preserved in the input byte
 # string, and will be removed during decoding by Python.
-handled_encodings = ("iso2022_jp", "iso2022_jp_2", "iso_ir_58")
+handled_encodings = ("iso2022_jp", "iso2022_jp_2")
 
 
 def _encode_to_jis_x_0201(value: str, errors: str = "strict") -> bytes:
@@ -730,16 +730,36 @@ def _python_encoding_for_corrected_encoding(encoding: str) -> str:
             return default_encoding
 
     # fallback: assume that it is already a python encoding
+    # Embedded NUL characters make codecs.lookup raise ValueError (not
+    # LookupError), which would leak out of dcmread's public contract.
+    # Warn about the NULs, strip them, and let the try/except below decide
+    # whether the stripped name is a valid encoding; fall back to the
+    # default only if it is not.  See #2338.
+    original_encoding = encoding
+    has_embedded_nul = "\x00" in encoding
+    if has_embedded_nul:
+        warn_and_log(
+            f"Specific Character Set '{encoding}' contains an embedded null "
+            "character - stripping it",
+            stacklevel=2,
+        )
+        encoding = encoding.replace("\x00", "")
+
     try:
         codecs.lookup(encoding)
         return encoding
     except LookupError:
-        _warn_about_invalid_encoding(encoding)
+        _warn_about_invalid_encoding(
+            original_encoding,
+            reason="embedded null character" if has_embedded_nul else None,
+        )
         return default_encoding
 
 
 def _warn_about_invalid_encoding(
-    encoding: str, patched_encoding: str | None = None
+    encoding: str,
+    patched_encoding: str | None = None,
+    reason: str | None = None,
 ) -> None:
     """Issue a warning for the given invalid encoding.
     If patched_encoding is given, it is mentioned as the
@@ -747,12 +767,18 @@ def _warn_about_invalid_encoding(
     If no replacement encoding is given, and
     :attr:`~pydicom.config.settings.reading_validation_mode` is set to
     ``RAISE``, `LookupError` is raised.
+    If reason is given, it is included in the message, e.g. the original
+    exception message for an encoding that cannot be looked up.
     """
     if patched_encoding is None:
+        reason_msg = f" ({reason})" if reason is not None else ""
         if config.settings.reading_validation_mode == config.RAISE:
-            raise LookupError(f"Unknown encoding '{encoding}'")
+            raise LookupError(f"Unknown encoding '{encoding}'{reason_msg}")
 
-        msg = f"Unknown encoding '{encoding}' - using default encoding instead"
+        msg = (
+            f"Unknown encoding '{encoding}'{reason_msg} - "
+            "using default encoding instead"
+        )
     else:
         msg = (
             f"Incorrect value for Specific Character Set '{encoding}' - "

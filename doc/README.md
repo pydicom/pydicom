@@ -5,10 +5,10 @@
 This documentation will be automatically built and generated with continuous
  integration, via the [circle.yml](../.circleci/config.yml).
 
-To get started, create a new virtualenv using Python 3:
+To get started, create a new virtualenv:
 
 ```
-mkvirtualenv -p /path/to/python3.X pydicom-sphinx
+mkvirtualenv -p /path/to/python3 pydicom-sphinx
 cd pydicom/
 pip install -e .
 pip install matplotlib

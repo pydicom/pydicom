@@ -20,13 +20,13 @@ default_encoding = "iso8859"
 
 # Delimiters for text strings and person name that reset the encoding.
 # See PS3.5, Section 6.1.2.5.3
-# Note: We use character codes for Python 3
-# because those are the types yielded if iterating over a byte string.
+# Note: We use character codes because iterating over bytes objects
+# yields integers.
 
-# Characters/Character codes for text VR delimiters: LF, CR, TAB, FF
+# Character codes for text VR delimiters: LF, CR, TAB, FF
 TEXT_VR_DELIMS = {0x0D, 0x0A, 0x09, 0x0C}
 
-# Character/Character code for PN delimiter: name part separator '^'
+# Character code for PN delimiter: name part separator '^'
 # (the component separator '=' is handled separately)
 PN_DELIMS = {0x5E}
 
@@ -614,7 +614,6 @@ class _DateTimeBase:
         self.__dict__.update(state)
 
     def __reduce_ex__(self, protocol: int) -> tuple[Any, ...]:  # type: ignore[override]
-        # Python 3.8 - protocol: SupportsIndex (added in 3.8)
         # datetime.time, and datetime.datetime return Tuple[Any, ...]
         # datetime.date doesn't define __reduce_ex__
         reduce_ex = cast(tuple[Any, ...], super().__reduce_ex__(protocol))
@@ -996,7 +995,11 @@ def format_number_as_ds(val: float | Decimal) -> str:
             remaining_chars = 14 - sign_chars - int(floor(logval))
         else:
             remaining_chars = 14 - sign_chars
-        return f"{val:.{remaining_chars}f}"
+        trunc_str = f"{val:.{remaining_chars}f}"
+        if len(trunc_str) > 16:
+            # rounding added a digit before the '.', e.g. 9.999... to 10.000...
+            trunc_str = f"{val:.{remaining_chars - 1}f}"
+        return trunc_str
 
 
 class DSfloat(float):
@@ -1088,7 +1091,7 @@ class DSfloat(float):
                     f'Value "{self}" is not valid for elements with a VR of DS'
                 )
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: Any) -> bool:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
@@ -1100,7 +1103,7 @@ class DSfloat(float):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: Any) -> bool:
         return not self == other
 
     def __str__(self) -> str:
@@ -1229,17 +1232,24 @@ class DSdecimal(Decimal):
                     raise ValueError(msg)
                 warn_and_log(msg)
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: Any) -> bool:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
+        # ponytail: mirror DSfloat.__eq__'s NaN handling (see #2296/#2273) so
+        # 'DS' compares equal for NaN regardless of which DS backing class
+        # (DSfloat vs DSdecimal, selected via config.use_DS_decimal) is used.
+        if isinstance(other, float) and math.isnan(other):
+            return self.is_nan()
+        if isinstance(other, Decimal) and other.is_nan():
+            return self.is_nan()
 
         return super().__eq__(other)
 
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: Any) -> bool:
         return not self == other
 
     def __str__(self) -> str:
@@ -1395,7 +1405,7 @@ class IS(int):
         elif isinstance(val, IS) and hasattr(val, "original_string"):
             self.original_string = val.original_string
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: Any) -> bool:
         """Override to allow string equality comparisons."""
         if isinstance(other, str):
             return str(self) == other
@@ -1405,7 +1415,7 @@ class IS(int):
     def __hash__(self) -> int:
         return super().__hash__()
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: Any) -> bool:
         return not self == other
 
     def __str__(self) -> str:
@@ -1670,11 +1680,11 @@ class PersonName:
         except IndexError:
             return ""
 
-    def __eq__(self, other: Any) -> Any:
+    def __eq__(self, other: Any) -> bool:
         """Return ``True`` if `other` equals the current name."""
-        return str(self) == other
+        return bool(str(self) == other)
 
-    def __ne__(self, other: Any) -> Any:
+    def __ne__(self, other: Any) -> bool:
         """Return ``True`` if `other` doesn't equal the current name."""
         return not self == other
 
@@ -1790,8 +1800,8 @@ class PersonName:
         ideographic_group: Sequence[str | bytes],
         phonetic_group: Sequence[str | bytes],
         encodings: list[str] | None = None,
-    ) -> bytes:
-        """Creates a byte string for a person name from lists of parts.
+    ) -> str | bytes:
+        """Creates a person name value from lists of parts.
 
         Each of the three component groups (alphabetic, ideographic, phonetic)
         are supplied as a list of components.
@@ -1809,8 +1819,10 @@ class PersonName:
 
         Returns
         -------
-        bytes:
-            Bytes string representation of the person name.
+        str | bytes:
+            If all components are :class:`str`, the decoded person name value
+            as :class:`str`, otherwise the byte string representation of the
+            person name encoded using `encodings`.
 
         Raises
         ------
@@ -1820,6 +1832,26 @@ class PersonName:
         """
         from pydicom.charset import encode_string, decode_bytes
 
+        disallowed_chars = ["\\", "=", "^"]
+
+        def check_chars(val: str) -> None:
+            for c in disallowed_chars:
+                if c in val:
+                    raise ValueError(f"Strings may not contain the {c} character")
+
+        groups = [alphabetic_group, ideographic_group, phonetic_group]
+        if not any(isinstance(c, bytes) for group in groups for c in group):
+            # All components are str - leave the value decoded so that it
+            # gets encoded on writing using the character set of the dataset
+            str_groups: list[str] = []
+            for group in groups:
+                str_components = [cast(str, c) for c in group]
+                for component in str_components:
+                    check_chars(component)
+                str_groups.append("^".join(str_components).rstrip("^"))
+
+            return "=".join(str_groups).rstrip("=")
+
         def enc(s: str) -> bytes:
             return encode_string(s, encodings or [default_encoding])
 
@@ -1828,8 +1860,6 @@ class PersonName:
 
         encoded_component_sep = enc("^")
         encoded_group_sep = enc("=")
-
-        disallowed_chars = ["\\", "=", "^"]
 
         def standardize_encoding(val: str | bytes) -> bytes:
             # Return a byte encoded string regardless of the input type
@@ -1843,9 +1873,7 @@ class PersonName:
                 val_dec = val
 
             # Check for disallowed chars in the decoded string
-            for c in disallowed_chars:
-                if c in val_dec:
-                    raise ValueError(f"Strings may not contain the {c} character")
+            check_chars(val_dec)
 
             # Return the encoded string
             return val_enc
@@ -1997,14 +2025,14 @@ class PersonName:
             name_suffix_phonetic,
         ]
 
-        encoded_value: bytes = cls._encode_component_groups(
+        value = cls._encode_component_groups(
             alphabetic_group,
             ideographic_group,
             phonetic_group,
             encodings,
         )
 
-        return cls(encoded_value, encodings=encodings)
+        return cls(value, encodings=encodings)
 
     @classmethod
     def from_named_components_veterinary(
@@ -2089,8 +2117,8 @@ class PersonName:
             patient_name_phonetic,
         ]
 
-        encoded_value: bytes = cls._encode_component_groups(
+        value = cls._encode_component_groups(
             alphabetic_group, ideographic_group, phonetic_group, encodings
         )
 
-        return cls(encoded_value, encodings=encodings)
+        return cls(value, encodings=encodings)
