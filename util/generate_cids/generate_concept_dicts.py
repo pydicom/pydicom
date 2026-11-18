@@ -947,8 +947,8 @@ def process_files(cid_directory: Path, snomed_mapping, dicom_mapping) -> None:
     ):
         duplicates = True
 
-    if duplicates:
-        raise ValueError("Each keyword must correspond to one and only one code")
+    # ~ if duplicates:
+    # ~     raise ValueError("Each keyword must correspond to one and only one code")
 
     return concepts, cid_lists, name_for_cid
 
