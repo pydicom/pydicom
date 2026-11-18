@@ -28,7 +28,7 @@ PYDICOM_SRC = Path(__file__).parent.parent.parent / "src" / "pydicom"
 SR_DIRECTORY = PYDICOM_SRC / "sr"
 
 FTP_HOST = "medical.nema.org"
-FTP_PATH = "medical/dicom/resources/valuesets/"
+FTP_PATH = "MEDICAL/Dicom/Resources/valuesets/"
 FTP_FHIR_REGEX = re.compile(
     r".+/DICOM_ValueSets(?P<version>[0-9]{4}[a-z])_release_fhir_json_[0-9]+.zip"
 )
@@ -734,7 +734,7 @@ def write_snomed_mapping(snomed_codes: list[tuple[str, str, str]]) -> None:
         for sct, srt, _ in snomed_codes:
             f.write(f"     '{srt}': '{sct}',\n")
 
-        f.write("}")
+        f.write("}\n")
 
 
 def setup_argparse():
