@@ -164,7 +164,7 @@ class TestCLIcall:
         """CLI `codify` command creates code with utf-8 characters"""
         main("codify pydicom::chrFren.dcm".split())
         out, _ = capsys.readouterr()
-        assert out.startswith("# -*- coding: utf-8 -*-")
+        assert out.startswith("# Coded version of ")
         assert "Buc^Jérôme" in out
 
     def test_help(self, capsys):
