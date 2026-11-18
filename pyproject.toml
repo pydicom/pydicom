@@ -94,7 +94,7 @@ dev = [
 
 [tool.ruff]
 include = ["src/*.py", "tests/*.py", "doc/*.py"]
-exclude = ["src/pydicom/*_dict.py", "src/pydicom/sr/_snomed_dict.py"]
+extend-exclude = ["src/pydicom/_*_dict.py", "src/pydicom/sr/_*_dict.py", "src/pydicom/uid.py"]
 
 [tool.ruff.lint]
 extend-select = [
