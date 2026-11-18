@@ -76,6 +76,7 @@ P16_TD1_URL = (
 # http://dicom.nema.org/medical/dicom/current/output/chtml/part16/chapter_8.html#table_8-1
 FHIR_SYSTEM_TO_DICOM_SCHEME_DESIGNATOR = {
     "http://snomed.info/sct": "SCT",
+    "http://snomed.info/srt": "SRT",
     "http://dicom.nema.org/resources/ontology/DCM": "DCM",
     "http://loinc.org": "LN",
     "http://www.radlex.org": "RADLEX",
