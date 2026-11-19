@@ -44,7 +44,7 @@ if TYPE_CHECKING:  # pragma: no cover
 LOGGER = logging.getLogger(__name__)
 
 
-EncodeFunction = Callable[[bytes, "EncodeRunner"], bytes | bytearray]
+EncodeFunction = Callable[[bytes, "EncodeRunner"], bytes]
 
 
 class EncodeOptions(RunnerOptions, total=False):
