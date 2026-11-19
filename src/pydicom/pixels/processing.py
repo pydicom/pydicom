@@ -224,9 +224,10 @@ def apply_color_lut(
 
     # IVs < `first_map` get set to first LUT entry (i.e. index 0)
     # `dtype` describes the *entries'* bit depth (8 or 16-bit), not how many
-    # entries there are: `nr_entries` can be up to 2**16 even for an 8-bit
-    # LUT, so the index buffer needs its own, wider dtype or a legal index
-    # beyond 255/65535 wraps and maps to the wrong entry.
+    # entries there are: PS3.3 C.7.6.3.1.5/C.7.9.2 bounds entry count and
+    # entry depth independently, so `nr_entries` can be up to 2**16 even for
+    # an 8-bit LUT. The index buffer needs its own, wider dtype or a legal
+    # index beyond 255/65535 wraps and maps to the wrong entry.
     clipped_iv = np.zeros(arr.shape, dtype=np.int64)
     # IVs >= `first_map` are mapped by the Palette Color LUTs
     # `first_map` may be negative, positive or 0
