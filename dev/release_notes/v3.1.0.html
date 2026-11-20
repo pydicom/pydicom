@@ -631,6 +631,9 @@ when rounding adds a digit before the decimal point, such as <code class="docuti
 <li><p>Fixed reading files truncated within the 32-bit length of an explicit VR data
 element raising <a class="reference external" href="https://docs.python.org/3/library/struct.html#struct.error" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">struct.error</span></code></a>. These now follow the configured reading
 validation mode, raising <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#EOFError" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EOFError</span></code></a> or issuing a warning (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/2394">#2394</a>).</p></li>
+<li><p>Fixed <code class="xref py py-mod docutils literal notranslate"><span class="pre">codify</span></code> failing or producing invalid code for multi-valued
+<strong>AT</strong> and <strong>PN</strong> elements, empty multi-valued elements and empty <strong>AT</strong> elements, and
+failing for empty binary elements when excluding large values.</p></li>
 </ul>
 </section>
 <section id="enhancements">
