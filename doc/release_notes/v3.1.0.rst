@@ -98,7 +98,7 @@ Fixes
 * Fixed :mod:`~pydicom.util.codify` failing or producing invalid code for multi-valued
   **AT** and **PN** elements, empty multi-valued elements and empty **AT** elements, and
   failing for empty binary elements when excluding large values.
-  
+
 
 Enhancements
 ------------
