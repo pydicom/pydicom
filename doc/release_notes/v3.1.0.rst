@@ -18,6 +18,10 @@ Changes
 Fixes
 -----
 
+* Restore buffered element positions when an operation using
+  :func:`~pydicom.fileutil.reset_buffer_position` raises an exception.
+* Fixed JSON serialization of buffered binary element values, including use of
+  a bulk data URI handler without reading the buffer into memory.
 * Changed logging of missing plugin imports to use :attr:`logging.DEBUG` (:issue:`2128`).
 * Include all :mod:`~pydicom.examples` module datasets with the package (:issue:`2128`, :issue:`2131`).
 * Fixed an invalid VR value in the private data dictionary (:issue:`2132`).
@@ -59,6 +63,10 @@ Fixes
   :func:`~pydicom.filereader.dcmread` and :func:`~pydicom.filewriter.dcmwrite` not
   inflating/deflating the dataset for those two transfer syntaxes (PS3.5 Sections A.7
   and A.12).
+* Fixed :meth:`~pydicom.valuerep.PersonName.from_named_components` and
+  :meth:`~pydicom.valuerep.PersonName.from_named_components_veterinary` replacing
+  non-ASCII characters in :class:`str` components with ``?`` when no `encodings` are
+  given; the value is now encoded when written using the character set of the dataset.
 * Make float data elements with `NaN` value compare as equal - this is semantically better suited
   then the mathematical comparison, where `NaN != NaN` (:issue:`2273`)
 * Fixed fileset-uid-property-annotation with Python 3.14 (:issue:`2358`)
@@ -79,9 +87,18 @@ Fixes
   (:issue:`2427`).
 * Fixed :attr:`~pydicom.dataset.Dataset.pixel_array` raising a bare ``StopIteration`` when
   encapsulated *Pixel Data* contains fewer frames than *Number of Frames* (:issue:`2371`).
+* Fixed :func:`~pydicom.filereader.read_sequence_item` converting ``KeyboardInterrupt``
+  and ``SystemExit`` to ``OSError`` (:pr:`2333`).
+* Fixed codify generating invalid Python for standard data elements without keywords.
+* Fixed :func:`~pydicom.valuerep.format_number_as_ds` returning a 17 character string
+  when rounding adds a digit before the decimal point, such as ``9.999999999999998``.
+* Fixed reading files truncated within the 32-bit length of an explicit VR data
+  element raising :class:`struct.error`. These now follow the configured reading
+  validation mode, raising :class:`EOFError` or issuing a warning (:pr:`2394`).
 * Fixed :mod:`~pydicom.util.codify` failing or producing invalid code for multi-valued
   **AT** and **PN** elements, empty multi-valued elements and empty **AT** elements, and
   failing for empty binary elements when excluding large values.
+  
 
 Enhancements
 ------------
@@ -124,3 +141,8 @@ Enhancements
 * Warn when multiples of the same element are found within a dataset or sequence item
   (:issue:`2420`).
 * Improved memory usage for :func:`~pydicom.pixels.apply_windowing` (:pr:`2315`)
+* When parsing fails because a value's length doesn't match the VR determined from a data
+  dictionary lookup, report that VR in the error message (previously ``None``) and suggest
+  :meth:`~pydicom.dataset.Dataset.update_raw_element` (:issue:`2170`)
+* The error for an unknown VR now names the pydicom version and the edition of the DICOM
+  Standard it implements (:issue:`2336`)

@@ -44,7 +44,7 @@ from ._write_stds import impl_LE_deflen_std_hex
 
 have_numpy = True
 try:
-    import numpy
+    import numpy as np
 except ImportError:
     have_numpy = False
 
@@ -112,6 +112,25 @@ class TestCodify:
         ]
         for elem, out in zip(input_elem, out_str):
             assert out == code_dataelem(elem)
+
+    @pytest.mark.parametrize(
+        "tag, vr, value",
+        [
+            (0x00080202, "OB", b"12"),
+            (0x00180061, "DS", "1.5"),
+            (0x00189445, "OB", b"12"),
+            (0x00280020, "OB", b"12"),
+            (0x04000315, "FL", 1.5),
+            (0x300A0135, "OB", b"12"),
+            (0x300A0782, "US", 42),
+        ],
+    )
+    def test_code_dataelem_without_keyword(self, tag, vr, value):
+        elem = DataElement(tag, vr, value)
+        ds = Dataset()
+        exec(code_dataelem(elem), {"ds": ds})
+        assert len(ds) == 1
+        assert ds[tag] == elem
 
     def test_code_dataelem_exclude_size(self):
         """Test utils.codify.code_dataelem exclude_size param"""
@@ -458,7 +477,7 @@ class TestDataElementCallbackTests:
         got = ds.ROIContourSequence[0].ContourSequence[0].ContourData
         expected = [2.0, 4.0, 8.0, 16.0]
         if have_numpy and config.use_DS_numpy:
-            assert numpy.allclose(expected, got)
+            assert np.allclose(expected, got)
         else:
             assert expected == got
 
@@ -487,7 +506,7 @@ class TestDataElementCallbackTests:
 
         expected = [32.0, 64.0, 128.0, 196.0]
         if have_numpy and config.use_DS_numpy:
-            assert numpy.allclose(expected, got)
+            assert np.allclose(expected, got)
         else:
             assert expected == got
 
