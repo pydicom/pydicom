@@ -162,6 +162,17 @@ def apply_color_lut(
     luts: list[np.ndarray] = []
     if "RedPaletteColorLookupTableData" in ds:
         # LUT Data is described by PS3.3, C.7.6.3.1.6
+        required = (
+            "RedPaletteColorLookupTableData",
+            "GreenPaletteColorLookupTableData",
+            "BluePaletteColorLookupTableData",
+        )
+        missing = [name for name in required if name not in ds]
+        if missing:
+            raise ValueError(
+                f"No suitable Palette Color Lookup Table data found, missing: {missing}"
+            )
+
         r_lut = cast(bytes, ds.RedPaletteColorLookupTableData)
         g_lut = cast(bytes, ds.GreenPaletteColorLookupTableData)
         b_lut = cast(bytes, ds.BluePaletteColorLookupTableData)
