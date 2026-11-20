@@ -397,7 +397,7 @@ def raw_element_value_retry(
 
     try:
         raw_element_value(raw, data, encoding=encoding, ds=ds, **kwargs)
-    except Exception as exc:
+    except Exception:
         vr = data["VR"]
         if target_VRs and vr in target_VRs:
             for candidate in target_VRs[vr]:
@@ -408,7 +408,7 @@ def raw_element_value_retry(
                 except Exception:
                     pass
 
-        raise exc
+        raise
 
 
 hooks: Hooks = Hooks()

@@ -326,7 +326,7 @@ class TestPixelArray:
             b"\x00\x00\x00\x00\x00\x00\x00\x03",
             b"\x00\x00\x00\x00\x00\x00\x00\x04",
         )
-        opts = as_pixel_options(ds, **{"extended_offsets": offsets})
+        opts = as_pixel_options(ds, extended_offsets=offsets)
         assert opts["extended_offsets"] == offsets
 
     def test_dataset(self):
