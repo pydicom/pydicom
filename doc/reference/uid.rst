@@ -124,8 +124,6 @@ Storage SOP Class UIDs
    Comprehensive3DSRStorage
    ComprehensiveSRStorage
    ComputedRadiographyImageStorage
-   ConfocalMicroscopyImageStorage
-   ConfocalMicroscopyTiledPyramidalImageStorage
    ContentAssessmentResultsStorage
    CornealTopographyMapStorage
    DICOS2DAITStorage
@@ -164,14 +162,12 @@ Storage SOP Class UIDs
    EnhancedXRFImageStorage
    EnhancedXRayRadiationDoseSRStorage
    ExtensibleSRStorage
-   General32bitECGWaveformStorage
    GeneralAudioWaveformStorage
    GeneralECGWaveformStorage
    GenericImplantTemplateStorage
    GrayscalePlanarMPRVolumetricPresentationStateStorage
    GrayscaleSoftcopyPresentationStateStorage
    HangingProtocolStorage
-   HeightMapSegmentationStorage
    HemodynamicWaveformStorage
    ImplantAssemblyTemplateStorage
    ImplantTemplateGroupStorage
@@ -182,7 +178,6 @@ Storage SOP Class UIDs
    InventoryStorage
    KeratometryMeasurementsStorage
    KeyObjectSelectionDocumentStorage
-   LabelMapSegmentationStorage
    LegacyConvertedEnhancedCTImageStorage
    LegacyConvertedEnhancedMRImageStorage
    LegacyConvertedEnhancedPETImageStorage
@@ -211,7 +206,6 @@ Storage SOP Class UIDs
    ParametricMapStorage
    PatientRadiationDoseSRStorage
    PerformedImagingAgentAdministrationSRStorage
-   PhotoacousticImageStorage
    PlannedImagingAgentAdministrationSRStorage
    PositronEmissionTomographyImageStorage
    ProcedureLogStorage
@@ -256,8 +250,6 @@ Storage SOP Class UIDs
    SurfaceScanMeshStorage
    SurfaceScanPointCloudStorage
    SurfaceSegmentationStorage
-   ThermographyImageStorage
-   ThermographyMultiFrameImageStorage
    TomotherapeuticRadiationRecordStorage
    TomotherapeuticRadiationStorage
    TractographyResultsStorage
@@ -269,13 +261,12 @@ Storage SOP Class UIDs
    VLPhotographicImageStorage
    VLSlideCoordinatesMicroscopicImageStorage
    VLWholeSlideMicroscopyImageStorage
-   VariableModalityLUTSoftcopyPresentationStateStorage
+   VariableModalityLUTPresentationStateStorage
    VideoEndoscopicImageStorage
    VideoMicroscopicImageStorage
    VideoPhotographicImageStorage
    VisualAcuityMeasurementsStorage
    VolumeRenderingVolumetricPresentationStateStorage
-   WaveformAnnotationSRStorage
    WideFieldOphthalmicPhotography3DCoordinatesImageStorage
    WideFieldOphthalmicPhotographyStereographicProjectionImageStorage
    XADefinedProcedureProtocolStorage

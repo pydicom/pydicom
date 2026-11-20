@@ -675,17 +675,11 @@ EncapsulatedMTLStorage = UID("1.2.840.10008.5.1.4.1.1.104.5")
 """1.2.840.10008.5.1.4.1.1.104.5"""
 GrayscaleSoftcopyPresentationStateStorage = UID("1.2.840.10008.5.1.4.1.1.11.1")
 """1.2.840.10008.5.1.4.1.1.11.1"""
-SegmentedVolumeRenderingVolumetricPresentationStateStorage = UID(
-    "1.2.840.10008.5.1.4.1.1.11.10"
-)
+SegmentedVolumeRenderingVolumetricPresentationStateStorage = UID("1.2.840.10008.5.1.4.1.1.11.10")
 """1.2.840.10008.5.1.4.1.1.11.10"""
-MultipleVolumeRenderingVolumetricPresentationStateStorage = UID(
-    "1.2.840.10008.5.1.4.1.1.11.11"
-)
+MultipleVolumeRenderingVolumetricPresentationStateStorage = UID("1.2.840.10008.5.1.4.1.1.11.11")
 """1.2.840.10008.5.1.4.1.1.11.11"""
-VariableModalityLUTSoftcopyPresentationStateStorage = UID(
-    "1.2.840.10008.5.1.4.1.1.11.12"
-)
+VariableModalityLUTPresentationStateStorage = UID("1.2.840.10008.5.1.4.1.1.11.12")
 """1.2.840.10008.5.1.4.1.1.11.12"""
 ColorSoftcopyPresentationStateStorage = UID("1.2.840.10008.5.1.4.1.1.11.2")
 """1.2.840.10008.5.1.4.1.1.11.2"""
@@ -695,13 +689,9 @@ BlendingSoftcopyPresentationStateStorage = UID("1.2.840.10008.5.1.4.1.1.11.4")
 """1.2.840.10008.5.1.4.1.1.11.4"""
 XAXRFGrayscaleSoftcopyPresentationStateStorage = UID("1.2.840.10008.5.1.4.1.1.11.5")
 """1.2.840.10008.5.1.4.1.1.11.5"""
-GrayscalePlanarMPRVolumetricPresentationStateStorage = UID(
-    "1.2.840.10008.5.1.4.1.1.11.6"
-)
+GrayscalePlanarMPRVolumetricPresentationStateStorage = UID("1.2.840.10008.5.1.4.1.1.11.6")
 """1.2.840.10008.5.1.4.1.1.11.6"""
-CompositingPlanarMPRVolumetricPresentationStateStorage = UID(
-    "1.2.840.10008.5.1.4.1.1.11.7"
-)
+CompositingPlanarMPRVolumetricPresentationStateStorage = UID("1.2.840.10008.5.1.4.1.1.11.7")
 """1.2.840.10008.5.1.4.1.1.11.7"""
 AdvancedBlendingPresentationStateStorage = UID("1.2.840.10008.5.1.4.1.1.11.8")
 """1.2.840.10008.5.1.4.1.1.11.8"""
@@ -733,13 +723,9 @@ EnhancedPETImageStorage = UID("1.2.840.10008.5.1.4.1.1.130")
 """1.2.840.10008.5.1.4.1.1.130"""
 BasicStructuredDisplayStorage = UID("1.2.840.10008.5.1.4.1.1.131")
 """1.2.840.10008.5.1.4.1.1.131"""
-IntravascularOpticalCoherenceTomographyImageStorageForPresentation = UID(
-    "1.2.840.10008.5.1.4.1.1.14.1"
-)
+IntravascularOpticalCoherenceTomographyImageStorageForPresentation = UID("1.2.840.10008.5.1.4.1.1.14.1")
 """1.2.840.10008.5.1.4.1.1.14.1"""
-IntravascularOpticalCoherenceTomographyImageStorageForProcessing = UID(
-    "1.2.840.10008.5.1.4.1.1.14.2"
-)
+IntravascularOpticalCoherenceTomographyImageStorageForProcessing = UID("1.2.840.10008.5.1.4.1.1.14.2")
 """1.2.840.10008.5.1.4.1.1.14.2"""
 CTImageStorage = UID("1.2.840.10008.5.1.4.1.1.2")
 """1.2.840.10008.5.1.4.1.1.2"""
@@ -843,16 +829,10 @@ UltrasoundImageStorage = UID("1.2.840.10008.5.1.4.1.1.6.1")
 """1.2.840.10008.5.1.4.1.1.6.1"""
 EnhancedUSVolumeStorage = UID("1.2.840.10008.5.1.4.1.1.6.2")
 """1.2.840.10008.5.1.4.1.1.6.2"""
-PhotoacousticImageStorage = UID("1.2.840.10008.5.1.4.1.1.6.3")
-"""1.2.840.10008.5.1.4.1.1.6.3"""
 EddyCurrentImageStorage = UID("1.2.840.10008.5.1.4.1.1.601.1")
 """1.2.840.10008.5.1.4.1.1.601.1"""
 EddyCurrentMultiFrameImageStorage = UID("1.2.840.10008.5.1.4.1.1.601.2")
 """1.2.840.10008.5.1.4.1.1.601.2"""
-ThermographyImageStorage = UID("1.2.840.10008.5.1.4.1.1.601.3")
-"""1.2.840.10008.5.1.4.1.1.601.3"""
-ThermographyMultiFrameImageStorage = UID("1.2.840.10008.5.1.4.1.1.601.4")
-"""1.2.840.10008.5.1.4.1.1.601.4"""
 RawDataStorage = UID("1.2.840.10008.5.1.4.1.1.66")
 """1.2.840.10008.5.1.4.1.1.66"""
 SpatialRegistrationStorage = UID("1.2.840.10008.5.1.4.1.1.66.1")
@@ -867,10 +847,6 @@ SurfaceSegmentationStorage = UID("1.2.840.10008.5.1.4.1.1.66.5")
 """1.2.840.10008.5.1.4.1.1.66.5"""
 TractographyResultsStorage = UID("1.2.840.10008.5.1.4.1.1.66.6")
 """1.2.840.10008.5.1.4.1.1.66.6"""
-LabelMapSegmentationStorage = UID("1.2.840.10008.5.1.4.1.1.66.7")
-"""1.2.840.10008.5.1.4.1.1.66.7"""
-HeightMapSegmentationStorage = UID("1.2.840.10008.5.1.4.1.1.66.8")
-"""1.2.840.10008.5.1.4.1.1.66.8"""
 RealWorldValueMappingStorage = UID("1.2.840.10008.5.1.4.1.1.67")
 """1.2.840.10008.5.1.4.1.1.67"""
 SurfaceScanMeshStorage = UID("1.2.840.10008.5.1.4.1.1.68.1")
@@ -909,30 +885,18 @@ StereometricRelationshipStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.5.3")
 """1.2.840.10008.5.1.4.1.1.77.1.5.3"""
 OphthalmicTomographyImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.5.4")
 """1.2.840.10008.5.1.4.1.1.77.1.5.4"""
-WideFieldOphthalmicPhotographyStereographicProjectionImageStorage = UID(
-    "1.2.840.10008.5.1.4.1.1.77.1.5.5"
-)
+WideFieldOphthalmicPhotographyStereographicProjectionImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.5.5")
 """1.2.840.10008.5.1.4.1.1.77.1.5.5"""
-WideFieldOphthalmicPhotography3DCoordinatesImageStorage = UID(
-    "1.2.840.10008.5.1.4.1.1.77.1.5.6"
-)
+WideFieldOphthalmicPhotography3DCoordinatesImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.5.6")
 """1.2.840.10008.5.1.4.1.1.77.1.5.6"""
-OphthalmicOpticalCoherenceTomographyEnFaceImageStorage = UID(
-    "1.2.840.10008.5.1.4.1.1.77.1.5.7"
-)
+OphthalmicOpticalCoherenceTomographyEnFaceImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.5.7")
 """1.2.840.10008.5.1.4.1.1.77.1.5.7"""
-OphthalmicOpticalCoherenceTomographyBscanVolumeAnalysisStorage = UID(
-    "1.2.840.10008.5.1.4.1.1.77.1.5.8"
-)
+OphthalmicOpticalCoherenceTomographyBscanVolumeAnalysisStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.5.8")
 """1.2.840.10008.5.1.4.1.1.77.1.5.8"""
 VLWholeSlideMicroscopyImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.6")
 """1.2.840.10008.5.1.4.1.1.77.1.6"""
 DermoscopicPhotographyImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.7")
 """1.2.840.10008.5.1.4.1.1.77.1.7"""
-ConfocalMicroscopyImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.8")
-"""1.2.840.10008.5.1.4.1.1.77.1.8"""
-ConfocalMicroscopyTiledPyramidalImageStorage = UID("1.2.840.10008.5.1.4.1.1.77.1.9")
-"""1.2.840.10008.5.1.4.1.1.77.1.9"""
 LensometryMeasurementsStorage = UID("1.2.840.10008.5.1.4.1.1.78.1")
 """1.2.840.10008.5.1.4.1.1.78.1"""
 AutorefractionMeasurementsStorage = UID("1.2.840.10008.5.1.4.1.1.78.2")
@@ -951,9 +915,7 @@ IntraocularLensCalculationsStorage = UID("1.2.840.10008.5.1.4.1.1.78.8")
 """1.2.840.10008.5.1.4.1.1.78.8"""
 MacularGridThicknessAndVolumeReportStorage = UID("1.2.840.10008.5.1.4.1.1.79.1")
 """1.2.840.10008.5.1.4.1.1.79.1"""
-OphthalmicVisualFieldStaticPerimetryMeasurementsStorage = UID(
-    "1.2.840.10008.5.1.4.1.1.80.1"
-)
+OphthalmicVisualFieldStaticPerimetryMeasurementsStorage = UID("1.2.840.10008.5.1.4.1.1.80.1")
 """1.2.840.10008.5.1.4.1.1.80.1"""
 OphthalmicThicknessMapStorage = UID("1.2.840.10008.5.1.4.1.1.81.1")
 """1.2.840.10008.5.1.4.1.1.81.1"""
@@ -997,16 +959,12 @@ PerformedImagingAgentAdministrationSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.7
 """1.2.840.10008.5.1.4.1.1.88.75"""
 EnhancedXRayRadiationDoseSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.76")
 """1.2.840.10008.5.1.4.1.1.88.76"""
-WaveformAnnotationSRStorage = UID("1.2.840.10008.5.1.4.1.1.88.77")
-"""1.2.840.10008.5.1.4.1.1.88.77"""
 TwelveLeadECGWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.1.1")
 """1.2.840.10008.5.1.4.1.1.9.1.1"""
 GeneralECGWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.1.2")
 """1.2.840.10008.5.1.4.1.1.9.1.2"""
 AmbulatoryECGWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.1.3")
 """1.2.840.10008.5.1.4.1.1.9.1.3"""
-General32bitECGWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.1.4")
-"""1.2.840.10008.5.1.4.1.1.9.1.4"""
 HemodynamicWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.2.1")
 """1.2.840.10008.5.1.4.1.1.9.2.1"""
 CardiacElectrophysiologyWaveformStorage = UID("1.2.840.10008.5.1.4.1.1.9.3.1")

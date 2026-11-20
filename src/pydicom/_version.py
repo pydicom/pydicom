@@ -20,4 +20,4 @@ __dicom_version__: str = "2024d"
 #   sr/_cid_dict.py
 #   sr/_concepts_dict.py
 #   sr/_snomed_dict.py
-__concepts_version__: str = "2024c"
+__concepts_version__: str = "2026c"
