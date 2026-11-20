@@ -36,6 +36,21 @@ jobs:
             test-extras: true
             upload-coverage: false
           - os: ubuntu
+            python-version: "3.15"
+            test-numpy: true
+            test-extras: true
+            upload-coverage: false
+          - os: macos
+            python-version: "3.15"
+            test-numpy: true
+            test-extras: true
+            upload-coverage: false
+          - os: windows
+            python-version: "3.15"
+            test-numpy: true
+            test-extras: true
+            upload-coverage: false
+          - os: ubuntu
             python-version: "pypy3.10"
             test-numpy: false
             test-extras: false
