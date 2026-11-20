@@ -675,7 +675,7 @@ def decompress(
                 **kwargs,
             )
             for buf, image_pixel in buffer_generator:
-                frames.append(buf)
+                frames.append(bytes(buf))
         else:
             frame_generator = decoder.iter_array(
                 ds,
@@ -2123,7 +2123,7 @@ def set_pixel_data(
         ds.SOPInstanceUID = ds.file_meta.MediaStorageSOPInstanceUID = generate_uid()
 
 
-def unpack_bits(src: bytes, as_array: bool = True) -> "np.ndarray | bytes":
+def unpack_bits(src: bytes | bytearray, as_array: bool = True) -> "np.ndarray | bytes":
     """Unpack the bit-packed data in `src`.
 
     Suitable for use when (0028,0011) *Bits Allocated* or (60xx,0100) *Overlay
