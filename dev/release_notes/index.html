@@ -629,6 +629,9 @@ and <code class="docutils literal notranslate"><span class="pre">SystemExit</spa
 <li><p>Fixed codify generating invalid Python for standard data elements without keywords.</p></li>
 <li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.valuerep.format_number_as_ds.html#pydicom.valuerep.format_number_as_ds" title="pydicom.valuerep.format_number_as_ds"><code class="xref py py-func docutils literal notranslate"><span class="pre">format_number_as_ds()</span></code></a> returning a 17 character string
 when rounding adds a digit before the decimal point, such as <code class="docutils literal notranslate"><span class="pre">9.999999999999998</span></code>.</p></li>
+<li><p>Fixed reading files truncated within the 32-bit length of an explicit VR data
+element raising <a class="reference external" href="https://docs.python.org/3/library/struct.html#struct.error" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">struct.error</span></code></a>. These now follow the configured reading
+validation mode, raising <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#EOFError" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EOFError</span></code></a> or issuing a warning (<a class="extlink-pr reference external" href="https://github.com/pydicom/pydicom/pull/2394">#2394</a>).</p></li>
 </ul>
 </section>
 <section id="enhancements">
