@@ -95,6 +95,9 @@ Fixes
 * Fixed reading files truncated within the 32-bit length of an explicit VR data
   element raising :class:`struct.error`. These now follow the configured reading
   validation mode, raising :class:`EOFError` or issuing a warning (:pr:`2394`).
+* Fixed :mod:`~pydicom.util.codify` failing or producing invalid code for multi-valued
+  **AT** and **PN** elements, empty multi-valued elements and empty **AT** elements, and
+  failing for empty binary elements when excluding large values.
 
 
 Enhancements
