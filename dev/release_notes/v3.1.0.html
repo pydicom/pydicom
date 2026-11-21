@@ -634,6 +634,9 @@ validation mode, raising <a class="reference external" href="https://docs.python
 <li><p>Fixed <code class="xref py py-mod docutils literal notranslate"><span class="pre">codify</span></code> failing or producing invalid code for multi-valued
 <strong>AT</strong> and <strong>PN</strong> elements, empty multi-valued elements and empty <strong>AT</strong> elements, and
 failing for empty binary elements when excluding large values.</p></li>
+<li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.pixels.processing.apply_color_lut.html#pydicom.pixels.processing.apply_color_lut" title="pydicom.pixels.processing.apply_color_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_color_lut()</span></code></a> raising
+<a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AttributeError</span></code></a> for missing palette LUT data; a <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a>
+naming the missing element(s) is raised instead (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2433">#2433</a>).</p></li>
 </ul>
 </section>
 <section id="enhancements">
