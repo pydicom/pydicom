@@ -98,6 +98,9 @@ Fixes
 * Fixed :mod:`~pydicom.util.codify` failing or producing invalid code for multi-valued
   **AT** and **PN** elements, empty multi-valued elements and empty **AT** elements, and
   failing for empty binary elements when excluding large values.
+* Fixed :func:`~pydicom.pixels.processing.apply_color_lut` raising
+  :class:`AttributeError` for missing palette LUT data; a :class:`ValueError`
+  naming the missing element(s) is raised instead (:issue:`2433`).
 
 
 Enhancements
