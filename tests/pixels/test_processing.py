@@ -686,6 +686,22 @@ class TestApplyColorLUT:
         with pytest.raises(ValueError, match=msg):
             apply_color_lut(np.asarray([[0, 1]], dtype="uint8"), ds=ds)
 
+    def test_missing_segmented_palette_color_data_raises(self):
+        """Test that missing segmented LUT data elements raise ValueError,
+        not AttributeError."""
+        ds = Dataset()
+        for colour in ("Red", "Green", "Blue"):
+            setattr(ds, f"{colour}PaletteColorLookupTableDescriptor", [256, 0, 8])
+        ds.SegmentedRedPaletteColorLookupTableData = bytes([0, 1, 0, 0])
+        # Green/Blue segmented data elements intentionally missing
+        msg = (
+            r"No suitable Palette Color Lookup Table data found, missing: "
+            r"\['SegmentedGreenPaletteColorLookupTableData', "
+            r"'SegmentedBluePaletteColorLookupTableData'\]"
+        )
+        with pytest.raises(ValueError, match=msg):
+            apply_color_lut(np.asarray([[0, 1]], dtype="uint8"), ds=ds)
+
     def test_uint08_16(self):
         """Test uint8 Pixel Data with 16-bit LUT entries."""
         ds = dcmread(PAL_08_200_0_16_1F, force=True)
