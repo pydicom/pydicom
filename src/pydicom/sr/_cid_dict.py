@@ -9357,9 +9357,7 @@ cid_concepts[4017] = {
     ]
 }
 
-name_for_cid[
-    4018
-] = "PrimaryAnatomicStructureforIntraoralRadiography(PermanentDentitionDesignationofTeeth)"
+name_for_cid[4018] = "PrimaryAnatomicStructureforIntraoralRadiography(PermanentDentitionDesignationofTeeth)"
 cid_concepts[4018] = {
     "SCT": [
         "PermanentMaxillaryLeftFirstPremolarTooth",
@@ -9397,9 +9395,7 @@ cid_concepts[4018] = {
     ]
 }
 
-name_for_cid[
-    4019
-] = "PrimaryAnatomicStructureforIntraoralRadiography(DeciduousDentitionDesignationofTeeth)"
+name_for_cid[4019] = "PrimaryAnatomicStructureforIntraoralRadiography(DeciduousDentitionDesignationofTeeth)"
 cid_concepts[4019] = {
     "SCT": [
         "DeciduousMandibularRightLateralIncisorTooth",
@@ -9606,9 +9602,7 @@ cid_concepts[4021] = {
     ],
 }
 
-name_for_cid[
-    4025
-] = "PrimaryAnatomicStructureforIntraoralRadiography(SupernumeraryDentitionDesignationofTeeth)"
+name_for_cid[4025] = "PrimaryAnatomicStructureforIntraoralRadiography(SupernumeraryDentitionDesignationofTeeth)"
 cid_concepts[4025] = {
     "SCT": [
         "SupernumeraryPermanentMandibularLeftFirstMolarTooth",
@@ -9666,9 +9660,7 @@ cid_concepts[4025] = {
     ]
 }
 
-name_for_cid[
-    4026
-] = "PrimaryAnatomicStructureforIntraoralandCraniofacialRadiographyTeeth"
+name_for_cid[4026] = "PrimaryAnatomicStructureforIntraoralandCraniofacialRadiographyTeeth"
 cid_concepts[4026] = {
     "SCT": [
         "DeciduousMandibularRightLateralIncisorTooth",
@@ -18057,9 +18049,7 @@ cid_concepts[7185] = {
     ]
 }
 
-name_for_cid[
-    7186
-] = "AbstractMultidimensionalImageModelQualitativeDimensionSampleSemantic"
+name_for_cid[7186] = "AbstractMultidimensionalImageModelQualitativeDimensionSampleSemantic"
 cid_concepts[7186] = {
     "DCM": [
         "GlutamateAndGlutamine",

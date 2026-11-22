@@ -92,6 +92,15 @@ Fixes
 * Fixed codify generating invalid Python for standard data elements without keywords.
 * Fixed :func:`~pydicom.valuerep.format_number_as_ds` returning a 17 character string
   when rounding adds a digit before the decimal point, such as ``9.999999999999998``.
+* Fixed reading files truncated within the 32-bit length of an explicit VR data
+  element raising :class:`struct.error`. These now follow the configured reading
+  validation mode, raising :class:`EOFError` or issuing a warning (:pr:`2394`).
+* Fixed :mod:`~pydicom.util.codify` failing or producing invalid code for multi-valued
+  **AT** and **PN** elements, empty multi-valued elements and empty **AT** elements, and
+  failing for empty binary elements when excluding large values.
+* Fixed :func:`~pydicom.pixels.processing.apply_color_lut` raising
+  :class:`AttributeError` for missing palette LUT data; a :class:`ValueError`
+  naming the missing element(s) is raised instead (:issue:`2433`).
 
 
 Enhancements
