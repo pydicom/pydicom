@@ -376,16 +376,17 @@ class DataElement:  # noqa: PLW1641
                     logger.info(f"encode bulk data element '{self.name}' inline")
                     json_element["InlineBinary"] = encoded_value
         elif self.VR == VR_.SQ:
-            # recursive call to get sequence item JSON dicts
-            value = [
-                ds.to_json(
-                    bulk_data_element_handler=bulk_data_element_handler,
-                    bulk_data_threshold=bulk_data_threshold,
-                    dump_handler=lambda d: d,
-                )
-                for ds in self.value
-            ]
-            json_element["Value"] = value
+            # an empty sequence has no "Value", see PS3.18, F.2.5
+            if not self.is_empty:
+                # recursive call to get sequence item JSON dicts
+                json_element["Value"] = [
+                    ds.to_json(
+                        bulk_data_element_handler=bulk_data_element_handler,
+                        bulk_data_threshold=bulk_data_threshold,
+                        dump_handler=lambda d: d,
+                    )
+                    for ds in self.value
+                ]
         elif self.VR == VR_.PN:
             if not self.is_empty:
                 elem_value = []
