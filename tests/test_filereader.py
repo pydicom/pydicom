@@ -24,6 +24,7 @@ from pydicom.datadict import add_dict_entries
 from pydicom.filereader import (
     dcmread,
     read_dataset,
+    read_sequence_item,
     data_element_generator,
     read_file_meta_info,
 )
@@ -52,7 +53,7 @@ have_gdcm_handler = gdcm_handler.is_available()
 
 have_numpy = pydicom.config.have_numpy
 if have_numpy:
-    import numpy
+    import numpy as np
 
 try:
     import jpeg_ls
@@ -159,8 +160,8 @@ class TestReader:
         assert expected == got
         got = cp0.BeamLimitingDevicePositionSequence[0].LeafJawPositions
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([DS("-100"), DS("100.0")])
-            assert numpy.allclose(got, expected)
+            expected = np.array([DS("-100"), DS("100.0")])
+            assert np.allclose(got, expected)
         else:
             expected = [DS("-100"), DS("100.0")]
             assert got == expected
@@ -189,8 +190,8 @@ class TestReader:
         got = ct.ImagePositionPatient
         DS = pydicom.valuerep.DS
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([-158.135803, -179.035797, -75.699997])
-            assert numpy.allclose(got, expected)
+            expected = np.array([-158.135803, -179.035797, -75.699997])
+            assert np.allclose(got, expected)
         else:
             expected = [DS("-158.135803"), DS("-179.035797"), DS("-75.699997")]
             assert got == expected
@@ -275,8 +276,8 @@ class TestReader:
         DS = pydicom.valuerep.DS
 
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([0.3125, 0.3125])
-            assert numpy.allclose(mr.PixelSpacing, expected)
+            expected = np.array([0.3125, 0.3125])
+            assert np.allclose(mr.PixelSpacing, expected)
         else:
             assert [DS("0.3125"), DS("0.3125")] == mr.PixelSpacing
 
@@ -372,7 +373,7 @@ class TestReader:
         """
         ds = Dataset()
         ds.InstanceNumber = 1
-        ds.FloatPixelData = numpy.random.random((3, 3)).tobytes()
+        ds.FloatPixelData = np.random.random((3, 3)).tobytes()
 
         fp = BytesIO()
         file_ds = FileDataset(fp, ds)
@@ -557,7 +558,7 @@ class TestReader:
         if have_numpy:
             px_data = px_data_ds.pixel_array
             pl_data = pl_data_ds.pixel_array
-            assert numpy.all(px_data == pl_data)
+            assert np.all(px_data == pl_data)
 
     def test_correct_ambiguous_vr(self):
         """Test correcting ambiguous VR elements read from file"""
@@ -1037,6 +1038,21 @@ class TestReader:
             "Expected sequence item with tag (FFFE,E000) at file position 0x22"
         ) in caplog.text
 
+    def test_sequence_item_truncated_header(self):
+        """Test a truncated sequence item header raises OSError"""
+        with pytest.raises(OSError, match="No tag to read at file position"):
+            read_sequence_item(BytesIO(b"\xfe\xff"), True, True, "iso8859")
+
+    def test_sequence_item_keyboard_interrupt(self):
+        """Test KeyboardInterrupt is not converted to OSError"""
+
+        class InterruptedIO(BytesIO):
+            def read(self, size=-1):
+                raise KeyboardInterrupt
+
+        with pytest.raises(KeyboardInterrupt):
+            read_sequence_item(InterruptedIO(), True, True, "iso8859")
+
     def test_registered_private_transfer_syntax(self, enable_debugging, caplog):
         """Test reading a dataset with a registered private transfer syntax"""
         uid = UID("1.2.3.4")
@@ -1317,8 +1333,11 @@ class TestUnknownVR:
             False,
             True,
         )
-        msg = r"Unknown Value Representation '{}' in tag \(0008,0006\)"
-        msg = msg.format(str_output)
+        msg = (
+            r"Unknown Value Representation '{}' \(pydicom .+ implements DICOM "
+            r"Standard {}\) in tag \(0008,0006\)"
+        )
+        msg = msg.format(str_output, pydicom.__dicom_version__)
         with pytest.raises(NotImplementedError, match=msg):
             print(ds)
 
@@ -1651,12 +1670,12 @@ class TestDSISnumpy:
         config.use_IS_numpy = True
         rtss = dcmread(rtstruct_name, force=True)
         col = rtss.ROIContourSequence[0].ROIDisplayColor  # VR is IS
-        assert isinstance(col, numpy.ndarray)
+        assert isinstance(col, np.ndarray)
         assert "int64" == col.dtype
 
         # Check a conversion with only a single value
         roi_num = rtss.ROIContourSequence[0].ReferencedROINumber
-        assert isinstance(roi_num, numpy.int64)
+        assert isinstance(roi_num, np.int64)
 
     def test_IS_not_numpy(self):
         """Test class of the object matches the config,
@@ -1680,12 +1699,12 @@ class TestDSISnumpy:
         rtss = dcmread(rtstruct_name, force=True)
         # ContourData has VR of DS
         cd = rtss.ROIContourSequence[0].ContourSequence[0].ContourData
-        assert isinstance(cd, numpy.ndarray)
+        assert isinstance(cd, np.ndarray)
         assert "float64" == cd.dtype
 
         # Check conversion with only a single value
         roi_vol = rtss.StructureSetROISequence[0].ROIVolume
-        assert isinstance(roi_vol, numpy.float64)
+        assert isinstance(roi_vol, np.float64)
 
     def test_DS_not_numpy(self):
         """Test class of the object matches the config."""
@@ -1769,8 +1788,8 @@ class TestDeferredRead:
         for data_elem in ds_norm:
             tag = data_elem.tag
 
-            if have_numpy and isinstance(data_elem.value, numpy.ndarray):
-                assert numpy.allclose(data_elem.value, ds_defer[tag].value)
+            if have_numpy and isinstance(data_elem.value, np.ndarray):
+                assert np.allclose(data_elem.value, ds_defer[tag].value)
             else:
                 assert data_elem.value == ds_defer[tag].value
 
@@ -1827,8 +1846,8 @@ class TestReadTruncatedFile:
         DS = pydicom.valuerep.DS
 
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([0.3125, 0.3125])
-            assert numpy.allclose(mr.PixelSpacing, expected)
+            expected = np.array([0.3125, 0.3125])
+            assert np.allclose(mr.PixelSpacing, expected)
         else:
             assert [DS("0.3125"), DS("0.3125")] == mr.PixelSpacing
 
@@ -1848,6 +1867,25 @@ class TestReadTruncatedFile:
         with pytest.raises(ValueError, match=msg):
             mr.pixel_array
 
+    @staticmethod
+    def _truncated_inside_element_length():
+        # The first 152 bytes end right after the 8-byte header of a 32-bit
+        # length element, so the length itself is missing.
+        with open(get_testdata_file("693_J2KI.dcm"), "rb") as f:
+            return f.read(152)
+
+    def testTruncatedElementLengthRaisesEOFError(self, enforce_valid_values):
+        """A file that ends inside an element length raises EOFError."""
+        data = self._truncated_inside_element_length()
+        with pytest.raises(EOFError, match="Unexpected end of file"):
+            dcmread(BytesIO(data), force=True)
+
+    def testTruncatedElementLengthWarns(self, allow_reading_invalid_values):
+        """With WARN validation the same file loads with a warning."""
+        data = self._truncated_inside_element_length()
+        with pytest.warns(UserWarning, match="Unexpected end of file"):
+            dcmread(BytesIO(data), force=True)
+
 
 class TestFileLike:
     """Test that can read DICOM files with file-like object rather than
@@ -1864,8 +1902,8 @@ class TestFileLike:
 
         got = ct.ImagePositionPatient
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([-158.135803, -179.035797, -75.699997])
-            assert numpy.allclose(got, expected)
+            expected = np.array([-158.135803, -179.035797, -75.699997])
+            assert np.allclose(got, expected)
         else:
             expected = [DS("-158.135803"), DS("-179.035797"), DS("-75.699997")]
             assert expected == got
@@ -1893,8 +1931,8 @@ class TestFileLike:
         DS = pydicom.valuerep.DS
 
         if have_numpy and config.use_DS_numpy:
-            expected = numpy.array([-158.135803, -179.035797, -75.699997])
-            assert numpy.allclose(got, expected)
+            expected = np.array([-158.135803, -179.035797, -75.699997])
+            assert np.allclose(got, expected)
         else:
             expected = [DS("-158.135803"), DS("-179.035797"), DS("-75.699997")]
             assert expected == got

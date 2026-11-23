@@ -44,7 +44,7 @@ from ._write_stds import impl_LE_deflen_std_hex
 
 have_numpy = True
 try:
-    import numpy
+    import numpy as np
 except ImportError:
     have_numpy = False
 
@@ -112,6 +112,25 @@ class TestCodify:
         ]
         for elem, out in zip(input_elem, out_str):
             assert out == code_dataelem(elem)
+
+    @pytest.mark.parametrize(
+        "tag, vr, value",
+        [
+            (0x00080202, "OB", b"12"),
+            (0x00180061, "DS", "1.5"),
+            (0x00189445, "OB", b"12"),
+            (0x00280020, "OB", b"12"),
+            (0x04000315, "FL", 1.5),
+            (0x300A0135, "OB", b"12"),
+            (0x300A0782, "US", 42),
+        ],
+    )
+    def test_code_dataelem_without_keyword(self, tag, vr, value):
+        elem = DataElement(tag, vr, value)
+        ds = Dataset()
+        exec(code_dataelem(elem), {"ds": ds})
+        assert len(ds) == 1
+        assert ds[tag] == elem
 
     def test_code_dataelem_exclude_size(self):
         """Test utils.codify.code_dataelem exclude_size param"""
@@ -236,6 +255,61 @@ class TestCodify:
         elem = DataElement(0x00000901, "AT", (0x1234, 0x5678))
         out = "ds.OffendingElement = (0x1234, 0x5678)"
         assert out == code_dataelem(elem)
+
+    def test_code_dataelem_at_multi_value(self):
+        """Test utils.codify.code_dataelem with multi-valued AT"""
+        elem = DataElement(0x00280009, "AT", [0x00540010, 0x00540020])
+        out = "ds.FrameIncrementPointer = [(0x0054, 0x0010), (0x0054, 0x0020)]"
+        assert out == code_dataelem(elem)
+
+    def test_code_dataelem_at_empty(self):
+        """Test utils.codify.code_dataelem with empty AT"""
+        elem = DataElement(0x00280009, "AT", None)
+        assert "ds.FrameIncrementPointer = None" == code_dataelem(elem)
+        elem = DataElement(0x00280009, "AT", [])
+        assert "ds.FrameIncrementPointer = []" == code_dataelem(elem)
+
+    def test_code_dataelem_multi_value(self):
+        """Test utils.codify.code_dataelem with multi-valued elements"""
+        input_elem = [
+            DataElement(0x00101001, "PN", ["Doe^John", "Roe^Jane"]),
+            DataElement(0x00080008, "CS", ["ORIGINAL", "PRIMARY"]),
+            DataElement(0x00280030, "DS", ["0.5", "0.25"]),
+            DataElement(0x00181310, "US", [0, 256, 256, 0]),
+            DataElement(0x00101001, "PN", []),
+            DataElement(0x00080008, "CS", []),
+        ]
+        out_str = [
+            "ds.OtherPatientNames = ['Doe^John', 'Roe^Jane']",
+            "ds.ImageType = ['ORIGINAL', 'PRIMARY']",
+            "ds.PixelSpacing = [0.5, 0.25]",
+            "ds.AcquisitionMatrix = [0, 256, 256, 0]",
+            "ds.OtherPatientNames = []",
+            "ds.ImageType = []",
+        ]
+        for elem, out in zip(input_elem, out_str):
+            assert out == code_dataelem(elem)
+
+    def test_code_dataelem_exclude_size_empty(self):
+        """Test utils.codify.code_dataelem exclude_size with empty values"""
+        elem = DataElement(0x00640009, "OF", None)
+        assert "ds.VectorGridData = None" == code_dataelem(elem, exclude_size=4)
+        elem = DataElement(0x7FE00010, "OB", b"")
+        assert "ds.PixelData = b''" == code_dataelem(elem, exclude_size=4)
+
+    def test_code_file_multi_value_at(self, capsys):
+        """Test utils.codify.code_file with multi-valued AT element"""
+        filename = get_testdata_file("JPGExtended.dcm")
+        codify_main(100, [filename])
+        out, err = capsys.readouterr()
+        assert "ds.FrameIncrementPointer = [(0x0054, 0x0010), (0x0054, 0x0020)]" in out
+
+    def test_code_file_empty_values(self, capsys):
+        """Test utils.codify.code_file with empty binary element values"""
+        filename = get_testdata_file("reportsi_with_empty_number_tags.dcm")
+        codify_main(100, [filename])
+        out, err = capsys.readouterr()
+        assert ".VectorGridData = None" in out
 
 
 class TestDump:
@@ -403,7 +477,7 @@ class TestDataElementCallbackTests:
         got = ds.ROIContourSequence[0].ContourSequence[0].ContourData
         expected = [2.0, 4.0, 8.0, 16.0]
         if have_numpy and config.use_DS_numpy:
-            assert numpy.allclose(expected, got)
+            assert np.allclose(expected, got)
         else:
             assert expected == got
 
@@ -432,7 +506,7 @@ class TestDataElementCallbackTests:
 
         expected = [32.0, 64.0, 128.0, 196.0]
         if have_numpy and config.use_DS_numpy:
-            assert numpy.allclose(expected, got)
+            assert np.allclose(expected, got)
         else:
             assert expected == got
 
