@@ -4,7 +4,7 @@ PLEASE NOTE: We do not accept AI-only PRs - they will be closed.
 We expect the following:
 * A human-written (and easily human-readable) summary which is succinct
 and explains the PR. If you're copy-pasting AI output, you're doing it wrong.
-* All AI-generated content must be explicitly labelled as such.
+* All AI-generated text in PR comments must be explicitly labelled as such.
 * The summary and tasks sections below must be kept and filled out as required.
 * Automatic AI generated comments to the PR be disabled.
 
