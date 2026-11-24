@@ -637,6 +637,9 @@ failing for empty binary elements when excluding large values.</p></li>
 <li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.pixels.processing.apply_color_lut.html#pydicom.pixels.processing.apply_color_lut" title="pydicom.pixels.processing.apply_color_lut"><code class="xref py py-func docutils literal notranslate"><span class="pre">apply_color_lut()</span></code></a> raising
 <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#AttributeError" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AttributeError</span></code></a> for missing palette LUT data; a <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a>
 naming the missing element(s) is raised instead (<a class="extlink-issue reference external" href="https://github.com/pydicom/pydicom/issues/2433">#2433</a>).</p></li>
+<li><p>Fixed <a class="reference internal" href="../reference/generated/pydicom.dataset.Dataset.html#pydicom.dataset.Dataset.to_json" title="pydicom.dataset.Dataset.to_json"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.to_json()</span></code></a> adding an empty
+<code class="docutils literal notranslate"><span class="pre">&quot;Value&quot;</span></code> array for empty sequences, which should have no <code class="docutils literal notranslate"><span class="pre">&quot;Value&quot;</span></code> as per
+<a class="extlink-dcm reference external" href="http://dicom.nema.org/medical/dicom/current/output/chtml/part18/sect_F.2.5.html">Part 18, Annex F.2.5</a>.</p></li>
 </ul>
 </section>
 <section id="enhancements">
