@@ -404,6 +404,51 @@ def _apply_jls_sign_correction(
     return arr
 
 
+def _swap_ow_bit_packed(
+    runner: "DecodeRunner",
+    src: Buffer | BinaryIO,
+    file_offset: int,
+    length_source: int | float,
+    index: int | None,
+) -> tuple[bytes, int]:
+    """Return bit-packed pixel data encoded as big endian OW in little endian
+    byte order.
+
+    Returns the bytes from the one containing the first pixel of the frame at
+    `index` (or of all frames if `index` is ``None``) up to and including the
+    one containing its last pixel, and the offset of the first returned byte
+    relative to the start of the pixel data.
+    """
+    length_pixels = int(runner.frame_length(unit="pixels"))
+    if index is None:
+        pixel_start = 0
+        length_pixels *= runner.number_of_frames
+    else:
+        pixel_start = index * length_pixels
+        if (pixel_start + length_pixels) / 8 > length_source:
+            raise ValueError(
+                f"There is insufficient pixel data to contain {index + 1} frames"
+            )
+
+    byte_start = pixel_start // 8
+    byte_end = ceil((pixel_start + length_pixels) / 8)
+
+    # Read whole 16-bit words so the bytes can be swapped pairwise
+    word_start = byte_start - byte_start % 2
+    word_end = byte_end + byte_end % 2
+    data = bytearray(
+        runner.get_data(src, file_offset + word_start, word_end - word_start)
+    )
+    if len(data) % 2:
+        # Missing trailing padding byte
+        data.append(0)
+
+    data[0::2], data[1::2] = data[1::2], data[0::2]
+    offset = byte_start - word_start
+
+    return bytes(data[offset : offset + byte_end - byte_start]), byte_start
+
+
 # Allow customization of the image processors
 PROCESSORS: list[ProcessingFunction] = [_process_color_space]
 
@@ -1577,7 +1622,16 @@ class Decoder(CoderBase):
             file_offset = src.tell()
             length_source = length_bytes * runner.number_of_frames
 
-        if runner._test_for("be_swap_ow"):
+        swap_ow = runner._test_for("be_swap_ow")
+        if swap_ow and runner.bits_allocated == 1:
+            # Big endian bit-packed data encoded as OW, swap the words
+            #   containing the frame and keep only the bytes it spans
+            frame, _ = _swap_ow_bit_packed(
+                runner, src, file_offset, length_source, index
+            )
+            arr = np.frombuffer(frame, dtype=dtype)
+            length_bytes = len(frame)
+        elif swap_ow:
             # Big endian 8-bit data may be encoded as OW
             # For example a 1 x 1 x 3 image will (presumably) be:
             #   b"\x02\x01\x00\x03" instead of b"\x01\x02\x03\x00"
@@ -1634,6 +1688,10 @@ class Decoder(CoderBase):
         else:
             if index is not None:
                 start_offset = floor(file_offset + index * length_bytes)
+                if runner.bits_allocated == 1:
+                    # Include any leading bits from the previous frame
+                    length_bytes += (index * length_pixels % 8) / 8
+
                 if (start_offset + length_bytes) > file_offset + length_source:
                     raise ValueError(
                         f"There is insufficient pixel data to contain {index + 1} "
@@ -1992,7 +2050,30 @@ class Decoder(CoderBase):
             file_offset = src.tell()
             length_source = length_bytes * runner.number_of_frames
 
-        if runner._test_for("be_swap_ow"):
+        swap_ow = runner._test_for("be_swap_ow")
+        if swap_ow and runner.bits_allocated == 1:
+            # Big endian bit-packed data encoded as OW
+            if index is None:
+                length = ceil(length_bytes * runner.number_of_frames)
+                return runner.get_data(src, file_offset, length + length % 2)
+
+            frame, byte_start = _swap_ow_bit_packed(
+                runner, src, file_offset, length_source, index
+            )
+            # Align the frame with the start of a byte, mask any pixels from
+            #   neighboring frames and restore the OW byte ordering
+            packed = bytearray(
+                get_packed_frame(
+                    frame,
+                    index=index,
+                    frame_length=int(runner.frame_length("pixels")),
+                    start_offset=byte_start,
+                )
+            )
+            packed[0::2], packed[1::2] = packed[1::2], packed[0::2]
+            return bytes(packed)
+
+        if swap_ow:
             # Since we are using 8 bit images, frames will always be an integer
             # number of bytes
             length_bytes = cast(int, length_bytes)
@@ -2026,6 +2107,11 @@ class Decoder(CoderBase):
         if index is not None:
             # Return specified frame only
             start_offset = floor(file_offset + index * length_bytes)
+            if runner.bits_allocated == 1:
+                # Include any leading bits from the previous frame
+                length_pixels = int(runner.frame_length(unit="pixels"))
+                length_bytes += (index * length_pixels % 8) / 8
+
             if start_offset + length_bytes > file_offset + length_source:
                 raise ValueError(
                     f"There is insufficient pixel data to contain {index + 1} frames"
@@ -2038,8 +2124,8 @@ class Decoder(CoderBase):
                 return get_packed_frame(
                     buf,
                     index=index,
-                    frame_length=int(runner.frame_length("pixels")),
-                    start_offset=start_offset,
+                    frame_length=length_pixels,
+                    start_offset=start_offset - file_offset,
                 )
 
             return buf
