@@ -1581,6 +1581,47 @@ class TestDecoder_Array:
         arr, _ = decoder.as_array(src + b"\x1d\x1c", **opts, index=2)
         assert arr.ravel().tolist() == [20, 21, 22, 23, 24, 25, 26, 0, 28, 29]
 
+    @pytest.mark.parametrize("as_binary", [False, True])
+    @pytest.mark.parametrize("raw", [False, True])
+    def test_expb_ow_single_bit_nonaligned_index(self, as_binary, raw):
+        """Test BE swapped OW with a single bit image whose frames span an
+        extra byte."""
+        decoder = get_decoder(ExplicitVRBigEndian)
+        word = 0x1A53D196C
+        src = pack(">HHH", word & 0xFFFF, (word >> 16) & 0xFFFF, word >> 32)
+        if as_binary:
+            src = BytesIO(b"prefix" + src)
+            src.seek(6)
+
+        opts = {
+            "rows": 1,
+            "columns": 11,
+            "number_of_frames": 3,
+            "samples_per_pixel": 1,
+            "photometric_interpretation": PI.MONOCHROME2,
+            "bits_allocated": 1,
+            "bits_stored": 1,
+            "pixel_representation": 0,
+            "pixel_keyword": "PixelData",
+            "be_swap_ow": True,
+        }
+        expected = np.asarray(
+            [
+                [[(word >> (11 * frame + column)) & 1 for column in range(11)]]
+                for frame in range(3)
+            ],
+            dtype="u1",
+        )
+        arr, _ = decoder.as_array(src, raw=raw, **opts)
+        assert np.array_equal(arr, expected)
+        for index in range(3):
+            arr, _ = decoder.as_array(src, index=index, raw=raw, **opts)
+            assert np.array_equal(arr, expected[index])
+
+        msg = "There is insufficient pixel data to contain 5 frames"
+        with pytest.raises(ValueError, match=msg):
+            decoder.as_array(src, index=4, raw=raw, **opts)
+
     def test_iter_native_indices(self):
         """Test the `indices` argument with native data."""
         decoder = get_decoder(ExplicitVRLittleEndian)
@@ -1918,6 +1959,67 @@ class TestDecoder_Buffer:
 
         assert len(frame_1_buffer) == expected_len
         assert frame_1_buffer == expected
+
+    @pytest.mark.parametrize("as_binary", [False, True])
+    def test_native_single_bit_nonaligned_index(self, as_binary):
+        """Test `as_buffer` with a single bit image whose frames span an
+        extra byte."""
+        decoder = get_decoder(ExplicitVRLittleEndian)
+        word = 0x1A53D196C
+        src = pack("<IH", word & 0xFFFFFFFF, word >> 32)
+        if as_binary:
+            src = BytesIO(b"prefix" + src)
+            src.seek(6)
+
+        opts = {
+            "rows": 1,
+            "columns": 11,
+            "number_of_frames": 3,
+            "samples_per_pixel": 1,
+            "photometric_interpretation": PI.MONOCHROME2,
+            "bits_allocated": 1,
+            "bits_stored": 1,
+            "pixel_representation": 0,
+            "pixel_keyword": "PixelData",
+        }
+        for index in range(3):
+            buffer, _ = decoder.as_buffer(src, index=index, **opts)
+            assert buffer == pack("<H", (word >> (11 * index)) & 0x7FF)
+
+    @pytest.mark.parametrize("as_binary", [False, True])
+    def test_expb_ow_single_bit_nonaligned_index(self, as_binary):
+        """Test `as_buffer` with BE swapped OW and a single bit image whose
+        frames span an extra byte."""
+        decoder = get_decoder(ExplicitVRBigEndian)
+        word = 0x1A53D196C
+        encoded = pack(">HHH", word & 0xFFFF, (word >> 16) & 0xFFFF, word >> 32)
+        src = encoded
+        if as_binary:
+            src = BytesIO(b"prefix" + src)
+            src.seek(6)
+
+        opts = {
+            "rows": 1,
+            "columns": 11,
+            "number_of_frames": 3,
+            "samples_per_pixel": 1,
+            "photometric_interpretation": PI.MONOCHROME2,
+            "bits_allocated": 1,
+            "bits_stored": 1,
+            "pixel_representation": 0,
+            "pixel_keyword": "PixelData",
+            "be_swap_ow": True,
+        }
+        buffer, _ = decoder.as_buffer(src, **opts)
+        assert buffer == encoded
+        for index in range(3):
+            # Frames are aligned with the start of a byte and keep the OW order
+            buffer, _ = decoder.as_buffer(src, index=index, **opts)
+            assert buffer == pack(">H", (word >> (11 * index)) & 0x7FF)
+
+        msg = "There is insufficient pixel data to contain 5 frames"
+        with pytest.raises(ValueError, match=msg):
+            decoder.as_buffer(src, index=4, **opts)
 
     def test_encapsulated_index(self):
         """Test `index` with an encapsulated pixel data."""
