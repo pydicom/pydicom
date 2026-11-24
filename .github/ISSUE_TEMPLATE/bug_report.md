@@ -7,6 +7,15 @@ assignees: ''
 
 ---
 
+<!--
+All AI-generated content must be explicitly labelled as such. Failure to abide by
+this rule will result in your issue being de-prioritised or closed.
+
+If you are experiencing a real world issue with real world code or DICOM data please
+say so and you will be given a higher priority.
+-->
+
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
