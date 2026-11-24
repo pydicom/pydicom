@@ -8,9 +8,11 @@ assignees: ''
 ---
 
 <!--
-If your issue is that the pixel data "looks green/teal", or has strange colors, you probably need to apply a YCbCr to RGB color space conversion using `pydicom.pixel_data_handlers.convert_color_space()`.
+All AI-generated content must be explicitly labelled as such. Failure to abide by
+this rule will result in your issue being de-prioritised or closed.
 
-See also: https://github.com/pydicom/pydicom/discussions/1577
+If you are experiencing a real world issue with real world code or DICOM data please
+say so and you will be given a higher priority.
 -->
 
 **Describe the issue**
@@ -24,28 +26,16 @@ Please include:
 **Steps to reproduce**
 
 A way for us to reproduce and troubleshoot the issue:
-* A minimum working code sample
+* A minimum working code sample that demonstrates the issue.
 * The *entire* traceback (if one occurred).
 
 It's also extremely helpful if you can include one of the following:
 * The **anonymized** DICOM dataset, which can be attached to the issue as a zip archive, or
 * The output from:
 
-  For **pydicom >= 2.3**:
   ```python
   from pydicom import dcmread
   from pydicom.util import debug_pixel_data
 
   ds = dcmread("/path/to/the/dataset")
   debug_pixel_data(ds)
-  ```
-
-  For **pydicom < 2.3**:
-  ```python
-  from pydicom import dcmread
-
-  ds = dcmread("/path/to/the/dataset")
-  print(ds.file_meta.get("TransferSyntaxUID", "(no transfer syntax)"))
-  print(ds.group_dataset(0x0028))
-  print(ds.group_dataset(0x7FE0))
-  ```
