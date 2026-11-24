@@ -408,6 +408,30 @@ class TestSequence:
         ds2 = Dataset.from_json(ds.to_json())
         assert ds == ds2
 
+    def test_empty_sequence(self):
+        """An empty sequence has no "Value" (PS3.18, F.2.5)."""
+        ds = Dataset()
+        ds.ReferencedImageSequence = []
+        ds.add_new(0x00081115, "SQ", None)  # Referenced Series Sequence
+        item = Dataset()
+        item.ReferencedSOPSequence = []
+        ds.ProcedureCodeSequence = [item]
+
+        ds_json = ds.to_json_dict()
+        assert ds_json["00081140"] == {"vr": "SQ"}
+        assert ds_json["00081115"] == {"vr": "SQ"}
+        assert ds_json["00081032"] == {
+            "vr": "SQ",
+            "Value": [{"00081199": {"vr": "SQ"}}],
+        }
+        assert Dataset.from_json(ds.to_json()) == ds
+
+    def test_empty_sequence_item(self):
+        """An empty item is an empty JSON object (PS3.18, F.2.5)."""
+        ds = Dataset()
+        ds.ReferencedImageSequence = [Dataset(), Dataset()]
+        assert ds.to_json_dict() == {"00081140": {"vr": "SQ", "Value": [{}, {}]}}
+
 
 class TestBinary:
     @pytest.mark.parametrize("vr", ["OB", "OW"])
