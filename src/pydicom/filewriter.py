@@ -202,8 +202,11 @@ def _correct_ambiguous_vr_element(
         # First value in LUT Descriptor is how many values in
         #   LUTData, if there's only one value then must be US
         # As per PS3.3 C.11.1.1.1
+        # If the value has been set as integers rather than as bytes then
+        #   it can only be written as US
         lut_descriptor = cast(Sequence[int], ds.LUTDescriptor)
-        if lut_descriptor and lut_descriptor[0] == 1:
+        has_int_value = isinstance(elem.value, int | MultiValue)
+        if (lut_descriptor and lut_descriptor[0] == 1) or has_int_value:
             elem.VR = VR.US
             if elem.VM == 0:
                 return elem

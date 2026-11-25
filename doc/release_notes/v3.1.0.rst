@@ -101,6 +101,9 @@ Fixes
 * Fixed :func:`~pydicom.pixels.processing.apply_color_lut` raising
   :class:`AttributeError` for missing palette LUT data; a :class:`ValueError`
   naming the missing element(s) is raised instead (:issue:`2433`).
+* Fixed writing *LUT Data* set as a list of integers failing with a ``TypeError``
+  because its ambiguous VR was resolved to **OW**; it is now written as **US**
+  (:issue:`2400`).
 * Fixed :meth:`Dataset.to_json() <pydicom.dataset.Dataset.to_json>` adding an empty
   ``"Value"`` array for empty sequences, which should have no ``"Value"`` as per
   :dcm:`Part 18, Annex F.2.5 <part18/sect_F.2.5.html>`.
