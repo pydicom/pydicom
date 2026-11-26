@@ -1786,9 +1786,7 @@ class FileSet:
         # Second pass: build the record hierarchy
         #   Records not in the hierarchy will be ignored
         #   Branches without a valid leaf node File ID will be removed
-        def recurse_node(
-            node: RecordNode, ancestors: Optional[set] = None
-        ) -> None:
+        def recurse_node(node: RecordNode, ancestors: set | None = None) -> None:
             # `ancestors` holds the offsets of `node` and the records above
             #   it in the hierarchy; a lower-level reference to any of them
             #   would parent a record under itself or one of its own
