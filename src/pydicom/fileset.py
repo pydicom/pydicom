@@ -1786,9 +1786,25 @@ class FileSet:
         # Second pass: build the record hierarchy
         #   Records not in the hierarchy will be ignored
         #   Branches without a valid leaf node File ID will be removed
-        def recurse_node(node: RecordNode) -> None:
+        def recurse_node(
+            node: RecordNode, ancestors: Optional[set] = None
+        ) -> None:
+            # `ancestors` holds the offsets of `node` and the records above
+            #   it in the hierarchy; a lower-level reference to any of them
+            #   would parent a record under itself or one of its own
+            #   descendants, creating a cycle
+            if ancestors is None:
+                ancestors = set()
+            ancestors = ancestors | {node._offset}
+
             child_offset = getattr(node._record, _LOWER_OFFSET, None)
             if child_offset:
+                if child_offset in ancestors:
+                    raise ValueError(
+                        "The DICOMDIR contains a cyclic "
+                        f"{_LOWER_OFFSET} chain: offset {child_offset} is "
+                        "referenced by itself or one of its own descendants"
+                    )
                 child = records[child_offset]
                 child.parent = node
 
@@ -1800,6 +1816,12 @@ class FileSet:
                             "The DICOMDIR contains a cyclic "
                             f"{_NEXT_OFFSET} chain: offset {next_offset} is "
                             "referenced more than once"
+                        )
+                    if next_offset in ancestors:
+                        raise ValueError(
+                            "The DICOMDIR contains a cyclic "
+                            f"{_LOWER_OFFSET} chain: offset {next_offset} is "
+                            "referenced by itself or one of its own descendants"
                         )
                     visited.add(next_offset)
                     child = records[next_offset]
@@ -1818,7 +1840,7 @@ class FileSet:
                 self._instances.append(node.instance)
 
             for child in node.children:
-                recurse_node(child)
+                recurse_node(child, ancestors)
 
         for node in self._tree.children:
             recurse_node(node)

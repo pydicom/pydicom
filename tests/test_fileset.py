@@ -2002,6 +2002,38 @@ class TestFileSet_Load:
         with pytest.raises(ValueError, match="cyclic"):
             FileSet(dicomdir)
 
+    def test_cyclic_lower_offset_self_raises(self, dicomdir):
+        """Test loading a DICOMDIR with a self-referencing lower-level offset."""
+        record = next(
+            r
+            for r in dicomdir.DirectoryRecordSequence
+            if getattr(r, "OffsetOfReferencedLowerLevelDirectoryEntity", None)
+        )
+        record.OffsetOfReferencedLowerLevelDirectoryEntity = record.seq_item_tell
+        with pytest.raises(ValueError, match="cyclic"):
+            FileSet(dicomdir)
+
+    def test_cyclic_lower_offset_ancestor_raises(self, dicomdir):
+        """Test loading a DICOMDIR whose lower-level offset references an ancestor."""
+        records = {r.seq_item_tell: r for r in dicomdir.DirectoryRecordSequence}
+        patient = dicomdir.DirectoryRecordSequence[0]
+        study = records[patient.OffsetOfReferencedLowerLevelDirectoryEntity]
+        series = records[study.OffsetOfReferencedLowerLevelDirectoryEntity]
+        series.OffsetOfReferencedLowerLevelDirectoryEntity = patient.seq_item_tell
+        with pytest.raises(ValueError, match="cyclic"):
+            FileSet(dicomdir)
+
+    def test_cyclic_lower_offset_sibling_raises(self, dicomdir):
+        """Test loading where a child chain's next offset references an ancestor."""
+        records = {r.seq_item_tell: r for r in dicomdir.DirectoryRecordSequence}
+        patient = dicomdir.DirectoryRecordSequence[0]
+        study = records[patient.OffsetOfReferencedLowerLevelDirectoryEntity]
+        series = records[study.OffsetOfReferencedLowerLevelDirectoryEntity]
+        image = records[series.OffsetOfReferencedLowerLevelDirectoryEntity]
+        image.OffsetOfTheNextDirectoryRecord = patient.seq_item_tell
+        with pytest.raises(ValueError, match="cyclic"):
+            FileSet(dicomdir)
+
     def test_bad_filename_raises(self, dicomdir):
         """Test loading with a bad path."""
         dicomdir.filename = "bad"
