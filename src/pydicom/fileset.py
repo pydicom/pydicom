@@ -1770,8 +1770,17 @@ class FileSet:
         if records:
             node = records[ds[_FIRST_OFFSET].value]
             node.parent = self._tree
+            visited = {node._offset}
             while getattr(node._record, _NEXT_OFFSET, None):
-                node = records[node._record[_NEXT_OFFSET].value]
+                next_offset = node._record[_NEXT_OFFSET].value
+                if next_offset in visited:
+                    raise ValueError(
+                        "The DICOMDIR contains a cyclic "
+                        f"{_NEXT_OFFSET} chain: offset {next_offset} is "
+                        "referenced more than once"
+                    )
+                visited.add(next_offset)
+                node = records[next_offset]
                 node.parent = self._tree
 
         # Second pass: build the record hierarchy
@@ -1784,7 +1793,15 @@ class FileSet:
                 child.parent = node
 
                 next_offset = getattr(child._record, _NEXT_OFFSET, None)
+                visited = {child._offset}
                 while next_offset:
+                    if next_offset in visited:
+                        raise ValueError(
+                            "The DICOMDIR contains a cyclic "
+                            f"{_NEXT_OFFSET} chain: offset {next_offset} is "
+                            "referenced more than once"
+                        )
+                    visited.add(next_offset)
                     child = records[next_offset]
                     child.parent = node
                     next_offset = getattr(child._record, _NEXT_OFFSET, None)

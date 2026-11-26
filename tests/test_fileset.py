@@ -1982,6 +1982,26 @@ class TestFileSet_Load:
         with pytest.raises(ValueError, match=msg):
             FileSet(dicomdir)
 
+    def test_cyclic_next_offset_root_raises(self, dicomdir):
+        """Test loading a DICOMDIR whose root record chain is cyclic."""
+        record = dicomdir.DirectoryRecordSequence[0]
+        record.OffsetOfTheNextDirectoryRecord = record.seq_item_tell
+        with pytest.raises(ValueError, match="cyclic"):
+            FileSet(dicomdir)
+
+    def test_cyclic_next_offset_child_raises(self, dicomdir):
+        """Test loading a DICOMDIR whose child record chain is cyclic."""
+        records = {r.seq_item_tell: r for r in dicomdir.DirectoryRecordSequence}
+        parent = next(
+            r
+            for r in dicomdir.DirectoryRecordSequence
+            if getattr(r, "OffsetOfReferencedLowerLevelDirectoryEntity", None)
+        )
+        child = records[parent.OffsetOfReferencedLowerLevelDirectoryEntity]
+        child.OffsetOfTheNextDirectoryRecord = child.seq_item_tell
+        with pytest.raises(ValueError, match="cyclic"):
+            FileSet(dicomdir)
+
     def test_bad_filename_raises(self, dicomdir):
         """Test loading with a bad path."""
         dicomdir.filename = "bad"
