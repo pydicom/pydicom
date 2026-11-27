@@ -1,6 +1,6 @@
 # Copyright 2008-2021 pydicom authors. See LICENSE file for details.
 
-from typing import NamedTuple, Any
+from typing import NamedTuple
 
 from pydicom.sr._snomed_dict import mapping as snomed_mapping
 
@@ -21,7 +21,7 @@ class Code(NamedTuple):
     def __hash__(self) -> int:
         return hash(self.scheme_designator + self.value)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if self.scheme_designator == "SRT" and self.value in snomed_mapping["SRT"]:
             self_mapped = Code(
                 value=snomed_mapping["SRT"][self.value],
@@ -36,6 +36,9 @@ class Code(NamedTuple):
                 scheme_designator=self.scheme_designator,
                 scheme_version=self.scheme_version,
             )
+
+        if not isinstance(other, Code):
+            return False
 
         if other.scheme_designator == "SRT" and other.value in snomed_mapping["SRT"]:
             other_mapped = Code(
