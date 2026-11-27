@@ -66,6 +66,7 @@ pydicom = "pydicom.cli.main:main"
 [project.entry-points.pydicom_subcommands]
 codify = "pydicom.cli.codify:add_subparser"
 show = "pydicom.cli.show:add_subparser"
+showglob = "pydicom.cli.showglob:add_subparser"
 
 
 [dependency-groups]
